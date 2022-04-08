@@ -117,20 +117,22 @@ class CalculatorViewModel : ViewModel() {
     }
 
     fun deleteLastToken() {
-        if (_input.value?.isEmpty() == true)
+        val expr = (_input.value ?: emptyList()).toMutableList()
+
+        if (expr.isEmpty())
             return
 
-        var lastToken = _input.value?.last()
+        var lastToken = expr.last()
 
-        if (!lastToken.isNullOrEmpty()) {
+        if (lastToken.isNotEmpty()) {
             lastToken = lastToken.subSequence(0, lastToken.lastIndex) as String
 
             if (lastToken.isNotEmpty())
-                _input.value?.set(_input.value?.lastIndex!!, lastToken)
+                expr[expr.lastIndex] = lastToken
             else
-                _input.value?.removeLast()
+                expr.removeLast()
 
-            _input.value = _input.value
+            _input.value = expr
         }
 
         updateResult()
@@ -139,5 +141,9 @@ class CalculatorViewModel : ViewModel() {
     fun clearAll() {
         _result.value = 0.0
         _input.value = mutableListOf()
+    }
+
+    fun useResult() {
+        _input.value = mutableListOf<String>().apply { add(_result.value.toString()) }
     }
 }

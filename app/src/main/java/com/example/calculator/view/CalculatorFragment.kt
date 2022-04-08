@@ -1,6 +1,7 @@
 package com.example.calculator.view
 
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,5 +33,16 @@ class CalculatorFragment : Fragment() {
             viewModel = calculatorViewModel
             calculatorFragment = this@CalculatorFragment
         }
+    }
+
+    fun onClickEqualButton() {
+        calculatorViewModel.useResult()
+    }
+
+    fun onInputChange() {
+        if (calculatorViewModel.expression.value.isNullOrEmpty())
+            binding?.clear?.text = getText(R.string.all_cleared)
+        else
+            binding?.clear?.text = getText(R.string.clear)
     }
 }

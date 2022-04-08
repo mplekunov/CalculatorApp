@@ -31,12 +31,15 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
 
+            android:breakStrategy="high_quality"
+            android:hyphenationFrequency="none"
             android:autoSizeTextType="uniform"
             android:autoSizeMaxTextSize="@dimen/input_text_max_size"
             android:autoSizeMinTextSize="@dimen/input_text_min_size"
             android:autoSizeStepGranularity="@dimen/input_text_size_step"
             android:text="@{@string/expression(viewModel.expression)}"
-            tools:text="5 + 5 + 7 + 10 * 7 / 9" />
+            tools:text="5 + 5 + 7 + 10 * 7 / 9"
+            android:onTextChanged="@{() -> calculatorFragment.onInputChange()}"/>
 
         <TextView
             app:layout_constraintEnd_toEndOf="parent"
@@ -47,8 +50,10 @@
             style="@style/Widget.Calculator.TextView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:minHeight="60dp"
+            android:minHeight="70dp"
 
+            android:breakStrategy="high_quality"
+            android:hyphenationFrequency="none"
             android:maxLines="1"
             android:gravity="center|end"
             android:autoSizeTextType="uniform"
@@ -76,7 +81,8 @@
 
             android:id="@+id/calculator_layout"
             android:layout_width="match_parent"
-            android:layout_height="0dp" >
+            android:layout_height="wrap_content" >
+
             <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -85,11 +91,11 @@
                 android:rowCount="5">
 
                 <Button
-                    android:id="@+id/clear_all"
+                    android:id="@+id/clear"
                     android:fontFamily="sans-serif-condensed"
-                    android:text="@string/clear_all"
+                    android:text="@string/all_cleared"
                     android:textColor="@color/calc_image_button_normal"
-                    android:textSize="20sp"
+                    android:textSize="@dimen/button_ac_text_size"
                     android:layout_marginStart="@dimen/button_margin"
                     android:layout_marginTop="@dimen/button_margin"
                     style="@style/Widget.Calculator.CalcButton"
@@ -98,7 +104,7 @@
                 <ImageButton
                     android:id="@+id/delete"
                     android:src="@drawable/ic_delete"
-                    android:padding="@dimen/icon_padding"
+                    android:padding="@dimen/button_icon_padding"
                     android:layout_marginTop="@dimen/button_margin"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick="@{() -> viewModel.deleteLastToken()}"/>
@@ -107,7 +113,7 @@
                     android:id="@+id/percent_sign"
                     android:src="@drawable/ic_percent"
                     android:layout_marginTop="@dimen/button_margin"
-                    android:padding="@dimen/icon_padding"
+                    android:padding="@dimen/button_icon_padding"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken("%")}'/>
 
@@ -115,7 +121,7 @@
                     android:id="@+id/division_sign"
                     android:src="@drawable/ic_divide"
                     android:layout_marginTop="@dimen/button_margin"
-                    android:padding="@dimen/icon_padding"
+                    android:padding="@dimen/button_icon_padding"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken("/")}'/>
 
@@ -123,7 +129,7 @@
                     android:id="@+id/number_7"
                     android:text="@string/number_7"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/number_size"
+                    android:textSize="@dimen/button_text_size"
                     android:layout_marginStart="@dimen/button_margin"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken("7")}'/>
@@ -132,7 +138,7 @@
                     android:id="@+id/number_8"
                     android:text="@string/number_8"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/number_size"
+                    android:textSize="@dimen/button_text_size"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken("8")}'/>
 
@@ -140,14 +146,14 @@
                     android:id="@+id/number_9"
                     android:text="@string/number_9"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/number_size"
+                    android:textSize="@dimen/button_text_size"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken("9")}'/>
 
                 <ImageButton
                     android:id="@+id/multiplication_sign"
                     android:src="@drawable/ic_multiply"
-                    android:padding="@dimen/icon_padding"
+                    android:padding="@dimen/button_icon_padding"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken("*")}'/>
 
@@ -155,8 +161,8 @@
                     android:id="@+id/number_4"
                     android:text="@string/number_4"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/number_size"
-                    android:layout_marginStart="20dp"
+                    android:textSize="@dimen/button_text_size"
+                    android:layout_marginStart="@dimen/button_margin"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken("4")}'/>
 
@@ -164,7 +170,7 @@
                     android:id="@+id/number_5"
                     android:text="@string/number_5"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/number_size"
+                    android:textSize="@dimen/button_text_size"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken("5")}'/>
 
@@ -172,14 +178,14 @@
                     android:id="@+id/number_6"
                     android:text="@string/number_6"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/number_size"
+                    android:textSize="@dimen/button_text_size"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken("6")}'/>
 
                 <ImageButton
                     android:id="@+id/minus_sign"
                     android:src="@drawable/ic_minus"
-                    android:padding="@dimen/icon_padding"
+                    android:padding="@dimen/button_icon_padding"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken("-")}'/>
 
@@ -187,8 +193,8 @@
                     android:id="@+id/number_1"
                     android:text="@string/number_1"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/number_size"
-                    android:layout_marginStart="20dp"
+                    android:textSize="@dimen/button_text_size"
+                    android:layout_marginStart="@dimen/button_margin"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken("1")}'/>
 
@@ -196,7 +202,7 @@
                     android:id="@+id/number_2"
                     android:text="@string/number_2"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/number_size"
+                    android:textSize="@dimen/button_text_size"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken("2")}'/>
 
@@ -204,29 +210,29 @@
                     android:id="@+id/number_3"
                     android:text="@string/number_3"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/number_size"
+                    android:textSize="@dimen/button_text_size"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken("3")}'/>
 
                 <ImageButton
                     android:id="@+id/addition_sign"
                     android:src="@drawable/ic_plus"
-                    android:padding="@dimen/icon_padding"
+                    android:padding="@dimen/button_icon_padding"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken("+")}'/>
 
                 <ImageButton
                     android:id="@+id/change_layout"
                     android:src="@drawable/ic_expand"
-                    android:layout_marginStart="20dp"
-                    android:padding="@dimen/icon_padding"
+                    android:layout_marginStart="@dimen/button_margin"
+                    android:padding="@dimen/button_icon_padding"
                     style="@style/Widget.Calculator.CalcButton"/>
 
                 <Button
                     android:id="@+id/number_0"
                     android:text="@string/number_0"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/number_size"
+                    android:textSize="@dimen/button_text_size"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken("0")}'/>
 
@@ -234,29 +240,17 @@
                     android:id="@+id/dot_sign"
                     android:text="@string/dot_sign"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/number_size"
+                    android:textSize="@dimen/button_text_size"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken(".")}'/>
 
                 <ImageButton
                     android:id="@+id/equal_sign"
                     android:src="@drawable/ic_equal"
-                    android:padding="@dimen/icon_padding"
-                    style="@style/Widget.Calculator.CalcButton"/>
+                    android:padding="@dimen/button_icon_padding"
+                    style="@style/Widget.Calculator.CalcButton"
+                    android:onClick="@{() -> calculatorFragment.onClickEqualButton()}"/>
             </GridLayout>
         </FrameLayout>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-
-        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

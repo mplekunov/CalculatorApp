@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/smart/AndroidStudioProjects/Calculator/app/src/main/res/drawable/button_background_selector.xml" value="0.3115" />
         <entry key="..\:/Users/smart/AndroidStudioProjects/Calculator/app/src/main/res/drawable/button_normal.xml" value="0.3635" />
         <entry key="..\:/Users/smart/AndroidStudioProjects/Calculator/app/src/main/res/drawable/button_pressed.xml" value="0.3635" />
         <entry key="..\:/Users/smart/AndroidStudioProjects/Calculator/app/src/main/res/drawable/ic_delete.xml" value="0.1935" />
@@ -19,7 +20,7 @@
         <entry key="..\:/Users/smart/AndroidStudioProjects/Calculator/app/src/main/res/layout/activity_main.xml" value="0.3484375" />
         <entry key="..\:/Users/smart/AndroidStudioProjects/Calculator/app/src/main/res/layout/calculator_expanded.xml" value="0.18541666666666667" />
         <entry key="..\:/Users/smart/AndroidStudioProjects/Calculator/app/src/main/res/layout/calculator_normal.xml" value="0.33" />
-        <entry key="..\:/Users/smart/AndroidStudioProjects/Calculator/app/src/main/res/layout/fragment_calculator.xml" value="0.22" />
+        <entry key="..\:/Users/smart/AndroidStudioProjects/Calculator/app/src/main/res/layout/fragment_calculator.xml" value="0.20380434782608695" />
         <entry key="..\:/Users/smart/AndroidStudioProjects/Calculator/app/src/main/res/layout/fragment_converter.xml" value="0.3625" />
         <entry key="..\:/Users/smart/AndroidStudioProjects/Calculator/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.2015" />
       </map>

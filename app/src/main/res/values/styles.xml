@@ -23,10 +23,12 @@
     <style name="Widget.Calculator.CalcButton" parent="Widget.AppCompat.Button">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginBottom">20dp</item>
-        <item name="android:layout_marginEnd">20dp</item>
+        <item name="android:maxHeight">@dimen/button_size</item>
+        <item name="android:layout_marginBottom">@dimen/button_margin</item>
+        <item name="android:layout_marginEnd">@dimen/button_margin</item>
         <item name="android:background">@drawable/button_background_selector</item>
         <item name="android:layout_gravity">fill</item>
+        <item name="android:adjustViewBounds">true</item>
         <item name="android:scaleType">fitCenter</item>
         <item name="android:layout_columnWeight">1</item>
         <item name="android:tint">@color/calc_image_button_normal</item>
