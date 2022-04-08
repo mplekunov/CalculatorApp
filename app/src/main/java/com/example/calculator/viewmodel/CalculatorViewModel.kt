@@ -1,5 +1,4 @@
 package com.example.calculator.viewmodel
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -7,17 +6,15 @@ import androidx.lifecycle.ViewModel
 import com.example.calculator.algorithms.InputEvaluator
 import com.example.calculator.model.Operator
 import java.text.NumberFormat
-import java.util.*
-import kotlin.math.ceil
-import kotlin.math.pow
 
 class CalculatorViewModel : ViewModel() {
     private var _result = MutableLiveData<Double>()
-    private var _infix = MutableLiveData<MutableList<String>>()
-    private val inputEvaluator = InputEvaluator()
+    private var _input = MutableLiveData<MutableList<String>>()
+
+    private val evaluator = InputEvaluator()
 
 
-    val expression: LiveData<String> = Transformations.map(_infix) {
+    val expression: LiveData<String> = Transformations.map(_input) {
         it.toString().replace(Regex("[\\[,\\]]"), "")
     }
 
@@ -30,80 +27,111 @@ class CalculatorViewModel : ViewModel() {
     }
 
     fun parseToken(token: String) {
-        if (_infix.value?.isNotEmpty() == true) {
-            if (inputEvaluator.isNumber(_infix.value?.last()!!) && inputEvaluator.isNumber(token))
-                concatToLastToken(token)
-            else if (inputEvaluator.isNumber(_infix.value?.last()!!) && !inputEvaluator.isNumber(token)) {
-                if (token.equals("%", true))
-                    setToken(_infix.value?.lastIndex!!, evalPercentExpr())
-                else if (token.equals(".", true)) {
-                    if (!_infix.value?.last()!!.last().toString().equals(".", true) && !inputEvaluator.isFloat(_infix.value?.last()!!.toDouble()))
-                        concatToLastToken(token)
-                }
-                else if (!token.equals(".", true)) {
-                    if (_infix.value?.last()!!.last().toString().equals(".", true))
-                        concatToLastToken("0")
+        if (evaluator.isNumber(token))
+            parseNumber(token)
+        else if (evaluator.isOperator(token))
+            parseOperator(token)
 
-                    addToken(token)
-                }
-            } else if (!inputEvaluator.isNumber(_infix.value?.last()!!) && inputEvaluator.isNumber(token))
-                addToken(token)
-        }
-        else if (inputEvaluator.isNumber(token))
-            addToken(token)
-
-        if (!_infix.value.isNullOrEmpty())
-            _result.value = inputEvaluator.getResult(_infix.value!!)
+        updateResult()
     }
 
-    private fun evalPercentExpr(): String {
-        var percentExpr : Double = _infix.value?.last()!!.toDouble() / 100
+    private fun parseOperator(token: String) {
+        val expr = _input.value ?: emptyList()
 
-        if (_infix.value?.size!! > 2 && _infix.value?.get(_infix.value?.lastIndex!! - 1)!!.equals("+", true))
-            percentExpr *= _infix.value?.get(_infix.value?.lastIndex!! - 2)!!.toDouble()
+        if (expr.isEmpty())
+            return
 
-        return percentExpr.toString()
+        when {
+            evaluator.getOperator(token) == Operator.PERCENTAGE -> parsePercentage()
+            evaluator.getOperator(token) == Operator.DOT -> parseDot(token)
+            else -> addToken(token)
+        }
+    }
+
+    private fun parseDot(token: String) {
+        val expr = _input.value ?: emptyList()
+
+        if (expr.isEmpty() || evaluator.isFloat(expr.last()) || evaluator.isOperator(expr.last()))
+            return
+
+        concatToLastToken(token)
+    }
+
+    private fun parsePercentage() {
+        val expr = _input.value ?: emptyList()
+
+        if (expr.isEmpty() || evaluator.isOperator(expr.last()))
+            return
+
+        var percentage: Double = expr.last().toDouble() / 100
+
+        if (expr.size > 2) {
+            val lastKnownOperator = evaluator.getOperator(expr[expr.lastIndex - 1])
+            val lastKnownNumber = expr[expr.lastIndex - 2].toDouble()
+
+            percentage = when (lastKnownOperator) {
+                Operator.ADDITION -> percentage * lastKnownNumber
+                Operator.SUBTRACTION -> (1 - percentage) * lastKnownNumber
+                else -> percentage
+            }
+        }
+
+        setToken(expr.lastIndex, percentage.toString())
+    }
+
+    private fun parseNumber(token: String) {
+        val expr = _input.value ?: emptyList()
+
+        if (expr.isNotEmpty() && evaluator.isNumber(expr.last()))
+            concatToLastToken(token)
+        else
+            addToken(token)
     }
 
     private fun addToken(element: String) {
-        _infix.value?.add(element)
-        _infix.value = _infix.value
+        _input.value?.add(element)
+        _input.value = _input.value
     }
 
     private fun concatToLastToken(element: String) {
-        _infix.value?.lastIndex?.let { _infix.value?.set(it, _infix.value?.last() + element) }
-        _infix.value = _infix.value
+        _input.value?.lastIndex?.let { _input.value?.set(it, _input.value?.last() + element) }
+        _input.value = _input.value
     }
 
     private fun setToken(index: Int, element: String) {
-        _infix.value?.set(index, element)
-        _infix.value = _infix.value
+        _input.value?.set(index, element)
+        _input.value = _input.value
+    }
+
+    private fun updateResult() {
+        if (_input.value.isNullOrEmpty())
+            _result.value = 0.0
+        else
+            _result.value = evaluator.getResult(_input.value!!)
     }
 
     fun deleteLastToken() {
-        if (_infix.value?.isEmpty() == true)
+        if (_input.value?.isEmpty() == true)
             return
 
-        var lastToken = _infix.value?.last()
+        var lastToken = _input.value?.last()
 
         if (!lastToken.isNullOrEmpty()) {
             lastToken = lastToken.subSequence(0, lastToken.lastIndex) as String
 
             if (lastToken.isNotEmpty())
-                _infix.value?.set(_infix.value?.lastIndex!!, lastToken)
+                _input.value?.set(_input.value?.lastIndex!!, lastToken)
             else
-                _infix.value?.removeLast()
+                _input.value?.removeLast()
 
-            _infix.value = _infix.value
+            _input.value = _input.value
         }
 
-        if (!_infix.value.isNullOrEmpty())
-            _result.value = inputEvaluator.getResult(_infix.value!!)
+        updateResult()
     }
 
     fun clearAll() {
-        Log.d("Calculator", "Values Initialized")
         _result.value = 0.0
-        _infix.value = mutableListOf()
+        _input.value = mutableListOf()
     }
 }
