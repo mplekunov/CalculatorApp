@@ -4,7 +4,7 @@ import com.example.calculator.model.*
 import java.util.*
 import kotlin.math.pow
 
-class InputEvaluator {
+object InputEvaluator {
     private fun infixToPostfix(infix: MutableList<String>) : MutableList<String> {
         val postfix = mutableListOf<String>()
         val opStack = Stack<Operator>()
