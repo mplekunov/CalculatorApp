@@ -13,7 +13,6 @@ class CalculatorViewModel : ViewModel() {
 
     private val evaluator = InputEvaluator()
 
-
     val expression: LiveData<String> = Transformations.map(_input) {
         it.toString().replace(Regex("[\\[,\\]]"), "")
     }
@@ -40,6 +39,10 @@ class CalculatorViewModel : ViewModel() {
 
         if (expr.isEmpty())
             return
+
+        val lastChar = expr.last().last().toString()
+        if (evaluator.isOperator(lastChar) && evaluator.getOperator(token) != Operator.DOT)
+            concatToLastToken("0")
 
         when {
             evaluator.getOperator(token) == Operator.PERCENTAGE -> parsePercentage()
