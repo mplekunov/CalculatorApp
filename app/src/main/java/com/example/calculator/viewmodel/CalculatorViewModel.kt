@@ -1,4 +1,5 @@
 package com.example.calculator.viewmodel
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -6,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.example.calculator.algorithms.InputEvaluator
 import com.example.calculator.model.StringFormatter
 import com.example.calculator.model.Operator
+import kotlin.math.max
 
 class CalculatorViewModel : ViewModel() {
     private var _result = MutableLiveData<Double>()
@@ -50,6 +52,7 @@ class CalculatorViewModel : ViewModel() {
             InputEvaluator.getOperator(token) == Operator.DOT -> parseDot(token)
             else -> addToken(token)
         }
+        Log.d("Calculator", "${_input.value}")
     }
 
     private fun parseDot(token: String) {
@@ -59,6 +62,7 @@ class CalculatorViewModel : ViewModel() {
             return
 
         concatToLastToken(token)
+        Log.d("Calculator", "${_input.value}")
     }
 
     private fun parsePercentage() {
@@ -81,6 +85,7 @@ class CalculatorViewModel : ViewModel() {
         }
 
         setToken(expr.lastIndex, percentage.toString())
+        Log.d("Calculator", "${_input.value}")
     }
 
     private fun parseNumber(token: String) {
@@ -89,8 +94,9 @@ class CalculatorViewModel : ViewModel() {
         when {
             expr.isEmpty() || InputEvaluator.isOperator(expr.last()) -> addToken(token)
             expr.last().first() == '0' && !InputEvaluator.isFloat(expr.last()) -> setToken(expr.lastIndex, token)
-            else -> concatToLastToken(token)
+            else -> if (expr.last().length < max(StringFormatter.MAX_INTEGER_DIGITS, StringFormatter.MAX_FRACTION_DIGITS)) concatToLastToken(token)
         }
+        Log.d("Calculator", "${_input.value}")
     }
 
     private fun addToken(element: String) {
