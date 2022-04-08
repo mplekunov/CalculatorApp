@@ -41,8 +41,11 @@ class CalculatorViewModel : ViewModel() {
             return
 
         val lastChar = expr.last().last().toString()
-        if (evaluator.isOperator(lastChar) && evaluator.getOperator(token) != Operator.DOT)
+        if (evaluator.isOperator(lastChar) && evaluator.getOperator(lastChar) == Operator.DOT && evaluator.getOperator(token) != Operator.DOT)
             concatToLastToken("0")
+
+        if (evaluator.isOperator(expr.last()))
+            return
 
         when {
             evaluator.getOperator(token) == Operator.PERCENTAGE -> parsePercentage()
@@ -54,7 +57,7 @@ class CalculatorViewModel : ViewModel() {
     private fun parseDot(token: String) {
         val expr = _input.value ?: emptyList()
 
-        if (expr.isEmpty() || evaluator.isFloat(expr.last()) || evaluator.isOperator(expr.last()))
+        if (expr.isEmpty() || evaluator.isFloat(expr.last()))
             return
 
         concatToLastToken(token)
@@ -63,7 +66,7 @@ class CalculatorViewModel : ViewModel() {
     private fun parsePercentage() {
         val expr = _input.value ?: emptyList()
 
-        if (expr.isEmpty() || evaluator.isOperator(expr.last()))
+        if (expr.isEmpty())
             return
 
         var percentage: Double = expr.last().toDouble() / 100
