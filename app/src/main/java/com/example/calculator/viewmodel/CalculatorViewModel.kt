@@ -14,7 +14,7 @@ class CalculatorViewModel : ViewModel() {
     private val evaluator = InputEvaluator()
 
     val expression: LiveData<String> = Transformations.map(_input) {
-        it.toString().replace(Regex("[\\[,\\]]"), "")
+        it.toString().replace(Regex("([\\[,\\]])"), "")
     }
 
     val result: LiveData<String> = Transformations.map(_result) {

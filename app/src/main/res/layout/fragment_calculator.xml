@@ -31,8 +31,11 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
 
+            android:textColor="?android:textColorPrimary"
+
             android:breakStrategy="high_quality"
             android:hyphenationFrequency="none"
+
             android:autoSizeTextType="uniform"
             android:autoSizeMaxTextSize="@dimen/input_text_max_size"
             android:autoSizeMinTextSize="@dimen/input_text_min_size"
@@ -48,14 +51,19 @@
 
             android:id="@+id/output"
             style="@style/Widget.Calculator.TextView"
+            android:gravity="center|end"
+
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:minHeight="70dp"
+            android:minHeight="@dimen/output_min_height"
+
+            android:textColor="?android:textColorPrimary"
+
+            android:maxLines="1"
 
             android:breakStrategy="high_quality"
             android:hyphenationFrequency="none"
-            android:maxLines="1"
-            android:gravity="center|end"
+
             android:autoSizeTextType="uniform"
             android:autoSizeMaxTextSize="@dimen/output_text_max_size"
             android:autoSizeMinTextSize="@dimen/output_text_min_size"
@@ -128,7 +136,6 @@
                 <Button
                     android:id="@+id/number_7"
                     android:text="@string/number_7"
-                    android:textColor="@color/black"
                     android:textSize="@dimen/button_text_size"
                     android:layout_marginStart="@dimen/button_margin"
                     style="@style/Widget.Calculator.CalcButton"
@@ -137,7 +144,6 @@
                 <Button
                     android:id="@+id/number_8"
                     android:text="@string/number_8"
-                    android:textColor="@color/black"
                     android:textSize="@dimen/button_text_size"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken("8")}'/>
@@ -145,7 +151,6 @@
                 <Button
                     android:id="@+id/number_9"
                     android:text="@string/number_9"
-                    android:textColor="@color/black"
                     android:textSize="@dimen/button_text_size"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken("9")}'/>
@@ -160,7 +165,6 @@
                 <Button
                     android:id="@+id/number_4"
                     android:text="@string/number_4"
-                    android:textColor="@color/black"
                     android:textSize="@dimen/button_text_size"
                     android:layout_marginStart="@dimen/button_margin"
                     style="@style/Widget.Calculator.CalcButton"
@@ -169,7 +173,6 @@
                 <Button
                     android:id="@+id/number_5"
                     android:text="@string/number_5"
-                    android:textColor="@color/black"
                     android:textSize="@dimen/button_text_size"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken("5")}'/>
@@ -177,7 +180,6 @@
                 <Button
                     android:id="@+id/number_6"
                     android:text="@string/number_6"
-                    android:textColor="@color/black"
                     android:textSize="@dimen/button_text_size"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken("6")}'/>
@@ -192,7 +194,6 @@
                 <Button
                     android:id="@+id/number_1"
                     android:text="@string/number_1"
-                    android:textColor="@color/black"
                     android:textSize="@dimen/button_text_size"
                     android:layout_marginStart="@dimen/button_margin"
                     style="@style/Widget.Calculator.CalcButton"
@@ -201,7 +202,6 @@
                 <Button
                     android:id="@+id/number_2"
                     android:text="@string/number_2"
-                    android:textColor="@color/black"
                     android:textSize="@dimen/button_text_size"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken("2")}'/>
@@ -209,7 +209,6 @@
                 <Button
                     android:id="@+id/number_3"
                     android:text="@string/number_3"
-                    android:textColor="@color/black"
                     android:textSize="@dimen/button_text_size"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken("3")}'/>
@@ -231,7 +230,6 @@
                 <Button
                     android:id="@+id/number_0"
                     android:text="@string/number_0"
-                    android:textColor="@color/black"
                     android:textSize="@dimen/button_text_size"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken("0")}'/>
@@ -239,7 +237,6 @@
                 <Button
                     android:id="@+id/dot_sign"
                     android:text="@string/dot_sign"
-                    android:textColor="@color/black"
                     android:textSize="@dimen/button_text_size"
                     style="@style/Widget.Calculator.CalcButton"
                     android:onClick='@{() -> viewModel.parseToken(".")}'/>
