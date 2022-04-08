@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <GridLayout
+        android:columnCount="4"
+        android:rowCount="5"
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/AC"
+            tools:text="AC"/>
+
+        <Button
+            android:id="@+id/clear"
+            />
+        <Button/>
+        <Button/>
+        <Button/>
+        <Button/>
+        <Button/>
+        <Button/>
+        <Button/>
+        <Button/>
+        <Button/>
+        <Button/>
+        <Button/>
+        <Button/>
+        <Button/>
+        <Button/>
+        <Button/>
+        <Button/>
+        <Button/>
+
+    </GridLayout>
+</layout>

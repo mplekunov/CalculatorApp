@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Calculator</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="number_7">7</string>
+    <string name="number_8">8</string>
+    <string name="number_9">9</string>
+    <string name="number_4">4</string>
+    <string name="number_6">6</string>
+    <string name="number_1">1</string>
+    <string name="number_5">5</string>
+    <string name="number_2">2</string>
+    <string name="number_3">3</string>
+    <string name="number_0">0</string>
+    <string name="dot_sign">.</string>
+    <string name="clear_all"><b>AC</b></string>
+    <string name="result">= %s</string>
+    <string name="expression">%s</string>
+</resources>

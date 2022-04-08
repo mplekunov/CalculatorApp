@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<!--    <dimen name="input_text_size">48sp</dimen>-->
+<!--    <dimen name="output_text_size">24sp</dimen>-->
+    <dimen name="button_margin">24dp</dimen>
+    <dimen name="icon_size">12dp</dimen>
+    <dimen name="icon_padding">15dp</dimen>
+    <dimen name="number_size">26sp</dimen>
+    <dimen name="output_text_max_size">48sp</dimen>
+    <dimen name="output_text_min_size">15sp</dimen>
+    <dimen name="output_text_size_step">2sp</dimen>
+    <dimen name="input_text_max_size">50sp</dimen>
+    <dimen name="input_text_min_size">24sp</dimen>
+    <dimen name="input_text_size_step">2sp</dimen>
+<!--    <dimen name="button_radius">1dp</dimen>-->
+</resources>
