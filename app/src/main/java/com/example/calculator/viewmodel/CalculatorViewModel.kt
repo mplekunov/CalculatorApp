@@ -88,15 +88,11 @@ class CalculatorViewModel : ViewModel() {
     private fun parseNumber(token: String) {
         val expr = _input.value ?: emptyList()
 
-        if (expr.isEmpty() || evaluator.isOperator(expr.last()))
-            addToken(token)
-
-        val mostSignificantDigit = expr.last().first()
-
-        if (mostSignificantDigit == '0' && !evaluator.isFloat(expr.last()))
-            setToken(expr.lastIndex, token)
-        else
-            concatToLastToken(token)
+        when {
+            expr.isEmpty() || evaluator.isOperator(expr.last()) -> addToken(token)
+            expr.last().first() == '0' && !evaluator.isFloat(expr.last()) -> setToken(expr.lastIndex, token)
+            else -> concatToLastToken(token)
+        }
     }
 
     private fun addToken(element: String) {

@@ -54,8 +54,6 @@ class InputEvaluator {
 
     fun isFloat(token: String): Boolean = token.any { it.toString() == Operator.DOT.operator }
 
-//        ceil(token.toDouble()) != token.toDouble()
-
     fun isOperator(token: String): Boolean = contains<Operator>(token)
 
     fun getResult(input: List<String>): Double {

@@ -5,6 +5,6 @@
     <color name="yellow_dark">#c17900</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="calc_button_pressed">#ededed</color>
+    <color name="calc_button_pressed">#bcbcbc</color>
     <color name="calc_image_button_normal">@android:color/holo_orange_dark</color>
 </resources>
