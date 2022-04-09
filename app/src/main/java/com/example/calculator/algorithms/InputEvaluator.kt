@@ -1,6 +1,7 @@
 package com.example.calculator.algorithms
 
 import com.example.calculator.model.*
+import java.math.RoundingMode
 import java.util.*
 import kotlin.math.pow
 
@@ -56,21 +57,20 @@ object InputEvaluator {
 
     fun isOperator(token: String): Boolean = contains<Operator>(token)
 
-    fun getResult(input: List<String>): Double {
+    fun getResult(input: List<String>): java.math.BigDecimal {
         val infix = mutableListOf<String>().apply { addAll(input) }
-
         if (input.isNullOrEmpty())
-            return 0.0
+            return java.math.BigDecimal.ZERO
 
         val postfix = infixToPostfix(infix)
 
-        val s = Stack<Double>()
+        val s = Stack<java.math.BigDecimal>()
 
         for (i in postfix.indices) {
             val token = postfix[i]
 
             if (!contains<Operator>(token))
-                s.push(token.toDouble())
+                s.push(token.toBigDecimal())
             else {
                 if (s.size < 2)
                     break
@@ -79,16 +79,16 @@ object InputEvaluator {
                 val left = s.pop()
 
                 when(getOperator(token)) {
-                    Operator.ADDITION -> s.push(left + right)
-                    Operator.SUBTRACTION -> s.push(left - right)
-                    Operator.MULTIPLICATION -> s.push(left * right)
-                    Operator.DIVISION -> s.push(left / right)
-                    Operator.POWER -> s.push(left.pow(right))
+                    Operator.ADDITION -> s.push(left.add(right))
+                    Operator.SUBTRACTION -> s.push(left.subtract(right))
+                    Operator.MULTIPLICATION -> s.push(left.multiply(right))
+                    Operator.DIVISION -> s.push(left.divide(right))
+                    Operator.POWER -> s.push(java.math.BigDecimal(left.toDouble().pow(right.toDouble())))
                     else -> {}
                 }
             }
         }
 
-        return s.pop()
+        return s.pop().setScale(6, RoundingMode.HALF_UP)
     }
 }

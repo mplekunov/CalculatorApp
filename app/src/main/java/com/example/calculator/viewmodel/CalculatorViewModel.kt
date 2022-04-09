@@ -7,10 +7,11 @@ import androidx.lifecycle.ViewModel
 import com.example.calculator.algorithms.InputEvaluator
 import com.example.calculator.model.StringFormatter
 import com.example.calculator.model.Operator
+import java.math.BigDecimal
 import kotlin.math.max
 
 class CalculatorViewModel : ViewModel() {
-    private var _result = MutableLiveData<Double>()
+    private var _result = MutableLiveData<BigDecimal>()
     private var _input = MutableLiveData<MutableList<String>>()
 
     val expression: LiveData<String> = Transformations.map(_input) {
@@ -52,7 +53,6 @@ class CalculatorViewModel : ViewModel() {
             InputEvaluator.getOperator(token) == Operator.DOT -> parseDot(token)
             else -> addToken(token)
         }
-        Log.d("Calculator", "${_input.value}")
     }
 
     private fun parseDot(token: String) {
@@ -62,7 +62,6 @@ class CalculatorViewModel : ViewModel() {
             return
 
         concatToLastToken(token)
-        Log.d("Calculator", "${_input.value}")
     }
 
     private fun parsePercentage() {
@@ -85,7 +84,6 @@ class CalculatorViewModel : ViewModel() {
         }
 
         setToken(expr.lastIndex, percentage.toString())
-        Log.d("Calculator", "${_input.value}")
     }
 
     private fun parseNumber(token: String) {
@@ -96,7 +94,6 @@ class CalculatorViewModel : ViewModel() {
             expr.last().first() == '0' && !InputEvaluator.isFloat(expr.last()) -> setToken(expr.lastIndex, token)
             else -> if (expr.last().length < max(StringFormatter.MAX_INTEGER_DIGITS, StringFormatter.MAX_FRACTION_DIGITS)) concatToLastToken(token)
         }
-        Log.d("Calculator", "${_input.value}")
     }
 
     private fun addToken(element: String) {
@@ -116,7 +113,7 @@ class CalculatorViewModel : ViewModel() {
 
     private fun updateResult() {
         if (_input.value.isNullOrEmpty())
-            _result.value = 0.0
+            _result.value = BigDecimal.ZERO
         else
             _result.value = InputEvaluator.getResult(_input.value!!)
     }
@@ -144,7 +141,7 @@ class CalculatorViewModel : ViewModel() {
     }
 
     fun clearAll() {
-        _result.value = 0.0
+        _result.value = BigDecimal.ZERO
         _input.value = mutableListOf()
     }
 
