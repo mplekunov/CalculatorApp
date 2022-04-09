@@ -57,20 +57,20 @@ object InputEvaluator {
 
     fun isOperator(token: String): Boolean = contains<Operator>(token)
 
-    fun getResult(input: List<String>): java.math.BigDecimal {
+    fun getResult(input: List<String>): Double {
         val infix = mutableListOf<String>().apply { addAll(input) }
         if (input.isNullOrEmpty())
-            return java.math.BigDecimal.ZERO
+            return 0.0
 
         val postfix = infixToPostfix(infix)
 
-        val s = Stack<java.math.BigDecimal>()
+        val s = Stack<Double>()
 
         for (i in postfix.indices) {
             val token = postfix[i]
 
             if (!contains<Operator>(token))
-                s.push(token.toBigDecimal())
+                s.push(token.toDouble())
             else {
                 if (s.size < 2)
                     break
@@ -79,16 +79,16 @@ object InputEvaluator {
                 val left = s.pop()
 
                 when(getOperator(token)) {
-                    Operator.ADDITION -> s.push(left.add(right))
-                    Operator.SUBTRACTION -> s.push(left.subtract(right))
-                    Operator.MULTIPLICATION -> s.push(left.multiply(right))
-                    Operator.DIVISION -> s.push(left.divide(right))
-                    Operator.POWER -> s.push(java.math.BigDecimal(left.toDouble().pow(right.toDouble())))
+                    Operator.ADDITION -> s.push(left + right)
+                    Operator.SUBTRACTION -> s.push(left - right)
+                    Operator.MULTIPLICATION -> s.push(left + right)
+                    Operator.DIVISION -> s.push(left / right)
+                    Operator.POWER -> s.push(left.pow(right))
                     else -> {}
                 }
             }
         }
 
-        return s.pop().setScale(6, RoundingMode.HALF_UP)
+        return s.pop()
     }
 }

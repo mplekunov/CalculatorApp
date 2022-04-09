@@ -1,16 +1,11 @@
 package com.example.calculator.model
 
 import com.example.calculator.algorithms.InputEvaluator
-import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.NumberFormat
 
 object StringFormatter {
-    const val MAX_FRACTION_DIGITS = 16
-    const val MAX_INTEGER_DIGITS = 16
-
     private val nf = NumberFormat.getNumberInstance()
-    private var bd = BigDecimal.ZERO
 
     init {
         nf.roundingMode = RoundingMode.HALF_UP
@@ -41,7 +36,7 @@ object StringFormatter {
         return formattedInput.toString()
     }
 
-    fun formatOutput(output: BigDecimal): String {
-        return nf.format(output)
+    fun formatOutput(output: Double): String {
+        return nf.format(output.toBigDecimal().setScale(6, RoundingMode.HALF_UP).toDouble())
     }
 }

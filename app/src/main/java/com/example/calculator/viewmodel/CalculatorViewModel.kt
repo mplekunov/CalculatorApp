@@ -1,5 +1,4 @@
 package com.example.calculator.viewmodel
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -7,13 +6,14 @@ import androidx.lifecycle.ViewModel
 import com.example.calculator.algorithms.InputEvaluator
 import com.example.calculator.model.StringFormatter
 import com.example.calculator.model.Operator
-import java.math.BigDecimal
-import kotlin.math.max
 
 class CalculatorViewModel : ViewModel() {
-    private var _result = MutableLiveData<BigDecimal>()
+    private var _result = MutableLiveData<Double>()
     private var _input = MutableLiveData<MutableList<String>>()
 
+
+//    val expression: String
+//        get() = StringFormatter.formatInput(_input.value!!)
     val expression: LiveData<String> = Transformations.map(_input) {
         StringFormatter.formatInput(it)
     }
@@ -92,7 +92,7 @@ class CalculatorViewModel : ViewModel() {
         when {
             expr.isEmpty() || InputEvaluator.isOperator(expr.last()) -> addToken(token)
             expr.last().first() == '0' && !InputEvaluator.isFloat(expr.last()) -> setToken(expr.lastIndex, token)
-            else -> if (expr.last().length < max(StringFormatter.MAX_INTEGER_DIGITS, StringFormatter.MAX_FRACTION_DIGITS)) concatToLastToken(token)
+            else -> if (expr.last().length < 18) concatToLastToken(token)
         }
     }
 
@@ -102,7 +102,7 @@ class CalculatorViewModel : ViewModel() {
     }
 
     private fun concatToLastToken(element: String) {
-        _input.value?.lastIndex?.let { _input.value?.set(it, _input.value?.last() + element) }
+        _input.value?.set(_input.value!!.lastIndex, _input.value?.last() + element)
         _input.value = _input.value
     }
 
@@ -113,7 +113,7 @@ class CalculatorViewModel : ViewModel() {
 
     private fun updateResult() {
         if (_input.value.isNullOrEmpty())
-            _result.value = BigDecimal.ZERO
+            _result.value = 0.0
         else
             _result.value = InputEvaluator.getResult(_input.value!!)
     }
@@ -141,11 +141,14 @@ class CalculatorViewModel : ViewModel() {
     }
 
     fun clearAll() {
-        _result.value = BigDecimal.ZERO
+        _result.value = 0.0
         _input.value = mutableListOf()
     }
 
     fun useResult() {
-        _input.value = mutableListOf<String>().apply { add(_result.value.toString()) }
+        val savedResult = _result.value
+        clearAll()
+        addToken(savedResult.toString())
+        _result.value = savedResult!!
     }
 }
