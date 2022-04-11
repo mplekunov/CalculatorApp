@@ -93,6 +93,7 @@
             android:layout_height="wrap_content" >
 
             <GridLayout
+                android:id="@+id/calculator"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
@@ -120,6 +121,7 @@
 
                 <ImageButton
                     android:id="@+id/percent_sign"
+                    android:text="%"
                     android:src="@drawable/ic_percent"
                     android:layout_marginTop="@dimen/button_margin"
                     android:padding="@dimen/button_icon_padding"
@@ -128,6 +130,7 @@
 
                 <ImageButton
                     android:id="@+id/division_sign"
+                    android:text="/"
                     android:src="@drawable/ic_divide"
                     android:layout_marginTop="@dimen/button_margin"
                     android:padding="@dimen/button_icon_padding"
@@ -158,6 +161,7 @@
 
                 <ImageButton
                     android:id="@+id/multiplication_sign"
+                    android:text="*"
                     android:src="@drawable/ic_multiply"
                     android:padding="@dimen/button_icon_padding"
                     style="@style/Widget.Calculator.CalcButton"
@@ -187,6 +191,7 @@
 
                 <ImageButton
                     android:id="@+id/minus_sign"
+                    android:text="-"
                     android:src="@drawable/ic_minus"
                     android:padding="@dimen/button_icon_padding"
                     style="@style/Widget.Calculator.CalcButton"
@@ -216,6 +221,7 @@
 
                 <ImageButton
                     android:id="@+id/addition_sign"
+                    android:text="+"
                     android:src="@drawable/ic_plus"
                     android:padding="@dimen/button_icon_padding"
                     style="@style/Widget.Calculator.CalcButton"

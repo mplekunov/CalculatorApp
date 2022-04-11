@@ -1,4 +1,5 @@
 package com.example.calculator.viewmodel
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -6,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.example.calculator.algorithms.InputEvaluator
 import com.example.calculator.model.StringFormatter
 import com.example.calculator.model.Operator
+import kotlin.math.exp
 
 class CalculatorViewModel : ViewModel() {
     private var _result = MutableLiveData<Double>()
@@ -15,8 +17,18 @@ class CalculatorViewModel : ViewModel() {
 //    val expression: String
 //        get() = StringFormatter.formatInput(_input.value!!)
     val expression: LiveData<String> = Transformations.map(_input) {
-        StringFormatter.formatInput(it)
+        val formattedInput = StringBuilder()
+
+        StringFormatter.formatInput(it).forEach{ token -> formattedInput.append(token)}
+
+        formattedInput.toString()
     }
+
+    val tokens: MutableList<String>
+        get() = StringFormatter.formatInput(_input.value!!)
+//        Transformations.map(_input) {
+//        StringFormatter.formatInput(it)
+//    }
 
     val result: LiveData<String> = Transformations.map(_result) {
         StringFormatter.formatOutput(it)
@@ -24,6 +36,24 @@ class CalculatorViewModel : ViewModel() {
 
     init {
         clearAll()
+    }
+
+    fun changeToken(newToken: String, pos: Int) {
+        setToken(pos, newToken)
+
+        updateResult()
+    }
+
+    fun concatToken(newToken: String, pos: Int) {
+        val expr = _input.value ?: mutableListOf()
+
+        Log.d("Calculator", "${_input.value}")
+
+        expr[pos] = expr[pos] + newToken
+
+        _input.value = expr
+
+        updateResult()
     }
 
     fun parseToken(token: String) {
@@ -118,6 +148,35 @@ class CalculatorViewModel : ViewModel() {
             _result.value = InputEvaluator.getResult(_input.value!!)
     }
 
+    fun deleteTokenAt(pos: Int) {
+        val expr = _input.value ?: mutableListOf()
+
+        if (expr.isEmpty() || pos >= expr.size)
+            return
+
+        expr.removeAt(pos)
+
+        _input.value = expr
+
+        updateResult()
+    }
+
+    fun deleteLastTokenAt(pos: Int) {
+        val expr = _input.value ?: mutableListOf()
+
+        if (expr.isEmpty())
+            return
+
+        if (expr[pos].length <= 1)
+            expr[pos] = "0"
+        else
+            expr[pos] = expr[pos].substring(0, expr[pos].lastIndex)
+
+        _input.value = expr
+
+        updateResult()
+    }
+
     fun deleteLastToken() {
         val expr = (_input.value ?: emptyList()).toMutableList()
 
@@ -150,5 +209,13 @@ class CalculatorViewModel : ViewModel() {
         clearAll()
         addToken(savedResult.toString())
         _result.value = savedResult!!
+    }
+
+    fun clearAllAt(pos: Int) {
+        val expr = _input.value ?: mutableListOf()
+
+        expr[pos] = "0"
+
+        updateResult()
     }
 }

@@ -11,7 +11,7 @@ object StringFormatter {
         nf.roundingMode = RoundingMode.HALF_UP
     }
 
-    fun formatInput(input: List<String>): String {
+    fun formatInput(input: List<String>): MutableList<String> {
         val inputCopy = mutableListOf<String>().apply { addAll(input) }
         inputCopy.replaceAll { token ->
             if (InputEvaluator.isNumber(token)) {
@@ -28,12 +28,12 @@ object StringFormatter {
             else
                 token
         }
+//
+//        val formattedInput = StringBuilder()
+//
+//        inputCopy.forEach{ token -> formattedInput.append(token)}
 
-        val formattedInput = StringBuilder()
-
-        inputCopy.forEach{ token -> formattedInput.append(token)}
-
-        return formattedInput.toString()
+        return inputCopy
     }
 
     fun formatOutput(output: Double): String {
