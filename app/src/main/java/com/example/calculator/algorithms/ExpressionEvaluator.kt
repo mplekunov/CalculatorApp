@@ -4,12 +4,13 @@ import com.example.calculator.model.*
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
-import kotlin.math.pow
+import kotlin.ArithmeticException
 
 /**
  * Helper class that evaluates [Expression].
  */
 object ExpressionEvaluator {
+    val bigDecimal = BigDecimal.ZERO
     /**
      * Converts infix into Postfix.
      * @param infix representation of a mathematical expression.
@@ -86,6 +87,7 @@ object ExpressionEvaluator {
      * @param expression as a collection of [Token].
      * @return [Token] containing result of computation.
      */
+    @Throws(ArithmeticException::class)
     fun getResult(expression: List<Token>): Token {
         val infix = mutableListOf<Token>().apply { addAll(expression) }
 
@@ -105,19 +107,28 @@ object ExpressionEvaluator {
                 if (s.size < 2)
                     break
 
-                val right = BigDecimal(s.pop().value)
-                val left = BigDecimal(s.pop().value)
+                val right = BigDecimal(s.pop().value).setScale(10, RoundingMode.HALF_UP)
+                val left = BigDecimal(s.pop().value).setScale(10, RoundingMode.HALF_UP)
 
                 when(token.value) {
-                    Operator.ADDITION.operator -> s.push(Token(Kind.Number, (left.add(right).toString())))
-                    Operator.SUBTRACTION.operator -> s.push(Token(Kind.Number, (left.subtract(right).toString())))
-                    Operator.MULTIPLICATION.operator -> s.push(Token(Kind.Number, (left.multiply(right).toString())))
-                    Operator.DIVISION.operator -> s.push(Token(Kind.Number, (left.divide(right).toString())))
-                    Operator.POWER.operator -> s.push(Token(Kind.Number, (left.pow(right.toInt()).toString())))
+                    Operator.ADDITION.operator -> s.push(Token(Kind.Number, addition(left, right)))
+                    Operator.SUBTRACTION.operator -> s.push(Token(Kind.Number, subtraction(left, right)))
+                    Operator.MULTIPLICATION.operator -> s.push(Token(Kind.Number, multiplication(left, right)))
+                    Operator.DIVISION.operator -> s.push(Token(Kind.Number, division(left, right)))
+                    Operator.POWER.operator -> s.push(Token(Kind.Number, power(left, right)))
                 }
             }
         }
 
         return s.pop()
     }
+
+    private fun addition(left: BigDecimal, right: BigDecimal): String = left.plus(right).toString()
+    private fun subtraction(left: BigDecimal, right: BigDecimal): String = left.minus(right).toString()
+    private fun multiplication(left: BigDecimal, right: BigDecimal): String = left.times(right).toString()
+    @Throws(ArithmeticException::class)
+    private fun division(left: BigDecimal, right: BigDecimal): String {
+        return if (right != BigDecimal.ZERO) left.div(right).toString() else throw ArithmeticException("Division by 0")
+    }
+    private fun power(left: BigDecimal, right: BigDecimal): String = left.pow(right.toInt()).toString()
 }

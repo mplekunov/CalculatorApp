@@ -44,7 +44,7 @@ class CalculatorViewModel : ViewModel() {
     }
 
     fun deleteAllTokens() {
-        resultOfExpression.value = "0"
+        resultOfExpression = Token(Kind.Number, "0")
         expression.deleteAllTokens()
         calculateExpression()
     }
@@ -63,6 +63,10 @@ class CalculatorViewModel : ViewModel() {
 
     private fun calculateExpression() {
         inputAsTokens = expression.expression
-        resultOfExpression = ExpressionEvaluator.getResult(inputAsTokens)
+        try {
+            resultOfExpression = ExpressionEvaluator.getResult(inputAsTokens)
+        } catch (e: ArithmeticException) {
+            resultOfExpression = Token(Kind.Number, "0")
+        }
     }
 }

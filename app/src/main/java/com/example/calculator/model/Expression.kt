@@ -2,6 +2,7 @@ package com.example.calculator.model
 
 import android.util.Log
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 /**
  * [Expression] data structure which contains expression in the infix format.
@@ -86,15 +87,15 @@ class Expression {
 
         val token = _expression[curIndex]
 
-        var percentage = BigDecimal(token.value).divide(BigDecimal(100.0))
+        var percentage = BigDecimal(token.value).setScale(10, RoundingMode.HALF_UP).div(BigDecimal(100.0).setScale(10, RoundingMode.HALF_UP))
 
         if (index > 2) {
             val lastKnownOperator = _expression[curIndex - 1]
-            val lastKnownNumber = BigDecimal(_expression[curIndex - 2].value)
+            val lastKnownNumber = BigDecimal(_expression[curIndex - 2].value).setScale(10, RoundingMode.HALF_UP)
 
             percentage = when (lastKnownOperator.value) {
                 Operator.ADDITION.operator -> percentage.multiply(lastKnownNumber)
-                Operator.SUBTRACTION.operator -> (BigDecimal(1).subtract(percentage)).multiply(lastKnownNumber)
+                Operator.SUBTRACTION.operator -> (BigDecimal(1).setScale(10, RoundingMode.HALF_UP).minus(percentage)).times(lastKnownNumber)
                 else -> percentage
             }
         }
