@@ -31,8 +31,10 @@ class CalculatorFragment : Fragment() {
     private var binding: FragmentCalculatorBinding? = null
     private val viewModel: CalculatorViewModel by viewModels()
 
-    private @ColorInt var primaryColor: Int = 0
-    private @ColorInt var secondaryColor: Int = 0
+    @ColorInt
+    private var primaryColor: Int = 0
+    @ColorInt
+    private var secondaryColor: Int = 0
 
     private lateinit var operatorsMap: Map<ImageButton, String>
 

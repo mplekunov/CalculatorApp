@@ -83,7 +83,7 @@ object ExpressionEvaluator {
      * Computes result of a mathematical expression.
      *
      * @param expression as a collection of [Token].
-     * @return result of computation.
+     * @return [Token] containing result of computation.
      */
     fun getResult(expression: List<Token>): Token {
         val infix = mutableListOf<Token>().apply { addAll(expression) }

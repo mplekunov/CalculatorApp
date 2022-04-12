@@ -159,17 +159,14 @@ class Expression {
             return false
 
         val token = _expression[index]
+        token.value = token.value.substring(0, token.value.lastIndex)
 
-        if (token.value.length <= 1)
-            token.value = "0"
-        else
-            token.value = token.value.substring(0, token.value.lastIndex)
-
-        if (token.value.isEmpty() && isRemovable)
-            _expression.removeAt(index)
-        else
-            _expression[index] = token
-
+        if (token.value.isEmpty()) {
+            when {
+                isRemovable -> _expression.removeAt(index)
+                !isRemovable && token.kind == Kind.Number -> _expression[index].value = "0"
+            }
+        }
         return true
     }
 

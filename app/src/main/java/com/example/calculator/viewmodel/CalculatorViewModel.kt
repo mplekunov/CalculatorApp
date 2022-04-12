@@ -13,49 +13,56 @@ class CalculatorViewModel : ViewModel() {
 
     fun appendToken(input: String) {
         val token = InputParser.parseToken(input)
+        expression.appendToken(token)
 
-        calculateExpression(expression.appendToken(token))
+        if (token.kind == Kind.Number)
+            calculateExpression()
     }
 
     fun appendTokenAt(input: String, index: Int) {
         val token = InputParser.parseToken(input)
-
-        calculateExpression(expression.appendTokenAt(token, index))
+        expression.appendTokenAt(token, index)
+        calculateExpression()
     }
 
     fun setTokenAt(input: String, index: Int) {
         val token = InputParser.parseToken(input)
-
-        calculateExpression(expression.setTokenAt(token, index))
+        expression.setTokenAt(token, index)
+        calculateExpression()
     }
 
     fun deleteToken() {
-        calculateExpression(expression.deleteToken())
+        expression.deleteToken()
+
+        if (expression.expression.isNotEmpty() && expression.expression.last().kind == Kind.Number)
+            calculateExpression()
     }
 
     fun deleteTokenAt(index: Int) {
-        calculateExpression(expression.deleteTokenAt(index, false))
+        expression.deleteTokenAt(index, false)
+        calculateExpression()
     }
 
     fun deleteAllTokens() {
         resultOfExpression.value = "0"
-        calculateExpression(expression.deleteAllTokens())
+        expression.deleteAllTokens()
+        calculateExpression()
     }
 
     fun deleteAllTokensAt(index: Int) {
-        calculateExpression(expression.deleteAllTokensAt(index))
+        expression.deleteAllTokensAt(index)
+        calculateExpression()
     }
 
     fun saveResult() {
         expression.deleteAllTokens()
         val token = InputParser.parseToken(resultOfExpression.value)
-        calculateExpression(expression.appendToken(token))
+        expression.appendToken(token)
+        calculateExpression()
     }
 
-    private fun calculateExpression(isUpdated: Boolean) {
-        if (isUpdated) {
-            inputAsTokens = expression.expression
-            resultOfExpression = ExpressionEvaluator.getResult(inputAsTokens)
-        }
+    private fun calculateExpression() {
+        inputAsTokens = expression.expression
+        resultOfExpression = ExpressionEvaluator.getResult(inputAsTokens)
     }
 }
