@@ -57,7 +57,5 @@ class CalculatorViewModel : ViewModel() {
             inputAsTokens = expression.expression
             resultOfExpression = ExpressionEvaluator.getResult(inputAsTokens)
         }
-
-        Log.d("Calculator", "$inputAsTokens")
     }
 }

@@ -155,6 +155,9 @@ class Expression {
      * @return result indicating success of operation.
      */
     fun deleteTokenAt(index: Int, isRemovable: Boolean) : Boolean {
+        if (index < 0 || index > _expression.lastIndex)
+            return false
+
         val token = _expression[index]
 
         if (token.value.length <= 1)
