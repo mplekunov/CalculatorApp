@@ -46,7 +46,7 @@ object TokenFormatter {
             return " 0 "
 
         return if (token.kind == Kind.Number) {
-            var formattedToken = nf.format(BigDecimal(token.value.toDouble()).setScale(10, RoundingMode.HALF_UP))
+            var formattedToken = nf.format(BigDecimal(token.value).setScale(10, RoundingMode.HALF_UP))
 
             if (!removeTrailingZeroes) {
                 if (token.value.last() == '.')

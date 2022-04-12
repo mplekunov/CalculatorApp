@@ -1,6 +1,7 @@
 package com.example.calculator.algorithms
 
 import com.example.calculator.model.*
+import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
 import kotlin.math.pow
@@ -104,15 +105,15 @@ object ExpressionEvaluator {
                 if (s.size < 2)
                     break
 
-                val right = s.pop().value.toDouble()
-                val left = s.pop().value.toDouble()
+                val right = BigDecimal(s.pop().value)
+                val left = BigDecimal(s.pop().value)
 
                 when(token.value) {
                     Operator.ADDITION.operator -> s.push(Token(Kind.Number, (left + right).toString()))
                     Operator.SUBTRACTION.operator -> s.push(Token(Kind.Number, (left - right).toString()))
                     Operator.MULTIPLICATION.operator -> s.push(Token(Kind.Number, (left * right).toString()))
                     Operator.DIVISION.operator -> s.push(Token(Kind.Number, (left / right).toString()))
-                    Operator.POWER.operator -> s.push(Token(Kind.Number, (left.pow(right).toString())))
+                    Operator.POWER.operator -> s.push(Token(Kind.Number, (left.pow(right.toInt()).toString())))
                 }
             }
         }

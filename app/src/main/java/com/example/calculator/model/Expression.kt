@@ -1,5 +1,7 @@
 package com.example.calculator.model
 
+import java.math.BigDecimal
+
 /**
  * [Expression] data structure which contains expression in the infix format.
  *
@@ -83,15 +85,15 @@ class Expression {
 
         val token = _expression[curIndex]
 
-        var percentage = token.value.toDouble() / 100
+        var percentage = BigDecimal(token.value) / BigDecimal(100)
 
         if (index > 2) {
             val lastKnownOperator = _expression[curIndex - 1]
-            val lastKnownNumber = _expression[curIndex - 2].value.toDouble()
+            val lastKnownNumber = _expression[curIndex - 2].value.toBigDecimal()
 
             percentage = when (lastKnownOperator.value) {
                 Operator.ADDITION.operator -> percentage * lastKnownNumber
-                Operator.SUBTRACTION.operator -> (1 - percentage) * lastKnownNumber
+                Operator.SUBTRACTION.operator -> (BigDecimal(1) - percentage) * lastKnownNumber
                 else -> percentage
             }
         }
