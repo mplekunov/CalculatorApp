@@ -1,5 +1,6 @@
 package com.example.calculator.model
 
+import android.util.Log
 import java.math.BigDecimal
 
 /**
@@ -85,21 +86,23 @@ class Expression {
 
         val token = _expression[curIndex]
 
-        var percentage = BigDecimal(token.value) / BigDecimal(100)
+        var percentage = BigDecimal(token.value).divide(BigDecimal(100.0))
 
         if (index > 2) {
             val lastKnownOperator = _expression[curIndex - 1]
-            val lastKnownNumber = _expression[curIndex - 2].value.toBigDecimal()
+            val lastKnownNumber = BigDecimal(_expression[curIndex - 2].value)
 
             percentage = when (lastKnownOperator.value) {
-                Operator.ADDITION.operator -> percentage * lastKnownNumber
-                Operator.SUBTRACTION.operator -> (BigDecimal(1) - percentage) * lastKnownNumber
+                Operator.ADDITION.operator -> percentage.multiply(lastKnownNumber)
+                Operator.SUBTRACTION.operator -> (BigDecimal(1).subtract(percentage)).multiply(lastKnownNumber)
                 else -> percentage
             }
         }
 
         token.value = percentage.toString()
         _expression[curIndex] = token
+
+        Log.d("Calculator", "$percentage")
 
         return true
     }

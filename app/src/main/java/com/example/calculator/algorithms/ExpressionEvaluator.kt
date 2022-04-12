@@ -109,10 +109,10 @@ object ExpressionEvaluator {
                 val left = BigDecimal(s.pop().value)
 
                 when(token.value) {
-                    Operator.ADDITION.operator -> s.push(Token(Kind.Number, (left + right).toString()))
-                    Operator.SUBTRACTION.operator -> s.push(Token(Kind.Number, (left - right).toString()))
-                    Operator.MULTIPLICATION.operator -> s.push(Token(Kind.Number, (left * right).toString()))
-                    Operator.DIVISION.operator -> s.push(Token(Kind.Number, (left / right).toString()))
+                    Operator.ADDITION.operator -> s.push(Token(Kind.Number, (left.add(right).toString())))
+                    Operator.SUBTRACTION.operator -> s.push(Token(Kind.Number, (left.subtract(right).toString())))
+                    Operator.MULTIPLICATION.operator -> s.push(Token(Kind.Number, (left.multiply(right).toString())))
+                    Operator.DIVISION.operator -> s.push(Token(Kind.Number, (left.divide(right).toString())))
                     Operator.POWER.operator -> s.push(Token(Kind.Number, (left.pow(right.toInt()).toString())))
                 }
             }
