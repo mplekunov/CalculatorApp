@@ -120,7 +120,10 @@ object ExpressionEvaluator {
             }
         }
 
-        return s.pop()
+        val token = s.pop()
+        token.value = BigDecimal(token.value).stripTrailingZeros().toString()
+
+        return token
     }
 
     private fun addition(left: BigDecimal, right: BigDecimal): String = left.plus(right).toString()
