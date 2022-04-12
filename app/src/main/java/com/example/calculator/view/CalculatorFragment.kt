@@ -158,6 +158,7 @@ class CalculatorFragment : Fragment() {
                         }
                         operatorsMap.containsKey(child) -> { disableButton(child, ContextCompat.getColor(requireContext(), R.color.calc_button_pressed)) }
                         child == binding?.percentSign -> { disableButton(child, ContextCompat.getColor(requireContext(), R.color.calc_button_pressed)) }
+                        child == binding?.changeLayout -> { disableButton(child, ContextCompat.getColor(requireContext(), R.color.calc_button_pressed)) }
                         else -> child.setOnClickListener {
                             viewModel.appendTokenAt((it as Button).text.toString(), index)
                             onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
