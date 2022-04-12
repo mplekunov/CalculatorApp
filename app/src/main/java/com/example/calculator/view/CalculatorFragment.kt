@@ -1,36 +1,38 @@
 package com.example.calculator.view
 
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
-import android.text.style.BackgroundColorSpan
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
-import android.util.Log
 import android.util.TypedValue
 import android.view.*
 import android.widget.*
+import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.children
 import androidx.core.widget.ImageViewCompat
-import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.calculator.R
-import com.example.calculator.algorithms.InputEvaluator
 import com.example.calculator.databinding.FragmentCalculatorBinding
+import com.example.calculator.model.Kind
+import com.example.calculator.model.Token
+import com.example.calculator.algorithms.TokenFormatter
+import com.example.calculator.model.Operator
 import com.example.calculator.viewmodel.CalculatorViewModel
-import java.text.BreakIterator
 
 class CalculatorFragment : Fragment() {
     private var binding: FragmentCalculatorBinding? = null
-    private val calculatorViewModel: CalculatorViewModel by viewModels()
+    private val viewModel: CalculatorViewModel by viewModels()
+
+    private @ColorInt var primaryColor: Int = 0
+    private @ColorInt var secondaryColor: Int = 0
 
     private lateinit var operatorsMap: Map<ImageButton, String>
 
@@ -48,215 +50,225 @@ class CalculatorFragment : Fragment() {
 
         binding?.apply {
             lifecycleOwner = viewLifecycleOwner
-            viewModel = calculatorViewModel
             calculatorFragment = this@CalculatorFragment
         }
 
         operatorsMap = mapOf(
             binding?.additionSign!! to "+",
-            binding?.minusSign!! to "-",
+            binding?.subtractionSign!! to "-",
             binding?.multiplicationSign!! to "*",
-            binding?.percentSign!! to "%",
             binding?.divisionSign!! to "/"
         )
+
+        val typedValue = TypedValue()
+        context?.theme?.resolveAttribute(android.R.attr.textColorPrimary, typedValue, true)
+        primaryColor = typedValue.data
+
+        context?.theme?.resolveAttribute(android.R.attr.textColorSecondary, typedValue, true)
+        secondaryColor = typedValue.data
+
+        setDefaultBindings()
     }
 
-    fun update() {
-        val text = calculatorViewModel.expression.value
+    private fun setInputField() {
+        val tokens = viewModel.inputAsTokens
 
-        if (text.isNullOrEmpty())
-            return
+        val tokensAsStrings = TokenFormatter.convertTokensToStrings(tokens)
+        val sb = StringBuilder()
+        tokensAsStrings.forEach { sb.append(it) }
+
+        val text = sb.toString()
+
+        setOutputField()
 
         val input = binding?.input!!
+
+        if (text.isEmpty()) {
+            input.text = ""
+            return
+        }
+
         input.movementMethod = LinkMovementMethod.getInstance()
-
-//        input.setText(text, TextView.BufferType.SPANNABLE)
-
         input.highlightColor = requireContext().getColor(com.google.android.material.R.color.mtrl_btn_transparent_bg_color)
 
         val spans = SpannableStringBuilder(text)
-//            (input.text as Spannable)
 
-        var pos = 0
         var start = 0
         var end = 0
 
-        Log.d("Calculator", "${calculatorViewModel.tokens}")
-
-        var iterator = BreakIterator.getWordInstance()
-
-        calculatorViewModel.tokens.forEach { token ->
-            end += token.length
-            spans.setSpan(toClickableSpan(token, pos, start, end), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-
+        for (index in tokensAsStrings.indices) {
+            end += tokensAsStrings[index].length
+            spans.setSpan(toClickableSpan(tokens[index], index, start, end), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             start = end
-            pos++
         }
 
         input.text = spans
     }
 
+    private fun applyEditingStyle(view: TextView, start: Int, end: Int, @ColorInt color: Int) {
+        val spans = SpannableString(view.text.toString())
+        spans.setSpan(ForegroundColorSpan(color), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        view.text = spans
+    }
 
-    private fun toClickableSpan(token: String, pos: Int, start: Int, end: Int): ClickableSpan {
+    private fun toClickableSpan(token: Token, index: Int, start: Int, end: Int): ClickableSpan {
         return object:  ClickableSpan() {
             override fun onClick(view: View) {
                 when {
-                    InputEvaluator.isNumber(token) -> numbers()
-//                    InputEvaluator.isOperator(token) -> tokens()
+                    token.kind == Kind.Number -> bindNumbersToEditableToken()
+                    token.kind == Kind.Operator -> bindOperatorsToEditableToken()
                 }
 
-                val spans = SpannableString(((view as TextView).text.toString()))
-                spans.setSpan(ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal)), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                view.text = spans
+                applyEditingStyle(view as TextView, start, end, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
 
                 binding?.equalSign?.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_check, requireContext().theme))
                 binding?.equalSign?.setOnClickListener {
-                    if (calculatorViewModel.tokens[pos].isEmpty())
-                        calculatorViewModel.changeToken("0", pos)
+                    setDefaultBindings()
 
-                    rebind()
                     binding?.equalSign?.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_equal, requireContext().theme))
-                    update()
+                    setInputField()
                 }
             }
 
-            private fun rebind() {
-                binding?.calculator?.children?.forEach { it ->
-                    if (it == binding?.equalSign)
-                        binding?.equalSign?.setOnClickListener { onClickEqualButton() }
-                    else if (it == binding?.delete)
-                        binding?.delete?.setOnClickListener { deleteToken() }
-                    else if (it == binding?.clear)
-                        binding?.clear?.setOnClickListener { deleteAll() }
-                    else if (operatorsMap.containsKey(it)) {
-                        ImageViewCompat.setImageTintList(it as ImageView, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal)))
-                        it.setOnClickListener { sendToViewModel(operatorsMap[it]!!) }
+            private fun bindOperatorsToEditableToken() {
+                binding?.calculator?.children?.forEach { child ->
+                    when {
+                        operatorsMap.containsKey(child) -> {
+                            child.setOnClickListener {
+                                viewModel.setTokenAt(operatorsMap[child]!!, index)
+                                onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
+                            }
+                        }
+                        child == binding?.equalSign -> {}
+                        else -> { disableButton(child, ContextCompat.getColor(requireContext(), R.color.calc_button_pressed)) }
                     }
-                    else
-                        it.setOnClickListener { sendToViewModel((it as Button).text.toString()) }
                 }
             }
 
-            private fun tokens() {
-                TODO("Not yet implemented")
-            }
-
-            private fun numbers() {
-                binding?.calculator?.children?.forEach { it ->
-                    if (it == binding?.delete)
-                        binding?.delete?.setOnClickListener { deleteTokenAt(pos, start) }
-                    else if (it == binding?.clear)
-                        binding?.clear?.setOnClickListener { clearAllAt(pos, start) }
-                    else if (operatorsMap.containsKey(it)) {
-                        ImageViewCompat.setImageTintList(it as ImageButton, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.calc_button_pressed)))
-                        it.setOnClickListener(null)
+            private fun bindNumbersToEditableToken() {
+                binding?.calculator?.children?.forEach { child ->
+                    when {
+                        child == binding?.delete -> binding?.delete?.setOnClickListener {
+                            viewModel.deleteTokenAt(index)
+                            onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
+                        }
+                        child == binding?.deleteAll -> binding?.deleteAll?.setOnClickListener {
+                            viewModel.deleteAllTokensAt(index)
+                            onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
+                        }
+                        operatorsMap.containsKey(child) -> { disableButton(child, ContextCompat.getColor(requireContext(), R.color.calc_button_pressed)) }
+                        child == binding?.percentSign -> { disableButton(child, ContextCompat.getColor(requireContext(), R.color.calc_button_pressed)) }
+                        else -> child.setOnClickListener {
+                            viewModel.appendTokenAt((it as Button).text.toString(), index)
+                            onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
+                        }
                     }
-                    else
-                        it.setOnClickListener { concatTokenAt(it as Button, pos, start) }
                 }
             }
 
             override fun updateDrawState(ds: TextPaint) {
-//                ds.isUnderlineText = true
                 ds.isUnderlineText = false
-//                ds.setColor(ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
             }
         }
     }
 
-    fun concatTokenAt(btn: Button, pos: Int, start: Int) {
-        calculatorViewModel.concatToken(btn.text.toString(), pos)
+    private fun disableButton(btn: View, @ColorInt color: Int) {
+        if (btn is ImageButton)
+            ImageViewCompat.setImageTintList(btn, ColorStateList.valueOf(color))
+        else
+            (btn as Button).setTextColor(color)
 
-        val end = calculatorViewModel.tokens[pos].length + start
-
-        val spans = SpannableString(calculatorViewModel.expression.value)
-        spans.setSpan(ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal)), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        binding?.input?.text = spans
+        btn.setOnClickListener(null)
+        btn.isClickable = false
     }
 
-    fun clearAllAt(pos: Int, start: Int) {
-        calculatorViewModel.clearAllAt(pos)
-
-        val end = calculatorViewModel.tokens[pos].length + start
-
-        val spans = SpannableString(calculatorViewModel.expression.value)
-        spans.setSpan(ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal)), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        binding?.input?.text = spans
+    private fun enableButton(btn: View, @ColorInt color: Int) {
+        if (btn is ImageButton)
+            ImageViewCompat.setImageTintList(btn, ColorStateList.valueOf(color))
+        else
+            (btn as Button).setTextColor(color)
     }
 
-    fun deleteTokenAt(pos: Int, start: Int) {
-        calculatorViewModel.deleteLastTokenAt(pos)
+    private fun onInputEdit(start: Int, index: Int, @ColorInt color: Int) {
+        val tokens = TokenFormatter.convertTokensToStrings(viewModel.inputAsTokens)
+        val sb = StringBuilder()
+        tokens.forEach { sb.append(it) }
 
-        val end = calculatorViewModel.tokens[pos].length + start
+        binding?.input?.text = sb.toString()
 
-        val spans = SpannableString(calculatorViewModel.expression.value)
-        spans.setSpan(ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal)), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        binding?.input?.text = spans
+        val end = tokens[index].length + start
+
+        applyEditingStyle(binding?.input!!, start, end, color)
+        setOutputField()
     }
 
-    fun onClickEqualButton() {
-        val value = TypedValue()
-        context?.theme?.resolveAttribute(android.R.attr.textColorSecondary, value, true)
-        binding?.input?.setTextColor(value.data)
+    private fun setDefaultBindings() {
+        binding?.calculator?.children?.forEach { child ->
+            enableButton(child, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
 
-        context?.theme?.resolveAttribute(android.R.attr.textColorPrimary, value, true)
-        binding?.output?.setTextColor(value.data)
-
-        binding?.output!!.setTextSize(TypedValue.COMPLEX_UNIT_SP, 40F)
-        binding?.input!!.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20F)
-
-        calculatorViewModel.useResult()
-    }
-
-    fun deleteToken() {
-        textStyling()
-
-        calculatorViewModel.deleteLastToken()
-    }
-
-    fun deleteAll() {
-        textStyling()
-
-        calculatorViewModel.clearAll()
-    }
-
-    private fun textStyling() {
-        if (binding?.output?.autoSizeTextType == TextViewCompat.AUTO_SIZE_TEXT_TYPE_NONE) {
-            val value = TypedValue()
-            context?.theme?.resolveAttribute(android.R.attr.textColorSecondary, value, true)
-            binding?.output?.setTextColor(value.data)
-
-            context?.theme?.resolveAttribute(android.R.attr.textColorPrimary, value, true)
-            binding?.input?.setTextColor(value.data)
-
-            binding?.output!!.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20F)
-            binding?.input!!.setTextSize(TypedValue.COMPLEX_UNIT_SP, 40F)
+            when {
+                child == binding?.equalSign -> binding?.equalSign?.setOnClickListener {
+                    applyInputOutputStyling(20F, 40F, secondaryColor, primaryColor)
+                    viewModel.saveResult()
+                    setInputField()
+                }
+                child == binding?.delete -> {
+                    child.setOnClickListener {
+                        applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
+                        viewModel.deleteToken()
+                        setInputField()
+                    }
+                }
+                child == binding?.deleteAll -> {
+                    child.setOnClickListener {
+                        applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
+                        viewModel.deleteAllTokens()
+                        setInputField()
+                    }
+                }
+                child == binding?.percentSign -> {
+                    child.setOnClickListener {
+                        applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
+                        viewModel.appendToken(Operator.PERCENTAGE.operator)
+                        setInputField()
+                    }
+                }
+                operatorsMap.containsKey(child) -> {
+                    child.setOnClickListener {
+                        applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
+                        viewModel.appendToken(operatorsMap[it]!!)
+                        setInputField()
+                    }
+                }
+                child == binding?.changeLayout -> {}
+                else -> {
+                    (child as Button).setTextColor(primaryColor)
+                    child.setOnClickListener {
+                        applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
+                        viewModel.appendToken((it as Button).text.toString())
+                        setInputField()
+                    }
+                }
+            }
         }
     }
 
-    fun inputTextOnTouch(motionEvent: MotionEvent): Boolean {
-//        if (motionEvent.action == MotionEvent.ACTION_DOWN) {
-//            binding?.input!!.setTextColor(resources.getColor(R.color.yellow_dark, context?.theme))
-//        }
-
-        return true
+    private fun setOutputField() {
+        binding?.output?.text = TokenFormatter.convertTokenToString(viewModel.resultOfExpression, true)
     }
 
-    fun sendToViewModel(token: String) {
-        textStyling()
+    private fun applyInputOutputStyling(min: Float, max: Float, @ColorInt primaryColor: Int, @ColorInt secondaryColor: Int) {
+        binding?.input?.setTextColor(primaryColor)
+        binding?.output?.setTextColor(secondaryColor)
 
-        calculatorViewModel.parseToken(token)
-        update()
-    }
-
-    fun deleteAt(pos: Int) {
-        calculatorViewModel.deleteLastTokenAt(pos)
+        binding?.output!!.setTextSize(TypedValue.COMPLEX_UNIT_SP, max)
+        binding?.input!!.setTextSize(TypedValue.COMPLEX_UNIT_SP, min)
     }
 
     fun onInputChange() {
-        if (calculatorViewModel.expression.value.isNullOrEmpty())
-            binding?.clear?.text = getText(R.string.all_cleared)
+        if (viewModel.inputAsTokens.isEmpty() )
+            binding?.deleteAll?.text = getText(R.string.all_cleared)
         else
-            binding?.clear?.text = getText(R.string.clear)
+            binding?.deleteAll?.text = getText(R.string.clear)
     }
 }

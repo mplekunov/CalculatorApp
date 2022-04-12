@@ -1,5 +1,11 @@
 package com.example.calculator.model
 
+/**
+ * [Operator] [Enum] containing information about all allowed operators.
+ *
+ * @property associativity [ASSOCIATIVITY] of the operator.
+ * @property precedence [Int] of the operator.
+ */
 enum class Operator {
     ADDITION("+", ASSOCIATIVITY.LEFT, 0),
     MULTIPLICATION("*", ASSOCIATIVITY.LEFT, 5),
@@ -32,10 +38,20 @@ enum class Operator {
     override fun toString(): String = operator
 }
 
+/**
+ * Helper function.
+ * Finds if specific operator contains in the [Operator].
+ *
+ * @param operator to check.
+ * @return [Boolean] indicating existence of the operator.
+ */
 inline fun <reified T: Enum<T>> contains(operator: String): Boolean {
     return enumValues<T>().any { it.toString() == operator }
 }
 
+/**
+ * Helper function.
+ */
 inline fun <reified T: Enum<T>> getValue(operator: String): T? {
     return enumValues<T>().firstOrNull { it.toString() == operator }
 }

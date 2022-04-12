@@ -18,7 +18,7 @@
             tools:text="AC"/>
 
         <Button
-            android:id="@+id/clear"
+            android:id="@+id/deleteAll"
             />
         <Button/>
         <Button/>
