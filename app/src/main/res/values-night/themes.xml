@@ -1,4 +1,7 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
     <!-- Base application theme. -->
     <style name="Theme.Calculator" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
@@ -8,7 +11,7 @@
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/yellow_800</item>
         <item name="colorSecondaryVariant">@color/yellow_light</item>
-        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->

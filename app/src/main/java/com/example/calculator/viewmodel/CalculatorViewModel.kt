@@ -1,5 +1,5 @@
 package com.example.calculator.viewmodel
-import android.util.Log
+
 import androidx.lifecycle.ViewModel
 import com.example.calculator.algorithms.ExpressionEvaluator
 import com.example.calculator.algorithms.InputParser
