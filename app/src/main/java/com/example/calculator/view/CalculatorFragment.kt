@@ -25,6 +25,7 @@ import com.example.calculator.databinding.FragmentCalculatorBinding
 import com.example.calculator.model.Kind
 import com.example.calculator.model.Token
 import com.example.calculator.algorithms.TokenFormatter
+import com.example.calculator.model.Function
 import com.example.calculator.model.Operator
 import com.example.calculator.viewmodel.CalculatorViewModel
 import kotlinx.coroutines.Dispatchers
@@ -246,7 +247,7 @@ class CalculatorFragment : Fragment() {
                     child.setOnClickListener {
                         applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
 
-                        viewModel.appendToken(Operator.PERCENTAGE.operator)
+                        viewModel.appendToken(Function.PERCENTAGE.operator)
 
                         setInputField()
                     }

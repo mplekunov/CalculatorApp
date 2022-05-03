@@ -1,5 +1,6 @@
 package com.example.calculator.algorithms
 
+import com.example.calculator.model.Function
 import com.example.calculator.model.Kind
 import com.example.calculator.model.Operator
 import com.example.calculator.model.Token
@@ -21,10 +22,20 @@ object InputParser {
         when {
             isOperator(token) -> kind = Kind.Operator
             isNumber(token) -> kind = Kind.Number
+            isFunction(token) -> kind = Kind.Function
         }
 
         return Token(kind, token)
     }
+
+    /**
+     * Helper function.
+     * Finds if token is a function.
+     *
+     * @param token the token in question.
+     * @return [Boolean] indicating the result of the query.
+     */
+    private fun isFunction(token: String): Boolean = contains<Function>(token)
 
     /**
      * Helper function.
@@ -33,7 +44,7 @@ object InputParser {
      * @param token the token in question.
      * @return [Boolean] indicating the result of the query.
      */
-    private fun isNumber(token: String): Boolean = !isOperator(token)
+    private fun isNumber(token: String): Boolean = token[0].isDigit()
 
     /**
      * Helper function.

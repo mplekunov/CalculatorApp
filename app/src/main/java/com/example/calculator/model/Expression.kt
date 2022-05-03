@@ -45,7 +45,6 @@ class Expression {
         // So I add check in advance
         if (lastToken.kind == Kind.Number) {
             return when (token.value) {
-                Operator.PERCENTAGE.operator -> parsePercentage(index)
                 Operator.DOT.operator -> parseDot(index)
                 else -> {
                     if (index <= _expression.lastIndex) {
@@ -145,8 +144,28 @@ class Expression {
         return when(token.kind) {
             Kind.Number -> appendNumber(token, index)
             Kind.Operator -> appendOperator(token, index)
+            Kind.Function -> appendFunction(token, index)
             else -> false
         }
+    }
+
+    private fun appendFunction(token: Token, index: Int): Boolean {
+        // Expression can't start with an operator
+        if (_expression.isEmpty())
+            return false
+
+        // In case of Operators, each operator has its own token
+        // No two operators can be appended to each other
+        val lastToken = _expression.last()
+
+        if (lastToken.kind == Kind.Number) {
+            return when (token.value) {
+                Function.PERCENTAGE.operator -> parsePercentage(index)
+                else -> false
+            }
+        }
+
+        return false
     }
 
     /**
