@@ -229,9 +229,7 @@ class CalculatorFragment : Fragment() {
                 child == binding?.delete -> {
                     child.setOnClickListener {
                         applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
-
                         viewModel.deleteToken()
-
                         setInputField()
                     }
                 }

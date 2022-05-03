@@ -35,8 +35,11 @@ class Expression {
 
         // Operators can't follow one another
         // In expression there is always a number between operators (or function)
-        if (lastToken.kind == Kind.Operator)
-            return false
+        // However, user may want to replace previous operator by pressing new operator
+        if (lastToken.kind == Kind.Operator) {
+            _expression[_expression.lastIndex] = token
+            return true
+        }
 
         // Later on there should be another kind of Tokens -> functions (sin/cos/tan/cot etc.)
         // So I add check in advance
