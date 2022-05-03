@@ -19,6 +19,7 @@ import androidx.core.view.children
 import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.calculator.R
 import com.example.calculator.databinding.FragmentCalculatorBinding
 import com.example.calculator.model.Kind
@@ -26,6 +27,10 @@ import com.example.calculator.model.Token
 import com.example.calculator.algorithms.TokenFormatter
 import com.example.calculator.model.Operator
 import com.example.calculator.viewmodel.CalculatorViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CalculatorFragment : Fragment() {
     private var binding: FragmentCalculatorBinding? = null
@@ -138,6 +143,7 @@ class CalculatorFragment : Fragment() {
                         operatorsMap.containsKey(child) -> {
                             child.setOnClickListener {
                                 viewModel.setTokenAt(operatorsMap[child]!!, index)
+
                                 onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
                             }
                         }
@@ -152,10 +158,12 @@ class CalculatorFragment : Fragment() {
                     when {
                         child == binding?.delete -> binding?.delete?.setOnClickListener {
                             viewModel.deleteTokenAt(index)
+
                             onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
                         }
                         child == binding?.deleteAll -> binding?.deleteAll?.setOnClickListener {
                             viewModel.deleteAllTokensAt(index)
+
                             onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
                         }
                         operatorsMap.containsKey(child) -> { disableButton(child, ContextCompat.getColor(requireContext(), R.color.calc_button_pressed)) }
@@ -163,6 +171,7 @@ class CalculatorFragment : Fragment() {
                         child == binding?.changeLayout -> { disableButton(child, ContextCompat.getColor(requireContext(), R.color.calc_button_pressed)) }
                         else -> child.setOnClickListener {
                             viewModel.appendTokenAt((it as Button).text.toString(), index)
+
                             onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
                         }
                     }
@@ -212,34 +221,44 @@ class CalculatorFragment : Fragment() {
             when {
                 child == binding?.equalSign -> binding?.equalSign?.setOnClickListener {
                     applyInputOutputStyling(20F, 40F, secondaryColor, primaryColor)
+
                     viewModel.saveResult()
+
                     setInputField()
                 }
                 child == binding?.delete -> {
                     child.setOnClickListener {
                         applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
+
                         viewModel.deleteToken()
+
                         setInputField()
                     }
                 }
                 child == binding?.deleteAll -> {
                     child.setOnClickListener {
                         applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
+
                         viewModel.deleteAllTokens()
+
                         setInputField()
                     }
                 }
                 child == binding?.percentSign -> {
                     child.setOnClickListener {
                         applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
+
                         viewModel.appendToken(Operator.PERCENTAGE.operator)
+
                         setInputField()
                     }
                 }
                 operatorsMap.containsKey(child) -> {
                     child.setOnClickListener {
                         applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
+
                         viewModel.appendToken(operatorsMap[it]!!)
+
                         setInputField()
                     }
                 }
@@ -248,7 +267,9 @@ class CalculatorFragment : Fragment() {
                     (child as Button).setTextColor(primaryColor)
                     child.setOnClickListener {
                         applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
+
                         viewModel.appendToken((it as Button).text.toString())
+
                         setInputField()
                     }
                 }

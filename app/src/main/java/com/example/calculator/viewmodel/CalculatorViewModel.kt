@@ -1,9 +1,14 @@
 package com.example.calculator.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.calculator.algorithms.ExpressionEvaluator
 import com.example.calculator.algorithms.InputParser
 import com.example.calculator.model.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 
 class CalculatorViewModel : ViewModel() {
@@ -23,12 +28,14 @@ class CalculatorViewModel : ViewModel() {
     fun appendTokenAt(input: String, index: Int) {
         val token = InputParser.parseToken(input)
         expression.appendTokenAt(token, index)
+
         calculateExpression()
     }
 
     fun setTokenAt(input: String, index: Int) {
         val token = InputParser.parseToken(input)
         expression.setTokenAt(token, index)
+
         calculateExpression()
     }
 
@@ -41,17 +48,20 @@ class CalculatorViewModel : ViewModel() {
 
     fun deleteTokenAt(index: Int) {
         expression.deleteTokenAt(index, false)
+
         calculateExpression()
     }
 
     fun deleteAllTokens() {
         resultOfExpression = Token(Kind.Number, "0")
         expression.deleteAllTokens()
+
         calculateExpression()
     }
 
     fun deleteAllTokensAt(index: Int) {
         expression.deleteAllTokensAt(index)
+
         calculateExpression()
     }
 
@@ -59,13 +69,17 @@ class CalculatorViewModel : ViewModel() {
         expression.deleteAllTokens()
         val token = InputParser.parseToken(resultOfExpression.value)
         expression.appendToken(token)
+
         calculateExpression()
     }
 
     private fun calculateExpression() {
         inputAsTokens = expression.expression
         try {
-            resultOfExpression = ExpressionEvaluator.getResult(inputAsTokens)
+            viewModelScope.launch {
+                resultOfExpression = ExpressionEvaluator.getResult(inputAsTokens)
+                Log.d("ThreadC", "Expression Thread ${this.coroutineContext}")
+            }
         } catch (e: ArithmeticException) {
             resultOfExpression = Token(Kind.Number, "0")
         }
