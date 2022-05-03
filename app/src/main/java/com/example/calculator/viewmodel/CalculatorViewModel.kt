@@ -6,9 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.calculator.algorithms.ExpressionEvaluator
 import com.example.calculator.algorithms.InputParser
 import com.example.calculator.model.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.math.BigDecimal
 
 class CalculatorViewModel : ViewModel() {
@@ -78,8 +76,8 @@ class CalculatorViewModel : ViewModel() {
         try {
             viewModelScope.launch {
                 resultOfExpression = ExpressionEvaluator.getResult(inputAsTokens)
-                Log.d("ThreadC", "Expression Thread ${this.coroutineContext}")
             }
+        // Division by zero
         } catch (e: ArithmeticException) {
             resultOfExpression = Token(Kind.Number, "0")
         }
