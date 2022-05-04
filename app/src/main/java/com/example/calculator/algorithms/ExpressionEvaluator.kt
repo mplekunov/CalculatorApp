@@ -121,7 +121,7 @@ object ExpressionEvaluator {
         }
 
         val token = s.pop()
-        token.value = BigDecimal(token.value).stripTrailingZeros().toString()
+        token.value = BigDecimal(token.value).toString()
 
         return token
     }
