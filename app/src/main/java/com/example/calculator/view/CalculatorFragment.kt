@@ -19,20 +19,13 @@ import androidx.core.view.children
 import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.example.calculator.R
 import com.example.calculator.databinding.FragmentCalculatorBinding
-import com.example.calculator.model.Kind
 import com.example.calculator.model.Token
 import com.example.calculator.algorithms.TokenFormatter
 import com.example.calculator.miscellaneous.TokenTypes
 import com.example.calculator.model.Function
-import com.example.calculator.model.Operator
 import com.example.calculator.viewmodel.CalculatorViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class CalculatorFragment : Fragment() {
     private var binding: FragmentCalculatorBinding? = null
@@ -176,7 +169,7 @@ class CalculatorFragment : Fragment() {
                         child == binding?.percentSign -> { disableButton(child, ContextCompat.getColor(requireContext(), R.color.calc_button_pressed)) }
                         child == binding?.changeLayout -> { disableButton(child, ContextCompat.getColor(requireContext(), R.color.calc_button_pressed)) }
                         else -> child.setOnClickListener {
-                            viewModel.appendTokenAt((it as Button).text.toString(), index)
+                            viewModel.addTokenAt((it as Button).text.toString(), index)
 
                             onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
                         }
@@ -252,7 +245,7 @@ class CalculatorFragment : Fragment() {
                     child.setOnClickListener {
                         applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
 
-                        viewModel.appendToken(Function.PERCENTAGE.operator)
+                        viewModel.addToken(Function.PERCENTAGE.operator)
 
                         setInputField()
                     }
@@ -261,7 +254,7 @@ class CalculatorFragment : Fragment() {
                     child.setOnClickListener {
                         applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
 
-                        viewModel.appendToken(operatorsMap[it]!!)
+                        viewModel.addToken(operatorsMap[it]!!)
 
                         setInputField()
                     }
@@ -272,7 +265,7 @@ class CalculatorFragment : Fragment() {
                     child.setOnClickListener {
                         applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
 
-                        viewModel.appendToken((it as Button).text.toString())
+                        viewModel.addToken((it as Button).text.toString())
 
                         setInputField()
                     }

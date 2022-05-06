@@ -1,10 +1,15 @@
 package com.example.calculator.algorithms
 
+import com.example.calculator.miscellaneous.Associativity
+import com.example.calculator.miscellaneous.Operators
+import com.example.calculator.miscellaneous.TokenTypes
 import com.example.calculator.model.*
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
 import kotlin.ArithmeticException
+import kotlin.NoSuchElementException
+import kotlin.Number as Number1
 
 /**
  * Helper class that evaluates [Expression].
@@ -16,29 +21,32 @@ object ExpressionEvaluator {
      * @param infix representation of a mathematical expression.
      * @return postfix representation of a mathematical expression.
      */
+    @Throws(NullPointerException::class)
     private fun infixToPostfix(infix: MutableList<Token>) : MutableList<Token> {
         val postfix = mutableListOf<Token>()
-        val opStack = Stack<Token>()
+        val opStack = Stack<Operator>()
 
         while (infix.isNotEmpty()){
             val token = infix.first()
             infix.removeFirst()
 
             // Operator or Function or Percentage
-            if (token.kind == Kind.Operator) {
-                when (token.value) {
-                    Operator.LEFT_BRACKET.operator -> opStack.push(token)
-                    Operator.RIGHT_BRACKET.operator -> {
-                        while (opStack.peek().value != Operator.LEFT_BRACKET.operator)
+            if (token.type == TokenTypes.Operator) {
+                val operatorToken = Operator.parseToken(token) ?: throw NullPointerException("Empty Operator Token")
+
+                when (operatorToken.type) {
+                    Operators.LEFT_BRACKET -> opStack.push(operatorToken)
+                    Operators.RIGHT_BRACKET -> {
+                        while (opStack.peek().type != Operators.LEFT_BRACKET)
                             postfix.add(opStack.pop())
 
                         opStack.pop()
                     }
                     else -> {
-                        while (opStack.isNotEmpty() && isAssociativeRule(token, opStack.peek()))
+                        while (opStack.isNotEmpty() && isAssociativeRule(operatorToken, opStack.peek()))
                             postfix.add(opStack.pop())
 
-                        opStack.push(token)
+                        opStack.push(operatorToken)
                     }
                 }
             }
@@ -60,8 +68,7 @@ object ExpressionEvaluator {
      * @param y of type [Operator] representing information about second operator.
      * @return [Boolean] indicating adherence to associative rule or the lack of.
      */
-    private fun isAssociativeRule(x: Token, y: Token) : Boolean =
-        (isLeftRule(getValue<Operator>(x.value), getValue<Operator>(y.value)) || isRightRule(getValue<Operator>(x.value), getValue<Operator>(y.value)))
+    private fun isAssociativeRule(x: Operator, y: Operator) : Boolean = isLeftRule(x, y) || isRightRule(x, y)
 
     /**
      * Helper function.
@@ -70,8 +77,8 @@ object ExpressionEvaluator {
      * @param x of type [Operator] representing information about first operator.
      * @param y of type [Operator] representing information about second operator.
      */
-    private fun isLeftRule(x: Operator?, y: Operator?): Boolean =
-        x!!.associativity == Operator.ASSOCIATIVITY.LEFT && x.precedence <= y!!.precedence
+    private fun isLeftRule(x: Operator, y: Operator): Boolean =
+        x.associativity == Associativity.LEFT && x.precedence <= y.precedence
     /**
      * Helper function.
      * Checks for the right rule of [Operator].
@@ -79,8 +86,8 @@ object ExpressionEvaluator {
      * @param x of type [Operator] representing information about first operator.
      * @param y of type [Operator] representing information about second operator.
      */
-    private fun isRightRule(x: Operator?, y: Operator?): Boolean =
-        x!!.associativity == Operator.ASSOCIATIVITY.RIGHT && x.precedence < y!!.precedence
+    private fun isRightRule(x: Operator, y: Operator): Boolean =
+        x.associativity == Associativity.RIGHT && x.precedence < y.precedence
 
     /**
      * Computes result of a mathematical expression.
@@ -88,12 +95,15 @@ object ExpressionEvaluator {
      * @param expression as a collection of [Token].
      * @return [Token] containing result of computation.
      */
-    @Throws(ArithmeticException::class)
+    @Throws(ArithmeticException::class, NoSuchElementException::class)
     fun getResult(expression: List<Token>): Token {
         val infix = mutableListOf<Token>().apply { addAll(expression) }
 
         if (infix.isNullOrEmpty())
-            return Token(Kind.Number, "0")
+            return object : Token {
+                override var value = "0"
+                override val type = TokenTypes.Number
+            }
 
         val postfix = infixToPostfix(infix)
 
@@ -102,22 +112,29 @@ object ExpressionEvaluator {
         for (i in postfix.indices) {
             val token = postfix[i]
 
-            if (token.kind == Kind.Number)
+            if (token.type == TokenTypes.Number)
                 s.push(token)
-            else {
+            else if (token.type == TokenTypes.Operator){
+                // All operators require 2 operands, therefore if we don't have two operands in our stack
+                // We can't calculate the result of an expression
                 if (s.size < 2)
                     break
+
+                val operator = Operator.parseToken(token) ?: throw NullPointerException("Empty Operator Token")
 
                 val right = BigDecimal(s.pop().value).setScale(10, RoundingMode.HALF_UP)
                 val left = BigDecimal(s.pop().value).setScale(10, RoundingMode.HALF_UP)
 
-                when(token.value) {
-                    Operator.ADDITION.operator -> s.push(Token(Kind.Number, addition(left, right)))
-                    Operator.SUBTRACTION.operator -> s.push(Token(Kind.Number, subtraction(left, right)))
-                    Operator.MULTIPLICATION.operator -> s.push(Token(Kind.Number, multiplication(left, right)))
-                    Operator.DIVISION.operator -> s.push(Token(Kind.Number, division(left, right)))
-                    Operator.POWER.operator -> s.push(Token(Kind.Number, power(left, right)))
+                val result = when(operator.type) {
+                    Operators.ADDITION -> addition(left, right)
+                    Operators.SUBTRACTION -> subtraction(left, right)
+                    Operators.MULTIPLICATION -> multiplication(left, right)
+                    Operators.DIVISION -> division(left, right)
+                    Operators.POWER -> power(left, right)
+                    else -> throw NoSuchElementException("No Suitable Operator Was Found")
                 }
+
+                s.push(numberToToken(result))
             }
         }
 
@@ -125,6 +142,13 @@ object ExpressionEvaluator {
         token.value = BigDecimal(token.value).toString()
 
         return token
+    }
+
+    private fun numberToToken(number: String) : Token {
+        return object : Token {
+            override var value = number
+            override val type = TokenTypes.Number
+        }
     }
 
     private fun addition(left: BigDecimal, right: BigDecimal): String = left.plus(right).toString()

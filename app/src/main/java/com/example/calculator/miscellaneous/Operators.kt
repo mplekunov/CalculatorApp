@@ -5,6 +5,7 @@ enum class Operators {
     SUBTRACTION,
     DIVISION,
     MULTIPLICATION,
-    DOT,
-    POWER
+    POWER,
+    LEFT_BRACKET,
+    RIGHT_BRACKET
 }
