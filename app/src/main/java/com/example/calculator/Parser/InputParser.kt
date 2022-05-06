@@ -1,10 +1,7 @@
-package com.example.calculator.algorithms
+package com.example.calculator.Parser
 
-import com.example.calculator.model.Function
-import com.example.calculator.model.Kind
-import com.example.calculator.model.Operator
-import com.example.calculator.model.Token
-import com.example.calculator.model.contains
+import com.example.calculator.miscellaneous.TokenTypes
+import com.example.calculator.model.*
 
 /**
  * Helper class that parses string into token
@@ -16,16 +13,13 @@ object InputParser {
      * @param token [String] representation of a token to be parsed.
      * @return [Token] representation of the [String] passed.
      */
-    fun parseToken(token: String) : Token {
-        var kind: Kind? = null
-
-        when {
-            isOperator(token) -> kind = Kind.Operator
-            isNumber(token) -> kind = Kind.Number
-            isFunction(token) -> kind = Kind.Function
+    fun parseToken(input: String) : Token? {
+        return when {
+            isOperator(input) -> Token(input, TokenTypes.Operator)
+            isNumber(input) -> Token(input, TokenTypes.Number)
+            isFunction(input) -> Token(input, TokenTypes.Function)
+            else -> null
         }
-
-        return Token(kind, token)
     }
 
     /**
@@ -35,7 +29,7 @@ object InputParser {
      * @param token the token in question.
      * @return [Boolean] indicating the result of the query.
      */
-    private fun isFunction(token: String): Boolean = contains<Function>(token)
+    private fun isFunction(token: String): Boolean = isNumber(token) == isOperator(token)
 
     /**
      * Helper function.
@@ -53,5 +47,5 @@ object InputParser {
      * @param token the token in question.
      * @return [Boolean] indicating the result of the query.
      */
-    private fun isOperator(token: String): Boolean = contains<Operator>(token)
+    private fun isOperator(token: String): Boolean = operatorMap.contains(token)
 }

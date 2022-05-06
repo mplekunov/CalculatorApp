@@ -1,13 +1,11 @@
 package com.example.calculator.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.calculator.algorithms.ExpressionEvaluator
-import com.example.calculator.algorithms.InputParser
+import com.example.calculator.Parser.InputParser
 import com.example.calculator.model.*
 import kotlinx.coroutines.*
-import java.math.BigDecimal
 
 class CalculatorViewModel : ViewModel() {
     private val expression = Expression()

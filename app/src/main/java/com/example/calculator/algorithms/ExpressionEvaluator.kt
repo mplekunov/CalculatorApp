@@ -24,6 +24,7 @@ object ExpressionEvaluator {
             val token = infix.first()
             infix.removeFirst()
 
+            // Operator or Function or Percentage
             if (token.kind == Kind.Operator) {
                 when (token.value) {
                     Operator.LEFT_BRACKET.operator -> opStack.push(token)

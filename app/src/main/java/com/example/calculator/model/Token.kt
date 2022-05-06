@@ -1,8 +1,11 @@
 package com.example.calculator.model
 
-class Token(val kind: Kind?, var value: String) {
+import com.example.calculator.miscellaneous.TokenTypes
 
-    override fun toString(): String {
-        return value
-    }
+/**
+ *
+ */
+interface Token {
+    var value: String
+    val type: Any
 }

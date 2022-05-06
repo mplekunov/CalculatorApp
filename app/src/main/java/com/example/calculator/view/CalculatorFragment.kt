@@ -25,6 +25,7 @@ import com.example.calculator.databinding.FragmentCalculatorBinding
 import com.example.calculator.model.Kind
 import com.example.calculator.model.Token
 import com.example.calculator.algorithms.TokenFormatter
+import com.example.calculator.miscellaneous.TokenTypes
 import com.example.calculator.model.Function
 import com.example.calculator.model.Operator
 import com.example.calculator.viewmodel.CalculatorViewModel
@@ -123,8 +124,8 @@ class CalculatorFragment : Fragment() {
         return object:  ClickableSpan() {
             override fun onClick(view: View) {
                 when {
-                    token.kind == Kind.Number -> bindNumbersToEditableToken()
-                    token.kind == Kind.Operator -> bindOperatorsToEditableToken()
+                    token.type == TokenTypes.Number -> bindNumbersToEditableToken()
+                    token.type == TokenTypes.Operator -> bindOperatorsToEditableToken()
                 }
 
                 applyEditingStyle(view as TextView, start, end, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
@@ -141,6 +142,10 @@ class CalculatorFragment : Fragment() {
             private fun bindOperatorsToEditableToken() {
                 binding?.calculator?.children?.forEach { child ->
                     when {
+                        binding?.additionSign?.setOnClickListener {
+                            viewModel
+                        }
+
                         operatorsMap.containsKey(child) -> {
                             child.setOnClickListener {
                                 viewModel.setTokenAt(operatorsMap[child]!!, index)

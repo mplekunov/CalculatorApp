@@ -1,25 +1,24 @@
 package com.example.calculator.model
 
-enum class Function {
-    PERCENTAGE("%", Operator.ASSOCIATIVITY.NONE, -1);
+import com.example.calculator.miscellaneous.Associativity
+import com.example.calculator.miscellaneous.Functions
+import com.example.calculator.miscellaneous.TokenTypes
 
-    enum class ASSOCIATIVITY {
-        LEFT,
-        RIGHT,
-        NONE
-    }
-
-    var operator: String = ""
-    var associativity: Operator.ASSOCIATIVITY = Operator.ASSOCIATIVITY.NONE
-    var precedence: Int = -1
-
-    constructor()
-
-    constructor(operator: String, associativity: Operator.ASSOCIATIVITY, precedence: Int) {
-        this.operator = operator
-        this.associativity = associativity
-        this.precedence = precedence
-    }
-
-    override fun toString(): String = operator
+class Function(
+    override var value: String,
+    override var type: Functions,
+    val associativity: Associativity = Associativity.RIGHT,
+) : Token {
+        companion object Factory {
+            fun parseToken(function : Functions) : Function? {
+                return when (function) {
+                    Functions.PERCENTAGE -> Function("%", Functions.PERCENTAGE)
+                    Functions.LOG -> Function("log", Functions.LOG)
+                    Functions.NATURAL_LOG -> Function("ln", Functions.NATURAL_LOG)
+                    Functions.COS -> Function("cos", Functions.COS)
+                    Functions.SIN -> Function("sin", Functions.SIN)
+                    else -> null
+                }
+            }
+        }
 }
