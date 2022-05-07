@@ -1,11 +1,21 @@
 package com.example.calculator.viewmodel
 
+import android.util.Log
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+
 import com.example.calculator.algorithms.ExpressionEvaluator
+import com.example.calculator.algorithms.TokenFormatter
+
 import com.example.calculator.miscellaneous.TokenTypes
-import com.example.calculator.model.*
+
+import com.example.calculator.model.Operator
 import com.example.calculator.model.Number
+import com.example.calculator.model.Function
+import com.example.calculator.model.Token
+import com.example.calculator.model.Expression
+
 import kotlinx.coroutines.*
 import kotlin.NullPointerException
 
@@ -24,7 +34,7 @@ class CalculatorViewModel : ViewModel() {
     }
 
     @Throws(NullPointerException::class)
-    private fun addNumber(token: Token, index: Int = expression.expression.lastIndex) {
+    private fun addNumber(token: Token, index: Int = expression.expression.size) {
         val number = Number.parseToken(token) ?: throw NullPointerException("Empty Number Token")
 
         // We can't receive more then one number token at a time because user inputs one token at a time
@@ -34,16 +44,25 @@ class CalculatorViewModel : ViewModel() {
     }
 
     @Throws(NullPointerException::class)
-    private fun addOperator(token: Token, index: Int = expression.expression.lastIndex) {
-        val operator = Operator.parseToken(token)?.type ?: throw NullPointerException("Empty Operator Token")
+    private fun addOperator(token: Token, index: Int = expression.expression.size) {
+        val operator = Operator.parseToken(token)?.subType ?: throw NullPointerException("Empty Operator Token")
 
         expression.addOperator(operator, index)
     }
 
-    fun addTokenAt(token: Token, index: Int = expression.expression.lastIndex) {
+    @Throws(NullPointerException::class)
+    private fun addFunction(token : Token, index : Int = expression.expression.size) {
+        val function = Function.parseToken(token)?.subType ?: throw NullPointerException("Empty Function Token")
+
+        expression.addFunction(function, index)
+        calculateExpression()
+    }
+
+    fun addTokenAt(token: Token, index: Int = expression.expression.size) {
         when(token.type) {
             TokenTypes.Operator -> addOperator(token, index)
             TokenTypes.Number -> addNumber(token, index)
+            TokenTypes.Function -> addFunction(token, index)
         }
     }
 

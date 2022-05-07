@@ -7,5 +7,5 @@ import com.example.calculator.miscellaneous.TokenTypes
  */
 interface Token {
     var value: String
-    val type: Any
+    val type: TokenTypes
 }

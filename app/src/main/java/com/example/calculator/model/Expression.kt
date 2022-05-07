@@ -1,5 +1,6 @@
 package com.example.calculator.model
 
+import com.example.calculator.miscellaneous.Functions
 import com.example.calculator.miscellaneous.Numbers
 import com.example.calculator.miscellaneous.Operators
 import com.example.calculator.miscellaneous.TokenTypes
@@ -34,6 +35,10 @@ class Expression {
         // We are sure that when we encounter number, it's going to be either "new" number
         // or it's going to be addition to the previous number
         val index = if (index > _expression.lastIndex) _expression.lastIndex else index
+
+        if (index < 0)
+            return true
+
         val tokenToEdit = _expression[index]
 
         // If last token is a number, we add new "token" to the previous number
@@ -53,7 +58,8 @@ class Expression {
             else if (numberToken.valueAsTokens.size < _tokenLengthLimit)
                 _expression[index].value += Number.parseNumber(number)?.value ?: 0
 
-        } else if (tokenToEdit.type == TokenTypes.Operator || tokenToEdit.type == TokenTypes.Function)
+        } else if ((tokenToEdit.type == TokenTypes.Operator ||
+                    (tokenToEdit.type == TokenTypes.Function && Function.parseToken(tokenToEdit)?.subType != Functions.PERCENTAGE)) && number != Numbers.DOT)
             _expression.add(token)
 
         return true
@@ -95,24 +101,29 @@ class Expression {
         return false
     }
 
-//    private fun appendFunction(token: Token, index: Int): Boolean {
-//        // Expression can't start with an operator
-//        if (_expression.isEmpty())
-//            return false
-//
-//        // In case of Operators, each operator has its own token
-//        // No two operators can be appended to each other
-//        val lastToken = _expression.last()
-//
-//        if (lastToken.type == TokenTypes.Number) {
-//            return when {
-//                functionMap[token.value]?.type == Functions.PERCENTAGE -> parsePercentage(index)
-//                else -> false
-//            }
-//        }
-//
-//        return false
-//    }
+    fun addFunction(function: Functions, index: Int) : Boolean {
+        val token =
+            object : Token {
+                override var value = Function.parseFunction(function)?.value ?: ""
+                override val type = TokenTypes.Function
+            }
+
+        if (function == Functions.PERCENTAGE && _expression.isEmpty())
+            return false
+
+        // All functions have the same format fun ( expr )
+        // The only exception is Percentage
+        if (function == Functions.PERCENTAGE && _expression.last().type == TokenTypes.Number) {
+            when {
+                index <= _expression.lastIndex ->_expression.add(index, token)
+                else -> _expression.add(token)
+            }
+        }
+
+        // Logic for fun ( expr ) format
+
+        return true
+    }
 
     @Throws(NullPointerException::class)
     private fun parseDot(index: Int): Boolean {
@@ -124,42 +135,13 @@ class Expression {
         val tokenToEdit = _expression[curIndex]
         val numberToken = Number.parseToken(tokenToEdit) ?: throw NullPointerException("Empty Number Token")
 
-        if (numberToken.type == Numbers.INTEGER) {
+        if (numberToken.subType == Numbers.INTEGER) {
             _expression[curIndex].value += "."
             return true
         }
 
         return false
     }
-
-//    private fun parsePercentage(index: Int): Boolean {
-//        val curIndex = if (index < _expression.lastIndex)
-//            index
-//        else
-//            _expression.lastIndex
-//
-//        val token = _expression[curIndex]
-//
-//        var percentage = BigDecimal(token.value).setScale(10, RoundingMode.HALF_UP).div(BigDecimal(100.0).setScale(10, RoundingMode.HALF_UP))
-//
-//        if (index > 2) {
-//            val lastKnownOperator = _expression[curIndex - 1]
-//            val lastKnownNumber = BigDecimal(_expression[curIndex - 2].value).setScale(10, RoundingMode.HALF_UP)
-//
-//            percentage = when (operatorMap[lastKnownOperator.value]?.type) {
-//                Operators.ADDITION -> percentage.multiply(lastKnownNumber)
-//                Operators.SUBTRACTION -> (BigDecimal(1).setScale(10, RoundingMode.HALF_UP).minus(percentage)).times(lastKnownNumber)
-//                else -> percentage
-//            }
-//        }
-//
-//        token.value = percentage.toString()
-//        _expression[curIndex] = token
-//
-//        Log.d("Calculator", "$percentage")
-//
-//        return true
-//    }
 
     /**
      * Deletes last character of the last [Token]'s value.
@@ -234,7 +216,7 @@ class Expression {
 
         val oldToken = _expression[index]
 
-        if (token != oldToken.type)
+        if (token.type != oldToken.type)
             return false
 
         _expression[index] = token

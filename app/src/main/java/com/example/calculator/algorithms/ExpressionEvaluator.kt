@@ -1,21 +1,22 @@
 package com.example.calculator.algorithms
 
 import com.example.calculator.miscellaneous.Associativity
+import com.example.calculator.miscellaneous.Functions
 import com.example.calculator.miscellaneous.Operators
 import com.example.calculator.miscellaneous.TokenTypes
+import com.example.calculator.model.Function
+
 import com.example.calculator.model.*
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
 import kotlin.ArithmeticException
 import kotlin.NoSuchElementException
-import kotlin.Number as Number1
 
 /**
  * Helper class that evaluates [Expression].
  */
 object ExpressionEvaluator {
-    val bigDecimal = BigDecimal.ZERO
     /**
      * Converts infix into Postfix.
      * @param infix representation of a mathematical expression.
@@ -30,14 +31,32 @@ object ExpressionEvaluator {
             val token = infix.first()
             infix.removeFirst()
 
-            // Operator or Function or Percentage
-            if (token.type == TokenTypes.Operator) {
+            // Operator or Function
+            if (token.type == TokenTypes.Function) {
+                if (Function.parseToken(token)?.subType == Functions.PERCENTAGE) {
+                    var percentage = BigDecimal(postfix.removeLast().value).setScale(10, RoundingMode.HALF_UP).div(BigDecimal(100.0).setScale(10, RoundingMode.HALF_UP))
+
+                    if (postfix.isNotEmpty()) {
+                        val lastKnownOperator = opStack.peek()
+                        val lastKnownNumber = BigDecimal(postfix.last().value).setScale(10, RoundingMode.HALF_UP)
+
+                        percentage =
+                            if (lastKnownOperator.subType == Operators.SUBTRACTION || lastKnownOperator.subType == Operators.ADDITION)
+                                percentage.times(lastKnownNumber)
+                            else
+                                percentage
+                    }
+
+                    postfix.add(numberToToken(percentage.toString()))
+                }
+            }
+            else if (token.type == TokenTypes.Operator) {
                 val operatorToken = Operator.parseToken(token) ?: throw NullPointerException("Empty Operator Token")
 
-                when (operatorToken.type) {
+                when (operatorToken.subType) {
                     Operators.LEFT_BRACKET -> opStack.push(operatorToken)
                     Operators.RIGHT_BRACKET -> {
-                        while (opStack.peek().type != Operators.LEFT_BRACKET)
+                        while (opStack.peek().subType != Operators.LEFT_BRACKET)
                             postfix.add(opStack.pop())
 
                         opStack.pop()
@@ -125,7 +144,7 @@ object ExpressionEvaluator {
                 val right = BigDecimal(s.pop().value).setScale(10, RoundingMode.HALF_UP)
                 val left = BigDecimal(s.pop().value).setScale(10, RoundingMode.HALF_UP)
 
-                val result = when(operator.type) {
+                val result = when(operator.subType) {
                     Operators.ADDITION -> addition(left, right)
                     Operators.SUBTRACTION -> subtraction(left, right)
                     Operators.MULTIPLICATION -> multiplication(left, right)
@@ -138,10 +157,7 @@ object ExpressionEvaluator {
             }
         }
 
-        val token = s.pop()
-        token.value = BigDecimal(token.value).toString()
-
-        return token
+        return s.pop()
     }
 
     private fun numberToToken(number: String) : Token {

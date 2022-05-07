@@ -1,13 +1,12 @@
 package com.example.calculator.model
 
-import com.example.calculator.miscellaneous.Associativity
 import com.example.calculator.miscellaneous.Functions
 import com.example.calculator.miscellaneous.TokenTypes
 
 class Function(
     override var value: String,
-    override var type: Functions,
-    val associativity: Associativity = Associativity.RIGHT,
+    var subType: Functions,
+    override val type: TokenTypes = TokenTypes.Function
 ) : Token {
         companion object Factory {
             fun parseFunction(function : Functions) : Function? {
@@ -20,7 +19,6 @@ class Function(
                     else -> null
                 }
             }
-
 
             fun parseToken(token: Token) : Function? {
                 return when(token.value) {

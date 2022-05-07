@@ -1,10 +1,13 @@
 package com.example.calculator.model
 
 import com.example.calculator.miscellaneous.Numbers
+import com.example.calculator.miscellaneous.TokenTypes
 
 class Number (
     override var value: String,
-    val valueAsTokens: MutableList<Numbers>
+    val valueAsTokens: MutableList<Numbers>,
+    var subType: Numbers = Numbers.INTEGER,
+    override val type: TokenTypes = TokenTypes.Number
     ) : Token {
         companion object Factory {
             fun parseNumber(number: Numbers) : Number? {
@@ -19,6 +22,7 @@ class Number (
                     Numbers.SEVEN -> Number("7", mutableListOf(Numbers.SEVEN))
                     Numbers.EIGHT -> Number("8", mutableListOf(Numbers.EIGHT))
                     Numbers.NINE -> Number("9", mutableListOf(Numbers.NINE))
+                    Numbers.DOT -> Number(".", mutableListOf(Numbers.DOT))
                     else -> null
                 }
             }
@@ -43,11 +47,9 @@ class Number (
                     })
 
                 if (number.valueAsTokens.contains(Numbers.DOT))
-                    number.type = Numbers.FLOAT
+                    number.subType = Numbers.FLOAT
 
                 return number
             }
         }
-
-        override var type = Numbers.INTEGER
     }
