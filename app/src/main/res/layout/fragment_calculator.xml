@@ -8,6 +8,9 @@
         <variable
             name="calculatorFragment"
             type="com.example.calculator.view.CalculatorFragment" />
+        <variable
+            name="viewModel"
+            type="com.example.calculator.viewmodel.CalculatorViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -44,7 +47,7 @@
 
                 tools:text="5 + 5 + 7 + 10 * 7 / 9"
 
-                android:onTextChanged="@{() -> calculatorFragment.onInputChange()}" />
+                android:onTextChanged="@{() -> calculatorFragment.}" />
 
             <TextView
                 android:id="@+id/output"

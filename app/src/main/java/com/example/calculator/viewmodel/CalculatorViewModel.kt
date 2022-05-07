@@ -48,9 +48,6 @@ class CalculatorViewModel : ViewModel() {
     }
 
     fun setTokenAt(token: Token, index: Int = expression.expression.lastIndex) {
-//        val token = InputParser.parseToken(input)
-//        expression.setTokenAt(token, index)
-
         expression.setTokenAt(token, index)
 
         if (index != expression.expression.lastIndex || (index == expression.expression.lastIndex && token.type == TokenTypes.Number))

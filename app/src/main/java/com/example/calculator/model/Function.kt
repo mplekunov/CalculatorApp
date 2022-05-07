@@ -10,13 +10,22 @@ class Function(
     val associativity: Associativity = Associativity.RIGHT,
 ) : Token {
         companion object Factory {
-            fun parseToken(function : Functions) : Function? {
+            fun parseFunction(function : Functions) : Function? {
                 return when (function) {
                     Functions.PERCENTAGE -> Function("%", Functions.PERCENTAGE)
                     Functions.LOG -> Function("log", Functions.LOG)
                     Functions.NATURAL_LOG -> Function("ln", Functions.NATURAL_LOG)
                     Functions.COS -> Function("cos", Functions.COS)
                     Functions.SIN -> Function("sin", Functions.SIN)
+                    else -> null
+                }
+            }
+
+
+            fun parseToken(token: Token) : Function? {
+                return when(token.value) {
+                    "%" -> parseFunction(Functions.PERCENTAGE)
+                    "log" -> parseFunction(Functions.LOG)
                     else -> null
                 }
             }
