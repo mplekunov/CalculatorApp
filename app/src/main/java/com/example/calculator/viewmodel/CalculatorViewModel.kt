@@ -1,7 +1,5 @@
 package com.example.calculator.viewmodel
 
-import android.util.Log
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
@@ -22,7 +20,10 @@ import kotlin.NullPointerException
 class CalculatorViewModel : ViewModel() {
     private val expression = Expression()
 
-    var inputAsTokens: List<Token> = emptyList()
+    private var _inputAsTokens: MutableList<Token> = mutableListOf()
+    val inputAsTokens: List<Token>
+        get() = _inputAsTokens
+
     lateinit var resultOfExpression: Token
 
     init {
@@ -112,10 +113,10 @@ class CalculatorViewModel : ViewModel() {
     }
 
     private fun calculateExpression() {
-        inputAsTokens = expression.expression
+        _inputAsTokens = expression.expression as MutableList<Token>
         try {
             viewModelScope.launch {
-                resultOfExpression = ExpressionEvaluator.getResult(inputAsTokens)
+                resultOfExpression = ExpressionEvaluator.getResult(_inputAsTokens)
             }
         // Division by zero
         } catch (e: ArithmeticException) {

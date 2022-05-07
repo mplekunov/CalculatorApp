@@ -23,7 +23,9 @@ object ExpressionEvaluator {
      * @return postfix representation of a mathematical expression.
      */
     @Throws(NullPointerException::class)
-    private fun infixToPostfix(infix: MutableList<Token>) : MutableList<Token> {
+    private fun infixToPostfix(expression: MutableList<Token>) : MutableList<Token> {
+        val infix = mutableListOf<Token>(). apply { addAll(expression) }
+
         val postfix = mutableListOf<Token>()
         val opStack = Stack<Operator>()
 
@@ -46,6 +48,9 @@ object ExpressionEvaluator {
                             else
                                 percentage
                     }
+
+                    expression.removeLast()
+                    expression[expression.lastIndex] = numberToToken(percentage.toString())
 
                     postfix.add(numberToToken(percentage.toString()))
                 }
@@ -115,16 +120,16 @@ object ExpressionEvaluator {
      * @return [Token] containing result of computation.
      */
     @Throws(ArithmeticException::class, NoSuchElementException::class)
-    fun getResult(expression: List<Token>): Token {
-        val infix = mutableListOf<Token>().apply { addAll(expression) }
+    fun getResult(expression: MutableList<Token>): Token {
+//        val infix = mutableListOf<Token>().apply { addAll(expression) }
 
-        if (infix.isNullOrEmpty())
+        if (expression.isNullOrEmpty())
             return object : Token {
                 override var value = "0"
                 override val type = TokenTypes.Number
             }
 
-        val postfix = infixToPostfix(infix)
+        val postfix = infixToPostfix(expression)
 
         val s = Stack<Token>()
 
