@@ -50,9 +50,9 @@ object ExpressionEvaluator {
                     }
 
                     expression.removeLast()
-                    expression[expression.lastIndex] = numberToToken(percentage.toString())
+                    expression[expression.lastIndex] = numberToToken(percentage.stripTrailingZeros().toString())
 
-                    postfix.add(numberToToken(percentage.toString()))
+                    postfix.add(numberToToken(percentage.stripTrailingZeros().toString()))
                 }
             }
             else if (token.type == TokenTypes.Operator) {
@@ -113,6 +113,8 @@ object ExpressionEvaluator {
     private fun isRightRule(x: Operator, y: Operator): Boolean =
         x.associativity == Associativity.RIGHT && x.precedence < y.precedence
 
+//    private fun roundNumber(number: String) : BigDecimal =
+
     /**
      * Computes result of a mathematical expression.
      *
@@ -172,12 +174,11 @@ object ExpressionEvaluator {
         }
     }
 
-    private fun addition(left: BigDecimal, right: BigDecimal): String = left.plus(right).toString()
-    private fun subtraction(left: BigDecimal, right: BigDecimal): String = left.minus(right).toString()
-    private fun multiplication(left: BigDecimal, right: BigDecimal): String = left.times(right).toString()
+    private fun addition(left: BigDecimal, right: BigDecimal): String = left.plus(right).stripTrailingZeros().toString()
+    private fun subtraction(left: BigDecimal, right: BigDecimal): String = left.minus(right).stripTrailingZeros().toString()
+    private fun multiplication(left: BigDecimal, right: BigDecimal): String = left.times(right).stripTrailingZeros().toString()
     @Throws(ArithmeticException::class)
-    private fun division(left: BigDecimal, right: BigDecimal): String {
-        return if (right != BigDecimal.ZERO) left.div(right).toString() else throw ArithmeticException("Division by 0")
-    }
-    private fun power(left: BigDecimal, right: BigDecimal): String = left.pow(right.toInt()).toString()
+    private fun division(left: BigDecimal, right: BigDecimal): String =
+        if (right != BigDecimal.ZERO) left.div(right).stripTrailingZeros().toString() else throw ArithmeticException("Division by 0")
+    private fun power(left: BigDecimal, right: BigDecimal): String = left.pow(right.toInt()).stripTrailingZeros().toString()
 }

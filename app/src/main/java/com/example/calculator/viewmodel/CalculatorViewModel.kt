@@ -107,8 +107,9 @@ class CalculatorViewModel : ViewModel() {
     }
 
     fun saveResult() {
+        val result = resultOfExpression
         deleteAllTokens()
-        addToken(resultOfExpression)
+        addToken(result)
         calculateExpression()
     }
 
