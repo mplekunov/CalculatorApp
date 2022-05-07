@@ -1,56 +1,37 @@
 package com.example.calculator.model
 
-/**
- * [Operator] [Enum] containing information about all allowed operators.
- *
- * @property associativity [ASSOCIATIVITY] of the operator.
- * @property precedence [Int] of the operator.
- */
-enum class Operator {
-    ADDITION("+", ASSOCIATIVITY.LEFT, 0),
-    MULTIPLICATION("*", ASSOCIATIVITY.LEFT, 5),
-    SUBTRACTION("-", ASSOCIATIVITY.LEFT, 0),
-    DIVISION("/", ASSOCIATIVITY.LEFT, 5),
-    POWER("^", ASSOCIATIVITY.RIGHT, 10),
-    LEFT_BRACKET("(", ASSOCIATIVITY.NONE, -1),
-    RIGHT_BRACKET(")", ASSOCIATIVITY.NONE, -1),
-    DOT(".", ASSOCIATIVITY.NONE, -1);
+import com.example.calculator.miscellaneous.Associativity
+import com.example.calculator.miscellaneous.Numbers
+import com.example.calculator.miscellaneous.Operators
+import com.example.calculator.miscellaneous.TokenTypes
 
-    enum class ASSOCIATIVITY {
-        LEFT,
-        RIGHT,
-        NONE
-    }
+class Operator (
+    override var value: String,
+    val subType: Operators,
+    val associativity: Associativity,
+    val precedence: Int,
+    override val type: TokenTypes = TokenTypes.Operator,
+    ) : Token {
+        companion object Factory {
+            fun parseOperator(operator : Operators) : Operator? {
+                return when(operator) {
+                    Operators.ADDITION -> Operator("+", Operators.ADDITION, Associativity.LEFT, 0)
+                    Operators.SUBTRACTION -> Operator("-", Operators.SUBTRACTION, Associativity.LEFT, 0)
+                    Operators.MULTIPLICATION -> Operator("*", Operators.MULTIPLICATION, Associativity.LEFT, 5)
+                    Operators.DIVISION -> Operator("/", Operators.DIVISION, Associativity.LEFT, 5)
+                    Operators.POWER -> Operator("^", Operators.POWER, Associativity.RIGHT, 10)
+                    else -> null
+                }
+            }
 
-    var operator: String = ""
-    var associativity: ASSOCIATIVITY = ASSOCIATIVITY.NONE
-    var precedence: Int = -1
-
-    constructor()
-
-    constructor(operator: String, associativity: ASSOCIATIVITY, precedence: Int) {
-        this.operator = operator
-        this.associativity = associativity
-        this.precedence = precedence
-    }
-
-    override fun toString(): String = operator
-}
-
-/**
- * Helper function.
- * Finds if specific operator contains in the [Operator].
- *
- * @param operator to check.
- * @return [Boolean] indicating existence of the operator.
- */
-inline fun <reified T: Enum<T>> contains(operator: String): Boolean {
-    return enumValues<T>().any { it.toString() == operator }
-}
-
-/**
- * Helper function.
- */
-inline fun <reified T: Enum<T>> getValue(operator: String): T? {
-    return enumValues<T>().firstOrNull { it.toString() == operator }
+            fun parseToken(token: Token) : Operator? {
+                return when(token.value) {
+                    "+" -> parseOperator(Operators.ADDITION)
+                    "-" -> parseOperator(Operators.SUBTRACTION)
+                    "*" -> parseOperator(Operators.MULTIPLICATION)
+                    "/" -> parseOperator(Operators.DIVISION)
+                    else -> null
+                }
+            }
+        }
 }

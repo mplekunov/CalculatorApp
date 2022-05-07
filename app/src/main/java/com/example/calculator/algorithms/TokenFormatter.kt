@@ -1,6 +1,6 @@
 package com.example.calculator.algorithms
 
-import com.example.calculator.model.Kind
+import com.example.calculator.miscellaneous.TokenTypes
 import com.example.calculator.model.Token
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -45,7 +45,7 @@ object TokenFormatter {
         if (token == null || token.value.isEmpty())
             return " 0 "
 
-        return if (token.kind == Kind.Number) {
+        return if (token.type == TokenTypes.Number) {
             var formattedToken = nf.format(BigDecimal(token.value).setScale(10, RoundingMode.HALF_UP))
 
             if (!removeTrailingZeroes) {

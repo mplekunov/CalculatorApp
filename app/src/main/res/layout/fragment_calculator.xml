@@ -8,6 +8,9 @@
         <variable
             name="calculatorFragment"
             type="com.example.calculator.view.CalculatorFragment" />
+        <variable
+            name="viewModel"
+            type="com.example.calculator.viewmodel.CalculatorViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

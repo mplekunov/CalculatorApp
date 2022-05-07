@@ -1,8 +1,9 @@
 package com.example.calculator.model
 
-import android.util.Log
-import java.math.BigDecimal
-import java.math.RoundingMode
+import com.example.calculator.miscellaneous.Functions
+import com.example.calculator.miscellaneous.Numbers
+import com.example.calculator.miscellaneous.Operators
+import com.example.calculator.miscellaneous.TokenTypes
 
 /**
  * [Expression] data structure which contains expression in the infix format.
@@ -16,15 +17,61 @@ class Expression {
     val expression: List<Token>
         get() = _expression
 
-    /**
-     * Appends [Token] to the last token.
-     *
-     * @param token the token to be appended.
-     * @return result indicating success of operation.
-     */
-    fun appendToken(token: Token) : Boolean = appendTokenAt(token, _expression.lastIndex + 1)
+    @Throws(NullPointerException::class)
+    fun addNumber(number: Numbers, index: Int) : Boolean {
+        val token =
+            object : Token {
+                override var value = (Number.parseNumber(number)?.value ?: 0) as String
+                override val type = TokenTypes.Number
+        }
 
-    private fun appendOperator(token: Token, index: Int) : Boolean {
+        if (_expression.isEmpty() && number != Numbers.DOT) {
+            _expression.add(token)
+            return true
+        }
+
+        // In case of numbers, each number has it's own token
+        // Since we can only input expression in the format: Number Operator Function/Number
+        // We are sure that when we encounter number, it's going to be either "new" number
+        // or it's going to be addition to the previous number
+        val index = if (index > _expression.lastIndex) _expression.lastIndex else index
+
+        if (index < 0)
+            return true
+
+        val tokenToEdit = _expression[index]
+
+        // If last token is a number, we add new "token" to the previous number
+        // Otherwise, we create new number
+        if (tokenToEdit.type == TokenTypes.Number) {
+            val numberToken = Number.parseToken(tokenToEdit) ?: throw NullPointerException("Empty Number Token")
+
+            // Dot can only be part of number
+            if (number == Numbers.DOT)
+                return parseDot(index)
+
+            // Numbers can't have leading zeroes, unless we are dealing with floats
+            if (numberToken.valueAsTokens.size == 1 && numberToken.valueAsTokens.last() == Numbers.ZERO)
+                _expression[index] = token
+
+            // There should be a limit to the number length
+            else if (numberToken.valueAsTokens.size < _tokenLengthLimit)
+                _expression[index].value += Number.parseNumber(number)?.value ?: 0
+
+        } else if ((tokenToEdit.type == TokenTypes.Operator ||
+                    (tokenToEdit.type == TokenTypes.Function && Function.parseToken(tokenToEdit)?.subType != Functions.PERCENTAGE)) && number != Numbers.DOT)
+            _expression.add(token)
+
+        return true
+    }
+
+    fun addOperator(operator: Operators, index: Int) : Boolean {
+        val token =
+            object : Token {
+                override var value = Operator.parseOperator(operator)?.value ?: ""
+                override val type = TokenTypes.Operator
+        }
+
         // Expression can't start with an operator
         if (_expression.isEmpty())
             return false
@@ -36,133 +83,61 @@ class Expression {
         // Operators can't follow one another
         // In expression there is always a number between operators (or function)
         // However, user may want to replace previous operator by pressing new operator
-        if (lastToken.kind == Kind.Operator) {
+        if (lastToken.type == TokenTypes.Operator) {
             _expression[_expression.lastIndex] = token
             return true
         }
 
-        // Later on there should be another kind of Tokens -> functions (sin/cos/tan/cot etc.)
-        // So I add check in advance
-        if (lastToken.kind == Kind.Number) {
-            return when (token.value) {
-                Operator.DOT.operator -> parseDot(index)
-                else -> {
-                    if (index <= _expression.lastIndex) {
-                        _expression.add(index, token)
-                        true
-                    }
-                    else
-                        _expression.add(token)
-                }
+        // We are using operators on either Numbers or Functions
+        if (lastToken.type == TokenTypes.Number || lastToken.type == TokenTypes.Function) {
+            when {
+                index <= _expression.lastIndex -> _expression.add(index, token)
+                else -> _expression.add(token)
             }
+
+            return true
         }
 
         return false
     }
 
-    private fun isFloat(token: Token) : Boolean = token.value.any { it == '.' }
+    fun addFunction(function: Functions, index: Int) : Boolean {
+        val token =
+            object : Token {
+                override var value = Function.parseFunction(function)?.value ?: ""
+                override val type = TokenTypes.Function
+            }
 
+        if (function == Functions.PERCENTAGE && _expression.isEmpty())
+            return false
+
+        // All functions have the same format fun ( expr )
+        // The only exception is Percentage
+        if (function == Functions.PERCENTAGE && _expression.last().type == TokenTypes.Number) {
+            when {
+                index <= _expression.lastIndex ->_expression.add(index, token)
+                else -> _expression.add(token)
+            }
+        }
+
+        // Logic for fun ( expr ) format
+
+        return true
+    }
+
+    @Throws(NullPointerException::class)
     private fun parseDot(index: Int): Boolean {
         val curIndex = if (index < _expression.lastIndex)
             index
         else
             _expression.lastIndex
 
-        val token = _expression[curIndex]
+        val tokenToEdit = _expression[curIndex]
+        val numberToken = Number.parseToken(tokenToEdit) ?: throw NullPointerException("Empty Number Token")
 
-        if (!isFloat(token)) {
-            token.value += Operator.DOT.operator
-
-            _expression[curIndex] = token
-
+        if (numberToken.subType == Numbers.INTEGER) {
+            _expression[curIndex].value += "."
             return true
-        }
-
-        return false
-    }
-
-    private fun parsePercentage(index: Int): Boolean {
-        val curIndex = if (index < _expression.lastIndex)
-            index
-        else
-            _expression.lastIndex
-
-        val token = _expression[curIndex]
-
-        var percentage = BigDecimal(token.value).setScale(10, RoundingMode.HALF_UP).div(BigDecimal(100.0).setScale(10, RoundingMode.HALF_UP))
-
-        if (index > 2) {
-            val lastKnownOperator = _expression[curIndex - 1]
-            val lastKnownNumber = BigDecimal(_expression[curIndex - 2].value).setScale(10, RoundingMode.HALF_UP)
-
-            percentage = when (lastKnownOperator.value) {
-                Operator.ADDITION.operator -> percentage.multiply(lastKnownNumber)
-                Operator.SUBTRACTION.operator -> (BigDecimal(1).setScale(10, RoundingMode.HALF_UP).minus(percentage)).times(lastKnownNumber)
-                else -> percentage
-            }
-        }
-
-        token.value = percentage.toString()
-        _expression[curIndex] = token
-
-        Log.d("Calculator", "$percentage")
-
-        return true
-    }
-
-    private fun appendNumber(token: Token, index: Int) : Boolean {
-        if (_expression.isEmpty()) {
-            _expression.add(token)
-            return true
-        }
-
-        val index = if (index > _expression.lastIndex) _expression.lastIndex else index
-        val editableToken = _expression[index]
-
-
-        if (editableToken.kind == Kind.Number) {
-            if (editableToken.value.length == 1 && editableToken.value.last() == '0')
-                _expression[index] = token
-            else if (editableToken.value.length < _tokenLengthLimit) {
-                editableToken.value += token.value
-                _expression[index] = editableToken
-            }
-        } else if (editableToken.kind == Kind.Operator)
-            _expression.add(token)
-
-        return true
-    }
-
-    /**
-     * Appends [Token] to the token at the specified *index*.
-     *
-     * @param token the token to be appended.
-     * @param index the position of editable [Token].
-     * @return result indicating success of operation.
-     */
-    fun appendTokenAt(token: Token, index: Int) : Boolean {
-        return when(token.kind) {
-            Kind.Number -> appendNumber(token, index)
-            Kind.Operator -> appendOperator(token, index)
-            Kind.Function -> appendFunction(token, index)
-            else -> false
-        }
-    }
-
-    private fun appendFunction(token: Token, index: Int): Boolean {
-        // Expression can't start with an operator
-        if (_expression.isEmpty())
-            return false
-
-        // In case of Operators, each operator has its own token
-        // No two operators can be appended to each other
-        val lastToken = _expression.last()
-
-        if (lastToken.kind == Kind.Number) {
-            return when (token.value) {
-                Function.PERCENTAGE.operator -> parsePercentage(index)
-                else -> false
-            }
         }
 
         return false
@@ -186,13 +161,18 @@ class Expression {
         if (index < 0 || index > _expression.lastIndex)
             return false
 
-        val token = _expression[index]
-        token.value = token.value.substring(0, token.value.lastIndex)
+        val tokenToEdit = _expression[index]
 
-        if (token.value.isEmpty()) {
+        when (tokenToEdit.type) {
+            TokenTypes.Number -> tokenToEdit.value = tokenToEdit.value.substring(0, tokenToEdit.value.lastIndex)
+            TokenTypes.Operator -> tokenToEdit.value = ""
+            TokenTypes.Function -> {}
+        }
+
+        if (tokenToEdit.value.isEmpty()) {
             when {
                 isRemovable -> _expression.removeAt(index)
-                !isRemovable && token.kind == Kind.Number -> _expression[index].value = "0"
+                !isRemovable && tokenToEdit.type == TokenTypes.Number -> _expression[index].value = "0"
             }
         }
         return true
@@ -215,10 +195,10 @@ class Expression {
      * @return result indicating success of operation.
      */
     fun deleteAllTokensAt(index: Int) : Boolean {
-        val token = _expression[index]
+        val tokenToEdit = _expression[index]
 
-        if (token.kind == Kind.Number)
-            _expression[index] = Token(token.kind, "0")
+        if (tokenToEdit.type == TokenTypes.Number)
+            _expression[index].value = "0"
 
         return true
     }
@@ -236,7 +216,7 @@ class Expression {
 
         val oldToken = _expression[index]
 
-        if (token.kind != oldToken.kind)
+        if (token.type != oldToken.type)
             return false
 
         _expression[index] = token

@@ -1,46 +1,82 @@
 package com.example.calculator.viewmodel
 
 import android.util.Log
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+
 import com.example.calculator.algorithms.ExpressionEvaluator
-import com.example.calculator.algorithms.InputParser
-import com.example.calculator.model.*
+import com.example.calculator.algorithms.TokenFormatter
+
+import com.example.calculator.miscellaneous.TokenTypes
+
+import com.example.calculator.model.Operator
+import com.example.calculator.model.Number
+import com.example.calculator.model.Function
+import com.example.calculator.model.Token
+import com.example.calculator.model.Expression
+
 import kotlinx.coroutines.*
-import java.math.BigDecimal
+import kotlin.NullPointerException
 
 class CalculatorViewModel : ViewModel() {
     private val expression = Expression()
 
     var inputAsTokens: List<Token> = emptyList()
-    var resultOfExpression: Token = Token(Kind.Number, "0")
+    lateinit var resultOfExpression: Token
 
-    fun appendToken(input: String) {
-        val token = InputParser.parseToken(input)
-        expression.appendToken(token)
-
-        if (token.kind == Kind.Number)
-            calculateExpression()
+    init {
+        resetResult()
     }
 
-    fun appendTokenAt(input: String, index: Int) {
-        val token = InputParser.parseToken(input)
-        expression.appendTokenAt(token, index)
+    fun addToken(token: Token) {
+        addTokenAt(token)
+    }
 
+    @Throws(NullPointerException::class)
+    private fun addNumber(token: Token, index: Int = expression.expression.size) {
+        val number = Number.parseToken(token) ?: throw NullPointerException("Empty Number Token")
+
+        // We can't receive more then one number token at a time because user inputs one token at a time
+        // Therefore, after conversion, valueAsTokens will have only 1 token and the that token we will need to add
+        expression.addNumber(number.valueAsTokens.first(), index)
         calculateExpression()
     }
 
-    fun setTokenAt(input: String, index: Int) {
-        val token = InputParser.parseToken(input)
+    @Throws(NullPointerException::class)
+    private fun addOperator(token: Token, index: Int = expression.expression.size) {
+        val operator = Operator.parseToken(token)?.subType ?: throw NullPointerException("Empty Operator Token")
+
+        expression.addOperator(operator, index)
+    }
+
+    @Throws(NullPointerException::class)
+    private fun addFunction(token : Token, index : Int = expression.expression.size) {
+        val function = Function.parseToken(token)?.subType ?: throw NullPointerException("Empty Function Token")
+
+        expression.addFunction(function, index)
+        calculateExpression()
+    }
+
+    fun addTokenAt(token: Token, index: Int = expression.expression.size) {
+        when(token.type) {
+            TokenTypes.Operator -> addOperator(token, index)
+            TokenTypes.Number -> addNumber(token, index)
+            TokenTypes.Function -> addFunction(token, index)
+        }
+    }
+
+    fun setTokenAt(token: Token, index: Int = expression.expression.lastIndex) {
         expression.setTokenAt(token, index)
 
-        calculateExpression()
+        if (index != expression.expression.lastIndex || (index == expression.expression.lastIndex && token.type == TokenTypes.Number))
+            calculateExpression()
     }
 
     fun deleteToken() {
         expression.deleteToken()
 
-        if (expression.expression.isNotEmpty() && expression.expression.last().kind == Kind.Number)
+        if (expression.expression.isNotEmpty() && expression.expression.last().type == TokenTypes.Number)
             calculateExpression()
     }
 
@@ -51,10 +87,16 @@ class CalculatorViewModel : ViewModel() {
     }
 
     fun deleteAllTokens() {
-        resultOfExpression = Token(Kind.Number, "0")
         expression.deleteAllTokens()
-
+        resetResult()
         calculateExpression()
+    }
+
+    private fun resetResult() {
+        resultOfExpression = object : Token {
+            override var value = "0"
+            override val type = TokenTypes.Number
+        }
     }
 
     fun deleteAllTokensAt(index: Int) {
@@ -64,10 +106,8 @@ class CalculatorViewModel : ViewModel() {
     }
 
     fun saveResult() {
-        expression.deleteAllTokens()
-        val token = InputParser.parseToken(resultOfExpression.value)
-        expression.appendToken(token)
-
+        deleteAllTokens()
+        addToken(resultOfExpression)
         calculateExpression()
     }
 
@@ -79,7 +119,7 @@ class CalculatorViewModel : ViewModel() {
             }
         // Division by zero
         } catch (e: ArithmeticException) {
-            resultOfExpression = Token(Kind.Number, "0")
+            resetResult()
         }
     }
 }
