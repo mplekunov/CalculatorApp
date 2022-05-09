@@ -1,9 +1,14 @@
 package com.example.calculator.algorithms
 
+import com.example.calculator.miscellaneous.Numbers
 import com.example.calculator.miscellaneous.TokenTypes
+
 import com.example.calculator.model.Token
+import com.example.calculator.parser.NumberParser
+
 import java.math.BigDecimal
 import java.math.RoundingMode
+
 import java.text.NumberFormat
 
 /**
@@ -46,14 +51,10 @@ object TokenFormatter {
             return " 0 "
 
         return if (token.type == TokenTypes.Number) {
-            var formattedToken = nf.format(BigDecimal(token.value).setScale(10, RoundingMode.HALF_UP))
+            var formattedToken = token.value
 
-            if (!removeTrailingZeroes) {
-                if (token.value.last() == '.')
-                    formattedToken += "."
-                else if (token.value.length >= 2 && token.value.substring(token.value.lastIndex - 1, token.value.length) == ".0")
-                    formattedToken += ".0"
-            }
+            if (NumberParser().parse(token).type != Numbers.INFINITY && removeTrailingZeroes)
+                formattedToken = BigDecimal(formattedToken).stripTrailingZeros().toString()
 
             " $formattedToken"
         } else

@@ -13,5 +13,9 @@ enum class Numbers {
     NINE,
     DOT,
     INTEGER,
-    FLOAT
+    FLOAT,
+    INFINITY,
+    NEGATIVE,
+    EXPONENT,
+    POSITIVE
 }

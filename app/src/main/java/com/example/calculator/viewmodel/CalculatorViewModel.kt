@@ -1,12 +1,14 @@
 package com.example.calculator.viewmodel
 
 import android.util.Log
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
 import com.example.calculator.algorithms.ExpressionEvaluator
 import com.example.calculator.algorithms.TokenFormatter
+import com.example.calculator.miscellaneous.Functions
+import com.example.calculator.miscellaneous.Numbers
+import com.example.calculator.miscellaneous.Operators
 
 import com.example.calculator.miscellaneous.TokenTypes
 
@@ -16,78 +18,67 @@ import com.example.calculator.model.Function
 import com.example.calculator.model.Token
 import com.example.calculator.model.Expression
 
+import com.example.calculator.parser.NumberParser
+
 import kotlinx.coroutines.*
-import kotlin.NullPointerException
 
 class CalculatorViewModel : ViewModel() {
     private val expression = Expression()
 
-    var inputAsTokens: List<Token> = emptyList()
+    private val numberParser = NumberParser()
+
+    private var _inputAsTokens: MutableList<Token> = mutableListOf()
+    val inputAsTokens: List<Token>
+        get() = _inputAsTokens
+
     lateinit var resultOfExpression: Token
+
+    private val expressionSize: Int
+        get() = expression.expression.size
 
     init {
         resetResult()
     }
 
-    fun addToken(token: Token) {
-        addTokenAt(token)
-    }
-
-    @Throws(NullPointerException::class)
-    private fun addNumber(token: Token, index: Int = expression.expression.size) {
-        val number = Number.parseToken(token) ?: throw NullPointerException("Empty Number Token")
-
-        // We can't receive more then one number token at a time because user inputs one token at a time
-        // Therefore, after conversion, valueAsTokens will have only 1 token and the that token we will need to add
-        expression.addNumber(number.valueAsTokens.first(), index)
+    fun add(number: Numbers, index: Int = expressionSize) {
+        expression.addNumber(Number(number), index)
+        Log.d("viewModel", "addNumber: ${TokenFormatter.convertTokensToStrings(expression.expression)}")
         calculateExpression()
     }
 
-    @Throws(NullPointerException::class)
-    private fun addOperator(token: Token, index: Int = expression.expression.size) {
-        val operator = Operator.parseToken(token)?.subType ?: throw NullPointerException("Empty Operator Token")
+    fun add(operator: Operators, index: Int = expressionSize) {
+        expression.addOperator(Operator(operator), index)
 
-        expression.addOperator(operator, index)
-    }
-
-    @Throws(NullPointerException::class)
-    private fun addFunction(token : Token, index : Int = expression.expression.size) {
-        val function = Function.parseToken(token)?.subType ?: throw NullPointerException("Empty Function Token")
-
-        expression.addFunction(function, index)
-        calculateExpression()
-    }
-
-    fun addTokenAt(token: Token, index: Int = expression.expression.size) {
-        when(token.type) {
-            TokenTypes.Operator -> addOperator(token, index)
-            TokenTypes.Number -> addNumber(token, index)
-            TokenTypes.Function -> addFunction(token, index)
-        }
-    }
-
-    fun setTokenAt(token: Token, index: Int = expression.expression.lastIndex) {
-        expression.setTokenAt(token, index)
-
-        if (index != expression.expression.lastIndex || (index == expression.expression.lastIndex && token.type == TokenTypes.Number))
+        if (index != expression.expression.lastIndex)
             calculateExpression()
     }
 
-    fun deleteToken() {
-        expression.deleteToken()
-
-        if (expression.expression.isNotEmpty() && expression.expression.last().type == TokenTypes.Number)
-            calculateExpression()
-    }
-
-    fun deleteTokenAt(index: Int) {
-        expression.deleteTokenAt(index, false)
-
+    fun add(function: Functions, index: Int = expressionSize) {
+        expression.addFunction(Function(function), index)
         calculateExpression()
     }
 
-    fun deleteAllTokens() {
-        expression.deleteAllTokens()
+    fun set(operator: Operators, index: Int = expressionSize) {
+        expression.setOperator(Operator(operator), index)
+        calculateExpression()
+    }
+
+    fun set(function: Functions, index: Int = expressionSize) {
+        TODO("Not yet implemented")
+    }
+
+    fun delete() {
+        expression.delete()
+        calculateExpression()
+    }
+
+    fun deleteAt(index: Int) {
+        expression.deleteAt(index, false)
+        calculateExpression()
+    }
+
+    fun deleteAll() {
+        expression.deleteAll()
         resetResult()
         calculateExpression()
     }
@@ -99,27 +90,33 @@ class CalculatorViewModel : ViewModel() {
         }
     }
 
-    fun deleteAllTokensAt(index: Int) {
-        expression.deleteAllTokensAt(index)
-
+    fun deleteAllAt(index: Int) {
+        expression.deleteAllAt(index)
         calculateExpression()
     }
 
     fun saveResult() {
-        deleteAllTokens()
-        addToken(resultOfExpression)
+        val result = numberParser.parse(resultOfExpression)
+        deleteAll()
+
+        if (result.type == Numbers.INFINITY)
+            expression.addNumber(Number(Numbers.ZERO), expressionSize)
+        else
+            expression.addNumber(result, expression.expression.lastIndex)
+
         calculateExpression()
     }
 
     private fun calculateExpression() {
-        inputAsTokens = expression.expression
-        try {
-            viewModelScope.launch {
-                resultOfExpression = ExpressionEvaluator.getResult(inputAsTokens)
+        _inputAsTokens = expression.expression as MutableList<Token>
+        viewModelScope.launch {
+            resultOfExpression = try {
+                ExpressionEvaluator.getResult(_inputAsTokens)
+            } catch (e: ArithmeticException) {
+                // Can't divide by zero
+                // Error msg?!
+                numberParser.parse(Number(Numbers.INFINITY))
             }
-        // Division by zero
-        } catch (e: ArithmeticException) {
-            resetResult()
         }
     }
 }
