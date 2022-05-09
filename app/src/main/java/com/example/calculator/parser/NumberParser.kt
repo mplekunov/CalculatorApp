@@ -1,5 +1,7 @@
 package com.example.calculator.parser
 
+import android.icu.text.NumberFormat.Field.EXPONENT
+import com.example.calculator.algorithms.TokenFormatter
 import com.example.calculator.datastructure.BiMap
 import com.example.calculator.miscellaneous.Numbers
 import com.example.calculator.miscellaneous.TokenTypes
@@ -20,7 +22,11 @@ class NumberParser : TokenParser<Number, String, Numbers> {
             "7" to Numbers.SEVEN,
             "8" to Numbers.EIGHT,
             "9" to Numbers.NINE,
-            "." to Numbers.DOT
+            "." to Numbers.DOT,
+            "E" to Numbers.EXPONENT,
+            "-" to Numbers.NEGATIVE,
+            "+" to Numbers.POSITIVE,
+            Double.POSITIVE_INFINITY.toString() to Numbers.INFINITY
         )) }
 
     override fun parse(input: Number): Token {
@@ -29,13 +35,19 @@ class NumberParser : TokenParser<Number, String, Numbers> {
             override val type: TokenTypes = TokenTypes.Number
         }
 
-        input.valueAsTokens.forEach { number -> token.value += map[number] }
+        if (input.type != Numbers.INFINITY)
+            input.valueAsTokens.forEach { number -> token.value += map[number] }
+        else
+            token.value = map[input.type]!!
 
         return token
     }
 
     fun parse(token: Token): Number {
         val number = Number()
+
+        if (map.containsKey(token.value) && map[token.value] == Numbers.INFINITY)
+            return Number(Numbers.INFINITY)
 
         token.value.forEach { ch ->
             run {

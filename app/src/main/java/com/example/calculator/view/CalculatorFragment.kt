@@ -37,9 +37,6 @@ import com.example.calculator.miscellaneous.Numbers
 import com.example.calculator.miscellaneous.Operators
 import com.example.calculator.miscellaneous.TokenTypes
 
-import com.example.calculator.model.Function
-import com.example.calculator.model.Number
-import com.example.calculator.model.Operator
 import com.example.calculator.model.Token
 
 import com.example.calculator.viewmodel.CalculatorViewModel
@@ -190,8 +187,7 @@ class CalculatorFragment : Fragment() {
 
                 functionButtons.forEach { (button, function) ->
                     button?.setOnClickListener {
-                        viewModel.deleteTokenAt(index)
-                        viewModel.addFunction(function, index)
+                        viewModel.set(function, index)
 
                         onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
                     }
@@ -208,8 +204,7 @@ class CalculatorFragment : Fragment() {
             private fun bindOperatorsToEditableToken() {
                 operatorButtons.forEach { (button, operator) ->
                     button?.setOnClickListener {
-                        viewModel.deleteTokenAt(index)
-                        viewModel.addOperator(operator, index)
+                        viewModel.set(operator, index)
                         onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
                     }
                 }
@@ -237,18 +232,18 @@ class CalculatorFragment : Fragment() {
 
                 digitButtons.forEach { (button, number) ->
                     button?.setOnClickListener {
-                        viewModel.addNumber(number, index)
+                        viewModel.add(number, index)
                         onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
                     }
                 }
 
                 binding?.delete?.setOnClickListener {
-                    viewModel.deleteTokenAt(index)
+                    viewModel.deleteAt(index)
                     onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
                 }
 
                 binding?.deleteAll?.setOnClickListener {
-                    viewModel.deleteAllTokensAt(index)
+                    viewModel.deleteAllAt(index)
                     onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
                 }
             }
@@ -307,20 +302,21 @@ class CalculatorFragment : Fragment() {
 
         binding?.delete?.setOnClickListener {
             applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
-            viewModel.deleteToken()
+            viewModel.delete()
             setClickableInputField()
         }
 
         binding?.deleteAll?.setOnClickListener {
             applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
-            viewModel.deleteAllTokens()
+            viewModel.deleteAll()
             setClickableInputField()
         }
 
         digitButtons.forEach { (button, number) ->
             button?.setOnClickListener {
                 applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
-                viewModel.addNumber(number)
+                viewModel.add(number)
+
                 setClickableInputField()
             }
         }
@@ -328,7 +324,7 @@ class CalculatorFragment : Fragment() {
         operatorButtons.forEach { (button, operator) ->
             button?.setOnClickListener {
                 applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
-                viewModel.addOperator(operator)
+                viewModel.add(operator)
                 setClickableInputField()
             }
         }
@@ -336,7 +332,7 @@ class CalculatorFragment : Fragment() {
         functionButtons.forEach { (button, function) ->
             button?.setOnClickListener {
                 applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
-                viewModel.addFunction(function)
+                viewModel.add(function)
                 setClickableInputField()
             }
         }

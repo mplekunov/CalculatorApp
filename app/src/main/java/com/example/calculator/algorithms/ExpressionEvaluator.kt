@@ -39,7 +39,9 @@ object ExpressionEvaluator {
             // Operator or Function
             if (token.type == TokenTypes.Function) {
                 if (functionParser.parse(token).type == Functions.PERCENTAGE) {
-                    var percentage = BigDecimal(postfix.removeLast().value).setScale(10, RoundingMode.HALF_UP).div(BigDecimal(100.0).setScale(10, RoundingMode.HALF_UP))
+                    val first = BigDecimal(postfix.removeLast().value).setScale(10, RoundingMode.HALF_UP)
+                    val second = BigDecimal(100.0).setScale(10, RoundingMode.HALF_UP)
+                    var percentage = BigDecimal(division(first, second))
 
                     if (postfix.isNotEmpty()) {
                         val lastKnownOperator = opStack.peek()
@@ -53,9 +55,9 @@ object ExpressionEvaluator {
                     }
 
                     expression.removeLast()
-                    expression[expression.lastIndex] = numberToToken(percentage.stripTrailingZeros().toString())
+                    expression[expression.lastIndex] = numberToToken(percentage.toString())
 
-                    postfix.add(numberToToken(percentage.stripTrailingZeros().toString()))
+                    postfix.add(numberToToken(percentage.toString()))
                 }
             }
             else if (token.type == TokenTypes.Operator) {
@@ -122,10 +124,11 @@ object ExpressionEvaluator {
      * @param expression as a collection of [Token].
      * @return [Token] containing result of computation.
      */
+    @Throws(ArithmeticException::class)
     fun getResult(expression: MutableList<Token>): Token {
         if (expression.isNullOrEmpty())
             return object : Token {
-                override var value = ""
+                override var value = "0"
                 override val type = TokenTypes.Number
             }
 
@@ -175,7 +178,10 @@ object ExpressionEvaluator {
     private fun addition(left: BigDecimal, right: BigDecimal): String = left.plus(right).stripTrailingZeros().toString()
     private fun subtraction(left: BigDecimal, right: BigDecimal): String = left.minus(right).stripTrailingZeros().toString()
     private fun multiplication(left: BigDecimal, right: BigDecimal): String = left.times(right).stripTrailingZeros().toString()
+    @Throws(ArithmeticException::class)
     private fun division(left: BigDecimal, right: BigDecimal): String =
-        if (right != BigDecimal.ZERO) left.div(right).stripTrailingZeros().toString() else ""
+        if (right.toDouble() != 0.0)
+            left.div(right).stripTrailingZeros().toString()
+        else throw ArithmeticException("Division by zero")
     private fun power(left: BigDecimal, right: BigDecimal): String = left.pow(right.toInt()).stripTrailingZeros().toString()
 }

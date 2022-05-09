@@ -3,7 +3,7 @@ package com.example.calculator.model
 import com.example.calculator.miscellaneous.Numbers
 
 class Number() {
-    val valueAsTokens: MutableList<Numbers> = mutableListOf()
+    var valueAsTokens: MutableList<Numbers> = mutableListOf()
     var type: Numbers = Numbers.INTEGER
 
     constructor(number: Numbers) : this() {
@@ -11,5 +11,7 @@ class Number() {
 
         if (number == Numbers.DOT)
             type = Numbers.DOT
+        else if (number == Numbers.INFINITY)
+            type = Numbers.INFINITY
     }
 }
