@@ -1,9 +1,12 @@
 package com.example.calculator.algorithms
 
 import com.example.calculator.miscellaneous.TokenTypes
+
 import com.example.calculator.model.Token
+
 import java.math.BigDecimal
 import java.math.RoundingMode
+
 import java.text.NumberFormat
 
 /**

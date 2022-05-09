@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
 import com.example.calculator.algorithms.ExpressionEvaluator
-import com.example.calculator.algorithms.TokenFormatter
+import com.example.calculator.miscellaneous.Functions
+import com.example.calculator.miscellaneous.Numbers
+import com.example.calculator.miscellaneous.Operators
 
 import com.example.calculator.miscellaneous.TokenTypes
 
@@ -14,8 +16,9 @@ import com.example.calculator.model.Function
 import com.example.calculator.model.Token
 import com.example.calculator.model.Expression
 
+import com.example.calculator.parser.NumberParser
+
 import kotlinx.coroutines.*
-import kotlin.NullPointerException
 
 class CalculatorViewModel : ViewModel() {
     private val expression = Expression()
@@ -30,49 +33,29 @@ class CalculatorViewModel : ViewModel() {
         resetResult()
     }
 
-    fun addToken(token: Token) {
-        addTokenAt(token)
-    }
-
-    @Throws(NullPointerException::class)
-    private fun addNumber(token: Token, index: Int = expression.expression.size) {
-        val number = Number.parseToken(token) ?: throw NullPointerException("Empty Number Token")
-
-        // We can't receive more then one number token at a time because user inputs one token at a time
-        // Therefore, after conversion, valueAsTokens will have only 1 token and the that token we will need to add
-        expression.addNumber(number.valueAsTokens.first(), index)
+    fun addNumber(number: Numbers, index: Int = expression.expression.size) {
+        expression.addNumber(Number(number), index)
         calculateExpression()
     }
 
-    @Throws(NullPointerException::class)
-    private fun addOperator(token: Token, index: Int = expression.expression.size) {
-        val operator = Operator.parseToken(token)?.subType ?: throw NullPointerException("Empty Operator Token")
+    fun addOperator(operator: Operators, index: Int = expression.expression.size) {
+        expression.addOperator(Operator(operator), index)
 
-        expression.addOperator(operator, index)
-    }
-
-    @Throws(NullPointerException::class)
-    private fun addFunction(token : Token, index : Int = expression.expression.size) {
-        val function = Function.parseToken(token)?.subType ?: throw NullPointerException("Empty Function Token")
-
-        expression.addFunction(function, index)
-        calculateExpression()
-    }
-
-    fun addTokenAt(token: Token, index: Int = expression.expression.size) {
-        when(token.type) {
-            TokenTypes.Operator -> addOperator(token, index)
-            TokenTypes.Number -> addNumber(token, index)
-            TokenTypes.Function -> addFunction(token, index)
-        }
-    }
-
-    fun setTokenAt(token: Token, index: Int = expression.expression.lastIndex) {
-        expression.setTokenAt(token, index)
-
-        if (index != expression.expression.lastIndex || (index == expression.expression.lastIndex && token.type == TokenTypes.Number))
+        if (index != expression.expression.lastIndex)
             calculateExpression()
     }
+
+    fun addFunction(function: Functions, index : Int = expression.expression.size) {
+        expression.addFunction(Function(function), index)
+        calculateExpression()
+    }
+
+//    fun setTokenAt(token: Token, index: Int = expression.expression.lastIndex) {
+//        expression.setTokenAt(token, index)
+//
+//        if (index != expression.expression.lastIndex || (index == expression.expression.lastIndex && token.type == TokenTypes.Number))
+//            calculateExpression()
+//    }
 
     fun deleteToken() {
         expression.deleteToken()
@@ -95,33 +78,27 @@ class CalculatorViewModel : ViewModel() {
 
     private fun resetResult() {
         resultOfExpression = object : Token {
-            override var value = "0"
+            override var value = ""
             override val type = TokenTypes.Number
         }
     }
 
     fun deleteAllTokensAt(index: Int) {
         expression.deleteAllTokensAt(index)
-
         calculateExpression()
     }
 
     fun saveResult() {
         val result = resultOfExpression
         deleteAllTokens()
-        addToken(result)
+        expression.addNumber(NumberParser().parse(result), expression.expression.lastIndex)
         calculateExpression()
     }
 
     private fun calculateExpression() {
         _inputAsTokens = expression.expression as MutableList<Token>
-        try {
-            viewModelScope.launch {
-                resultOfExpression = ExpressionEvaluator.getResult(_inputAsTokens)
-            }
-        // Division by zero
-        } catch (e: ArithmeticException) {
-            resetResult()
+        viewModelScope.launch {
+            resultOfExpression = ExpressionEvaluator.getResult(_inputAsTokens)
         }
     }
 }

@@ -1,7 +1,9 @@
 package com.example.calculator.view
 
 import android.content.res.ColorStateList
+
 import android.os.Bundle
+
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -9,26 +11,37 @@ import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
+
 import android.util.TypedValue
+
 import android.view.*
+
 import android.widget.*
+
 import androidx.annotation.ColorInt
+
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.ImageViewCompat
+
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+
 import com.example.calculator.R
 import com.example.calculator.databinding.FragmentCalculatorBinding
+
 import com.example.calculator.algorithms.TokenFormatter
+
 import com.example.calculator.miscellaneous.Functions
 import com.example.calculator.miscellaneous.Numbers
 import com.example.calculator.miscellaneous.Operators
 import com.example.calculator.miscellaneous.TokenTypes
+
 import com.example.calculator.model.Function
 import com.example.calculator.model.Number
 import com.example.calculator.model.Operator
 import com.example.calculator.model.Token
+
 import com.example.calculator.viewmodel.CalculatorViewModel
 
 class CalculatorFragment : Fragment() {
@@ -50,7 +63,7 @@ class CalculatorFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentCalculatorBinding.inflate(inflater, container, false)
         return binding!!.root
     }
@@ -177,7 +190,9 @@ class CalculatorFragment : Fragment() {
 
                 functionButtons.forEach { (button, function) ->
                     button?.setOnClickListener {
-                        viewModel.setTokenAt(Function.parseFunction(function)!!, index)
+                        viewModel.deleteTokenAt(index)
+                        viewModel.addFunction(function, index)
+
                         onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
                     }
                 }
@@ -193,7 +208,8 @@ class CalculatorFragment : Fragment() {
             private fun bindOperatorsToEditableToken() {
                 operatorButtons.forEach { (button, operator) ->
                     button?.setOnClickListener {
-                        viewModel.setTokenAt(Operator.parseOperator(operator)!!, index)
+                        viewModel.deleteTokenAt(index)
+                        viewModel.addOperator(operator, index)
                         onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
                     }
                 }
@@ -221,7 +237,7 @@ class CalculatorFragment : Fragment() {
 
                 digitButtons.forEach { (button, number) ->
                     button?.setOnClickListener {
-                        viewModel.addTokenAt(Number.parseNumber(number)!!, index)
+                        viewModel.addNumber(number, index)
                         onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
                     }
                 }
@@ -240,7 +256,7 @@ class CalculatorFragment : Fragment() {
             private fun setButtonsAsClickable() {
                 operatorButtons.forEach { (button, _) -> enableButton(button!!, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal)) }
                 functionButtons.forEach { (button, _) -> enableButton(button!!, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal)) }
-                digitButtons.forEach { (button, _) -> enableButton(button!!, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))}
+                digitButtons.forEach { (button, _) -> enableButton(button!!, primaryColor)}
                 enableButton(binding?.deleteAll!!, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
                 enableButton(binding?.delete!!, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
             }
@@ -304,7 +320,7 @@ class CalculatorFragment : Fragment() {
         digitButtons.forEach { (button, number) ->
             button?.setOnClickListener {
                 applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
-                viewModel.addToken(Number.parseNumber(number)!!)
+                viewModel.addNumber(number)
                 setClickableInputField()
             }
         }
@@ -312,7 +328,7 @@ class CalculatorFragment : Fragment() {
         operatorButtons.forEach { (button, operator) ->
             button?.setOnClickListener {
                 applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
-                viewModel.addToken(Operator.parseOperator(operator)!!)
+                viewModel.addOperator(operator)
                 setClickableInputField()
             }
         }
@@ -320,7 +336,7 @@ class CalculatorFragment : Fragment() {
         functionButtons.forEach { (button, function) ->
             button?.setOnClickListener {
                 applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
-                viewModel.addToken(Function.parseFunction(function)!!)
+                viewModel.addFunction(function)
                 setClickableInputField()
             }
         }
