@@ -41,7 +41,7 @@ object ExpressionEvaluator {
                 if (functionParser.parse(token).type == Functions.PERCENTAGE) {
                     val first = BigDecimal(postfix.removeLast().value).setScale(10, RoundingMode.HALF_UP)
                     val second = BigDecimal(100.0).setScale(10, RoundingMode.HALF_UP)
-                    var percentage = BigDecimal(division(first, second))
+                    var percentage = division(first, second)
 
                     if (postfix.isNotEmpty()) {
                         val lastKnownOperator = opStack.peek()
@@ -49,7 +49,7 @@ object ExpressionEvaluator {
 
                         percentage =
                             if (lastKnownOperator.type == Operators.SUBTRACTION || lastKnownOperator.type == Operators.ADDITION)
-                                percentage.times(lastKnownNumber)
+                                multiplication(lastKnownNumber, percentage)
                             else
                                 percentage
                     }
@@ -161,7 +161,7 @@ object ExpressionEvaluator {
                     else -> TODO("Not Implemented Yet")
                 }
 
-                s.push(numberToToken(result))
+                s.push(numberToToken(result.toString()))
             }
         }
 
@@ -175,13 +175,13 @@ object ExpressionEvaluator {
         }
     }
 
-    private fun addition(left: BigDecimal, right: BigDecimal): String = left.plus(right).stripTrailingZeros().toString()
-    private fun subtraction(left: BigDecimal, right: BigDecimal): String = left.minus(right).stripTrailingZeros().toString()
-    private fun multiplication(left: BigDecimal, right: BigDecimal): String = left.times(right).stripTrailingZeros().toString()
+    private fun addition(left: BigDecimal, right: BigDecimal): BigDecimal = left.plus(right).stripTrailingZeros()
+    private fun subtraction(left: BigDecimal, right: BigDecimal): BigDecimal = left.minus(right).stripTrailingZeros()
+    private fun multiplication(left: BigDecimal, right: BigDecimal): BigDecimal = left.times(right).stripTrailingZeros()
     @Throws(ArithmeticException::class)
-    private fun division(left: BigDecimal, right: BigDecimal): String =
+    private fun division(left: BigDecimal, right: BigDecimal): BigDecimal =
         if (right.toDouble() != 0.0)
-            left.div(right).stripTrailingZeros().toString()
+            left.div(right).stripTrailingZeros()
         else throw ArithmeticException("Division by zero")
-    private fun power(left: BigDecimal, right: BigDecimal): String = left.pow(right.toInt()).stripTrailingZeros().toString()
+    private fun power(left: BigDecimal, right: BigDecimal): BigDecimal = left.pow(right.toInt()).stripTrailingZeros()
 }
