@@ -1,16 +1,13 @@
 package com.example.calculator.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
 import com.example.calculator.algorithms.ExpressionEvaluator
-import com.example.calculator.algorithms.TokenFormatter
+import com.example.calculator.formatter.TokenFormatter
 import com.example.calculator.miscellaneous.Functions
 import com.example.calculator.miscellaneous.Numbers
 import com.example.calculator.miscellaneous.Operators
-
-import com.example.calculator.miscellaneous.TokenTypes
 
 import com.example.calculator.model.Operator
 import com.example.calculator.model.Number
@@ -28,79 +25,158 @@ class CalculatorViewModel : ViewModel() {
     private val numberParser = NumberParser()
 
     private var _inputAsTokens: MutableList<Token> = mutableListOf()
+    private var _resultAsToken: Token = numberParser.parse(Number(Numbers.ZERO))
+
     val inputAsTokens: List<Token>
         get() = _inputAsTokens
 
-    lateinit var resultOfExpression: Token
+    val input: List<String>
+        get() = TokenFormatter.convertTokensToStrings(_inputAsTokens)
+    val result: String
+        get() = TokenFormatter.convertTokenToString(_resultAsToken, true)
 
-    private val expressionSize: Int
+    private val inputSize: Int
         get() = expression.expression.size
 
-    init {
-        resetResult()
-    }
+    /**
+     * Sends [Numbers] object to [CalculatorViewModel]
+     *
+     * @param [number] [Numbers] enum field that represents number (usually as digit or [Numbers.DOT])
+     * @param [index] position of an object to which [number] will be appended
+     * @return [TRUE] upon successful operation, otherwise [FALSE]
+     */
+    fun add(number: Numbers, index: Int = inputSize) : Boolean {
+        val result = expression.addNumber(Number(number), index)
 
-    fun add(number: Numbers, index: Int = expressionSize) {
-        expression.addNumber(Number(number), index)
-        Log.d("viewModel", "addNumber: ${TokenFormatter.convertTokensToStrings(expression.expression)}")
-        calculateExpression()
-    }
-
-    fun add(operator: Operators, index: Int = expressionSize) {
-        expression.addOperator(Operator(operator), index)
-
-        if (index != expression.expression.lastIndex)
+        if (result)
             calculateExpression()
+
+        return result
     }
 
-    fun add(function: Functions, index: Int = expressionSize) {
-        expression.addFunction(Function(function), index)
-        calculateExpression()
+    /**
+     * Sends [Operators] object to [CalculatorViewModel]
+     *
+     * @param [operator] [Operators] enum field that represents operator
+     * @param [index] position of an object to which [operator] will be appended
+     * @return [TRUE] upon successful operation, otherwise [FALSE]
+     */
+    fun add(operator: Operators, index: Int = inputSize) : Boolean {
+        return expression.addOperator(Operator(operator), index)
     }
 
-    fun set(operator: Operators, index: Int = expressionSize) {
-        expression.setOperator(Operator(operator), index)
-        calculateExpression()
+    /**
+     * Sends [Functions] object to [CalculatorViewModel]
+     *
+     * @param [function] [Functions] enum field that represents function
+     * @param [index] position of an object to which [function] will be appended
+     * @return [TRUE] upon successful operation, otherwise [FALSE]
+     */
+    fun add(function: Functions, index: Int = inputSize) : Boolean {
+        val result = expression.addFunction(Function(function), index)
+
+        if (result)
+            calculateExpression()
+
+        return result
     }
 
-    fun set(function: Functions, index: Int = expressionSize) {
+    /**
+     * Replaces an old object in [CalculatorViewModel] at specified [index] to [operator]
+     *
+     * @param [operator] [Operators] enum field that represents operator
+     * @param [index] position of an object to be replaced
+     * @return [TRUE] upon successful operation, otherwise [FALSE]
+     */
+    fun set(operator: Operators, index: Int = inputSize) : Boolean {
+        val result = expression.setOperator(Operator(operator), index)
+
+        if (result)
+            calculateExpression()
+
+        return result
+    }
+
+    /**
+     * Replaces an old object in [CalculatorViewModel] at specified [index] to [function]
+     *
+     * @param [function] [Functions] enum field that represents function
+     * @param [index] position of an object to be replaced
+     * @return [TRUE] upon successful operation, otherwise [FALSE]
+     */
+    fun set(function: Functions, index: Int = inputSize) : Boolean {
         TODO("Not yet implemented")
     }
 
-    fun delete() {
-        expression.delete()
-        calculateExpression()
+    /**
+     * Deletes last [Numbers], [Functions], or [Operators] of the last object in [CalculatorViewModel]
+     *
+     * @return [TRUE] upon successful operation, otherwise [FALSE]
+     */
+    fun delete() : Boolean {
+        val result = expression.delete()
+
+        if (result)
+            calculateExpression()
+
+        return result
     }
 
-    fun deleteAt(index: Int) {
-        expression.deleteAt(index, false)
-        calculateExpression()
+    /**
+     * Deletes last [Numbers], [Functions], or []Operators] of the object in [CalculatorViewModel] at specified [index]
+     *
+     * @param [index] position of editable object
+     * @return [TRUE] upon successful operation, otherwise [FALSE]
+     */
+    fun deleteAt(index: Int) : Boolean {
+        val result = expression.deleteAt(index, false)
+
+        if (result)
+            calculateExpression()
+
+        return result
     }
 
-    fun deleteAll() {
-        expression.deleteAll()
+    /**
+     * Deletes all object currently stored in the [CalculatorViewModel]
+     *
+     * @return [TRUE] upon successful operation, otherwise [FALSE]
+     */
+    fun deleteAll() : Boolean {
         resetResult()
-        calculateExpression()
+
+        return expression.deleteAll()
+    }
+
+    /**
+     * Deletes all [Functions], [Numbers], or [Operators] stored in [CalculatorViewModel]'s object at specified [index]
+     *
+     * @param [index] position of editable object in [CalculatorViewModel]
+     * @return [TRUE] upon successful operation, otherwise [FALSE]
+     */
+    fun deleteAllAt(index: Int) : Boolean {
+        val result = expression.deleteAllAt(index)
+
+        if (result)
+            calculateExpression()
+
+        return result
     }
 
     private fun resetResult() {
-        resultOfExpression = object : Token {
-            override var value = "0"
-            override val type = TokenTypes.Number
-        }
+        _resultAsToken = numberParser.parse(Number(Numbers.ZERO))
     }
 
-    fun deleteAllAt(index: Int) {
-        expression.deleteAllAt(index)
-        calculateExpression()
-    }
 
+    /**
+     * Saves the [result] of calculation and assigns it as the first [Token] of [Expression] in [CalculatorViewModel]
+     */
     fun saveResult() {
-        val result = numberParser.parse(resultOfExpression)
+        val result = numberParser.parse(_resultAsToken)
         deleteAll()
 
         if (result.type == Numbers.INFINITY)
-            expression.addNumber(Number(Numbers.ZERO), expressionSize)
+            expression.addNumber(Number(Numbers.ZERO), inputSize)
         else
             expression.addNumber(result, expression.expression.lastIndex)
 
@@ -110,7 +186,7 @@ class CalculatorViewModel : ViewModel() {
     private fun calculateExpression() {
         _inputAsTokens = expression.expression as MutableList<Token>
         viewModelScope.launch {
-            resultOfExpression = try {
+            _resultAsToken = try {
                 ExpressionEvaluator.getResult(_inputAsTokens)
             } catch (e: ArithmeticException) {
                 // Can't divide by zero

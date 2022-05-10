@@ -1,4 +1,4 @@
-package com.example.calculator.algorithms
+package com.example.calculator.formatter
 
 import com.example.calculator.miscellaneous.Numbers
 import com.example.calculator.miscellaneous.TokenTypes
@@ -7,7 +7,6 @@ import com.example.calculator.model.Token
 import com.example.calculator.parser.NumberParser
 
 import java.math.BigDecimal
-import java.math.RoundingMode
 
 import java.text.NumberFormat
 

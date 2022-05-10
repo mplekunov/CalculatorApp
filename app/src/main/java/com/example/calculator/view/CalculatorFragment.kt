@@ -5,12 +5,12 @@ import android.content.res.ColorStateList
 import android.os.Bundle
 
 import android.text.Spannable
-import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 
 import android.util.TypedValue
 
@@ -29,17 +29,16 @@ import androidx.fragment.app.viewModels
 
 import com.example.calculator.R
 import com.example.calculator.databinding.FragmentCalculatorBinding
-
-import com.example.calculator.algorithms.TokenFormatter
+import com.example.calculator.formatter.TokenFormatter
 
 import com.example.calculator.miscellaneous.Functions
 import com.example.calculator.miscellaneous.Numbers
 import com.example.calculator.miscellaneous.Operators
 import com.example.calculator.miscellaneous.TokenTypes
-
 import com.example.calculator.model.Token
 
 import com.example.calculator.viewmodel.CalculatorViewModel
+import kotlin.math.abs
 
 class CalculatorFragment : Fragment() {
     private var binding: FragmentCalculatorBinding? = null
@@ -50,6 +49,8 @@ class CalculatorFragment : Fragment() {
     private lateinit var operatorButtons: Map<View?, Operators>
 
     private lateinit var functionButtons: Map<View?, Functions>
+
+    private val spannableInput: SpannableStringBuilder = SpannableStringBuilder()
 
     @ColorInt
     private var primaryColor: Int = 0
@@ -79,6 +80,11 @@ class CalculatorFragment : Fragment() {
 
         context?.theme?.resolveAttribute(android.R.attr.textColorSecondary, typedValue, true)
         secondaryColor = typedValue.data
+
+        binding?.input?.text = spannableInput
+
+        binding?.input?.movementMethod = LinkMovementMethod.getInstance()
+        binding?.input?.highlightColor = requireContext().getColor(com.google.android.material.R.color.mtrl_btn_transparent_bg_color)
 
         initDigitButtons()
         initOperatorButtons()
@@ -118,49 +124,131 @@ class CalculatorFragment : Fragment() {
         )
     }
 
-    private fun setClickableInputField() {
-        val tokens = viewModel.inputAsTokens
+    private fun disableButton(btn: View, @ColorInt color: Int) {
+        if (btn is ImageButton)
+            ImageViewCompat.setImageTintList(btn, ColorStateList.valueOf(color))
+        else
+            (btn as Button).setTextColor(color)
 
-        val tokensAsStrings = TokenFormatter.convertTokensToStrings(tokens)
-        val sb = StringBuilder()
-        tokensAsStrings.forEach { sb.append(it) }
-
-        val text = sb.toString()
-
-        setOutputField()
-
-        val input = binding?.input!!
-
-        if (text.isEmpty()) {
-            input.text = ""
-            return
-        }
-
-        input.movementMethod = LinkMovementMethod.getInstance()
-        input.highlightColor = requireContext().getColor(com.google.android.material.R.color.mtrl_btn_transparent_bg_color)
-
-        val spans = SpannableStringBuilder(text)
-
-        var start = 0
-        var end = 0
-
-        for (index in tokensAsStrings.indices) {
-            end += tokensAsStrings[index].length
-            spans.setSpan(toClickableSpan(tokens[index], index, start, end), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            start = end
-        }
-
-        input.text = spans
+        btn.isClickable = false
     }
 
-    private fun applyEditingStyle(view: TextView, start: Int, end: Int, @ColorInt color: Int) {
-        val spans = SpannableString(view.text.toString())
-        spans.setSpan(ForegroundColorSpan(color), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        view.text = spans
+    private fun enableButton(btn: View, @ColorInt color: Int) {
+        if (btn is ImageButton)
+            ImageViewCompat.setImageTintList(btn, ColorStateList.valueOf(color))
+        else
+            (btn as Button).setTextColor(color)
+
+        btn.isClickable = true
     }
 
-    private fun toClickableSpan(token: Token, index: Int, start: Int, end: Int): ClickableSpan {
+    private fun replaceTokenInSpannableString(newToken: Token, oldToken: Token? = null, index: Int = viewModel.inputAsTokens.lastIndex) {
+        val start = if (index < 0) 0 else getStartingPosOfTokenAt(index)
+
+        val oldEnd =
+            if (oldToken != null)
+                start + TokenFormatter.convertTokenToString(oldToken, false).length
+            else
+                spannableInput.length
+
+        val newEnd = start + TokenFormatter.convertTokenToString(newToken, false).length
+
+        spannableInput.replace(start, oldEnd, TokenFormatter.convertTokenToString(newToken, false))
+
+        val what = toClickableSpan(newToken, index)
+        spannableInput.setSpan(what, start + 1, newEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+        binding?.input?.text = spannableInput
+        binding?.output?.text = viewModel.result
+    }
+
+    private fun getStartingPosOfTokenAt(index: Int) : Int {
+        var startingIndex = 0
+        viewModel.input.subList(0, index).forEach { token -> startingIndex += token.length }
+        return startingIndex
+    }
+
+    private fun resetSpannableInput() {
+        spannableInput.clearSpans()
+        spannableInput.clear()
+
+        binding?.input?.text = spannableInput
+        binding?.output?.text = viewModel.result
+    }
+
+    fun setDefaultButtonBindings() {
+        binding?.equalSign?.setOnClickListener {
+            applyInputOutputStyling(20F, 40F, secondaryColor, primaryColor)
+            viewModel.saveResult()
+
+            resetSpannableInput()
+            replaceTokenInSpannableString(viewModel.inputAsTokens[viewModel.inputAsTokens.lastIndex])
+        }
+
+        binding?.delete?.setOnClickListener {
+            applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
+
+            if (viewModel.delete()) {
+                if (viewModel.inputAsTokens.lastIndex > 0) {
+                    val newToken = viewModel.inputAsTokens[viewModel.inputAsTokens.lastIndex]
+                    replaceTokenInSpannableString(newToken)
+                }
+                else
+                    resetSpannableInput()
+            }
+        }
+
+        binding?.deleteAll?.setOnClickListener {
+            applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
+
+            if (viewModel.deleteAll())
+                resetSpannableInput()
+        }
+
+        digitButtons.forEach { (button, number) ->
+            button?.setOnClickListener {
+                applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
+
+                if (viewModel.add(number)) {
+                    val newToken = viewModel.inputAsTokens[viewModel.inputAsTokens.lastIndex]
+                    replaceTokenInSpannableString(newToken)
+                }
+            }
+        }
+
+        operatorButtons.forEach { (button, operator) ->
+            button?.setOnClickListener {
+                applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
+
+                if (viewModel.add(operator)) {
+                    val newToken = viewModel.inputAsTokens[viewModel.inputAsTokens.lastIndex]
+                    replaceTokenInSpannableString(newToken)
+                }
+            }
+        }
+
+        functionButtons.forEach { (button, function) ->
+            button?.setOnClickListener {
+                applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
+
+                if (viewModel.add(function)) {
+                    val newToken = viewModel.inputAsTokens[viewModel.inputAsTokens.lastIndex]
+                    replaceTokenInSpannableString(newToken)
+                }
+            }
+        }
+    }
+
+    private fun applyColorToSpan(view: TextView, start: Int, end: Int, @ColorInt color: Int) {
+        spannableInput.setSpan(ForegroundColorSpan(color), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        view.text = spannableInput
+    }
+
+    private fun toClickableSpan(token: Token, index: Int): ClickableSpan {
         return object :  ClickableSpan() {
+            val start: Int get() = getStartingPosOfTokenAt(index)
+            val end: Int get() = start + TokenFormatter.convertTokenToString(viewModel.inputAsTokens[index], false).length
+
             override fun onClick(view: View) {
                 when (token.type) {
                     TokenTypes.Number -> bindNumbersToEditableToken()
@@ -168,13 +256,14 @@ class CalculatorFragment : Fragment() {
                     TokenTypes.Function -> bindFunctionsToEditableToken()
                 }
 
-                applyEditingStyle(view as TextView, start, end, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
+                applyColorToSpan(view as TextView, this.start, this.end, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
 
                 binding?.equalSign?.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_check, requireContext().theme))
                 binding?.equalSign?.setOnClickListener {
                     setDefaultButtonBindings()
                     setButtonsAsClickable()
-                    setClickableInputField()
+
+                    applyColorToSpan(binding?.input!!, this.start, this.end, ContextCompat.getColor(requireContext(), R.color.white))
 
                     binding?.equalSign?.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_equal, requireContext().theme))
                 }
@@ -187,9 +276,24 @@ class CalculatorFragment : Fragment() {
 
                 functionButtons.forEach { (button, function) ->
                     button?.setOnClickListener {
-                        viewModel.set(function, index)
+                        val oldToken = viewModel.inputAsTokens[index]
 
-                        onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
+                        if (viewModel.set(function, index)) {
+
+                            val newToken = viewModel.inputAsTokens[index]
+
+                            replaceTokenInSpannableString(newToken, oldToken, index)
+
+                            applyColorToSpan(
+                                binding?.input!!,
+                                start,
+                                end,
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    R.color.calc_image_button_normal
+                                )
+                            )
+                        }
                     }
                 }
 
@@ -204,8 +308,23 @@ class CalculatorFragment : Fragment() {
             private fun bindOperatorsToEditableToken() {
                 operatorButtons.forEach { (button, operator) ->
                     button?.setOnClickListener {
-                        viewModel.set(operator, index)
-                        onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
+                        val oldToken = viewModel.inputAsTokens[index]
+
+                        if (viewModel.set(operator, index)) {
+                            val newToken = viewModel.inputAsTokens[index]
+
+                            replaceTokenInSpannableString(newToken, oldToken, index)
+
+                            applyColorToSpan(
+                                binding?.input!!,
+                                start,
+                                end,
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    R.color.calc_image_button_normal
+                                )
+                            )
+                        }
                     }
                 }
 
@@ -232,19 +351,64 @@ class CalculatorFragment : Fragment() {
 
                 digitButtons.forEach { (button, number) ->
                     button?.setOnClickListener {
-                        viewModel.add(number, index)
-                        onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
+                        val oldToken = viewModel.inputAsTokens[index]
+
+                        if (viewModel.add(number, index)) {
+                            val newToken = viewModel.inputAsTokens[index]
+
+                            replaceTokenInSpannableString(newToken, oldToken, index)
+
+                            applyColorToSpan(
+                                binding?.input!!,
+                                start,
+                                end,
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    R.color.calc_image_button_normal
+                                )
+                            )
+                        }
                     }
                 }
 
                 binding?.delete?.setOnClickListener {
-                    viewModel.deleteAt(index)
-                    onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
+                    val oldToken = viewModel.inputAsTokens[index]
+
+                    if (viewModel.deleteAt(index)) {
+                        val newToken = viewModel.inputAsTokens[index]
+
+                        replaceTokenInSpannableString(newToken, oldToken, index)
+
+                        applyColorToSpan(
+                            binding?.input!!,
+                            start,
+                            end,
+                            ContextCompat.getColor(
+                                requireContext(),
+                                R.color.calc_image_button_normal
+                            )
+                        )
+                    }
                 }
 
                 binding?.deleteAll?.setOnClickListener {
-                    viewModel.deleteAllAt(index)
-                    onInputEdit(start, index, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
+                    val oldToken = viewModel.inputAsTokens[index]
+
+                    if (viewModel.deleteAllAt(index)) {
+                        val newToken = viewModel.inputAsTokens[index]
+
+                        replaceTokenInSpannableString(newToken, oldToken, index)
+
+                        applyColorToSpan(
+                            binding?.input!!,
+                            start,
+                            end,
+                            ContextCompat.getColor(
+                                requireContext(),
+                                R.color.calc_image_button_normal
+                            )
+                        )
+                    }
                 }
             }
 
@@ -255,91 +419,11 @@ class CalculatorFragment : Fragment() {
                 enableButton(binding?.deleteAll!!, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
                 enableButton(binding?.delete!!, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
             }
+
             override fun updateDrawState(ds: TextPaint) {
                 ds.isUnderlineText = false
             }
         }
-    }
-
-    private fun disableButton(btn: View, @ColorInt color: Int) {
-        if (btn is ImageButton)
-            ImageViewCompat.setImageTintList(btn, ColorStateList.valueOf(color))
-        else
-            (btn as Button).setTextColor(color)
-
-        btn.isClickable = false
-    }
-
-    private fun enableButton(btn: View, @ColorInt color: Int) {
-        if (btn is ImageButton)
-            ImageViewCompat.setImageTintList(btn, ColorStateList.valueOf(color))
-        else
-            (btn as Button).setTextColor(color)
-
-        btn.isClickable = true
-    }
-
-    private fun onInputEdit(start: Int, index: Int, @ColorInt color: Int) {
-        val tokens = TokenFormatter.convertTokensToStrings(viewModel.inputAsTokens)
-        val sb = StringBuilder()
-        tokens.forEach { sb.append(it) }
-
-        binding?.input?.text = sb.toString()
-
-        val end = tokens[index].length + start
-
-        applyEditingStyle(binding?.input!!, start, end, color)
-        setOutputField()
-    }
-
-    // For Equal button
-    fun setDefaultButtonBindings() {
-        binding?.equalSign?.setOnClickListener {
-            applyInputOutputStyling(20F, 40F, secondaryColor, primaryColor)
-            viewModel.saveResult()
-            setClickableInputField()
-        }
-
-        binding?.delete?.setOnClickListener {
-            applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
-            viewModel.delete()
-            setClickableInputField()
-        }
-
-        binding?.deleteAll?.setOnClickListener {
-            applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
-            viewModel.deleteAll()
-            setClickableInputField()
-        }
-
-        digitButtons.forEach { (button, number) ->
-            button?.setOnClickListener {
-                applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
-                viewModel.add(number)
-
-                setClickableInputField()
-            }
-        }
-
-        operatorButtons.forEach { (button, operator) ->
-            button?.setOnClickListener {
-                applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
-                viewModel.add(operator)
-                setClickableInputField()
-            }
-        }
-
-        functionButtons.forEach { (button, function) ->
-            button?.setOnClickListener {
-                applyInputOutputStyling(40F, 20F, primaryColor, secondaryColor)
-                viewModel.add(function)
-                setClickableInputField()
-            }
-        }
-    }
-
-    private fun setOutputField() {
-        binding?.output?.text = TokenFormatter.convertTokenToString(viewModel.resultOfExpression, true)
     }
 
     private fun applyInputOutputStyling(min: Float, max: Float, @ColorInt primaryColor: Int, @ColorInt secondaryColor: Int) {
@@ -351,7 +435,7 @@ class CalculatorFragment : Fragment() {
     }
 
     fun onInputChange() {
-        if (viewModel.inputAsTokens.isEmpty() )
+        if (viewModel.input.isEmpty() )
             binding?.deleteAll?.text = getText(R.string.all_cleared)
         else
             binding?.deleteAll?.text = getText(R.string.clear)

@@ -1,15 +1,13 @@
 package com.example.calculator.model
 
-import android.util.Log
-import com.example.calculator.algorithms.TokenFormatter
 import com.example.calculator.miscellaneous.Functions
 import com.example.calculator.miscellaneous.Numbers
-import com.example.calculator.miscellaneous.Operators
 import com.example.calculator.miscellaneous.TokenTypes
 import com.example.calculator.parser.FunctionParser
 
 import com.example.calculator.parser.NumberParser
 import com.example.calculator.parser.OperatorParser
+
 
 /**
  * [Expression] data structure which contains expression in the infix format.
@@ -27,6 +25,13 @@ class Expression {
     val expression: List<Token>
         get() = _expression
 
+    /**
+     * Adds specified object to [Expression] at [index]
+     *
+     * @param  [number] [Number] object that stores representation of a number
+     * @param [index] position of [number] in [Expression]
+     * @return [TRUE] upon successful operation, otherwise [FALSE]
+     */
     fun addNumber(number: Number, index: Int) : Boolean {
         val token = numberParser.parse(number)
 
@@ -39,15 +44,13 @@ class Expression {
         // Since we can only input expression in the format: Number Operator Function/Number
         // We are sure that when we encounter number, it's going to be either "new" number
         // or it's going to be addition to the previous number
+        @Suppress("NAME_SHADOWING")
         val index = if (index > _expression.lastIndex) _expression.lastIndex else index
 
-        if (index < 0)
-            return true
+        if (index < 0 || (number.type == Numbers.DOT && _expression[index].type != TokenTypes.Number))
+            return false
 
         val tokenToEdit = _expression[index]
-
-        if (number.type == Numbers.DOT && tokenToEdit.type != TokenTypes.Number)
-            return false
 
         // If last token is a number, we add new "token" to the previous number
         // Otherwise, we create new number
@@ -59,8 +62,10 @@ class Expression {
                 return parseDot(index)
 
             // Numbers can't have leading zeroes, unless we are dealing with floats
-            if (numberToken.valueAsTokens.size == 1 && numberToken.valueAsTokens.last() == Numbers.ZERO)
+            if (numberToken.valueAsTokens.size == 1 && numberToken.valueAsTokens.last() == Numbers.ZERO) {
                 _expression[index] = token
+                return true
+            }
 
             // There should be a limit to the number length
             else if (numberToken.valueAsTokens.size < _tokenLengthLimit) {
@@ -68,13 +73,21 @@ class Expression {
                 numberToken.type = number.type
 
                 _expression[index] = numberParser.parse(numberToken)
+                return true
             }
         } else if (tokenToEdit.type == TokenTypes.Operator || (tokenToEdit.type == TokenTypes.Function && functionParser.parse(tokenToEdit).type != Functions.PERCENTAGE))
-            _expression.add(token)
+            return _expression.add(token)
 
-        return true
+        return false
     }
 
+    /**
+     * Adds specified object to [Expression] at [index]
+     *
+     * @param  [operator] [Operator] object that stores representation of an operator
+     * @param [index] position of [operator] in [Expression]
+     * @return [TRUE] upon successful operation, otherwise [FALSE]
+     */
     fun addOperator(operator: Operator, index: Int) : Boolean {
         val token = operatorParser.parse(operator)
 
@@ -107,6 +120,13 @@ class Expression {
         return false
     }
 
+    /**
+     * Adds specified object to [Expression] at [index]
+     *
+     * @param  [function] [Function] object that stores representation of a function or function expression
+     * @param [index] position of [function] in [Expression]
+     * @return [TRUE] upon successful operation, otherwise [FALSE]
+     */
     fun addFunction(function: Function, index: Int) : Boolean {
         val token = functionParser.parse(function)
 
@@ -120,11 +140,13 @@ class Expression {
                 index <= _expression.lastIndex ->_expression.add(index, token)
                 else -> _expression.add(token)
             }
+
+            return true
         }
 
         // Logic for fun ( expr ) format
 
-        return true
+        return false
     }
 
     private fun parseDot(index: Int): Boolean {
@@ -138,6 +160,7 @@ class Expression {
         if (numberToken.type == Numbers.INTEGER) {
             numberToken.valueAsTokens.add(Numbers.DOT)
             _expression[curIndex] = numberParser.parse(numberToken)
+
             return true
         }
 
@@ -145,18 +168,18 @@ class Expression {
     }
 
     /**
-     * Deletes last character of the last [Token]'s value.
+     * Deletes last [Numbers], [Functions], or [Operators] of the last object in [Expression].
      *
-     * @return result indicating success of operation.
+     * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
     fun delete() : Boolean = deleteAt(_expression.lastIndex, true)
 
     /**
-     * Deletes last character of the [Token]'s value at the position specified by *index*.
+     * Deletes last [Numbers], [Functions], or [Operators] of the object in [Expression] at specified [index].
      *
-     * @param index the position of editable [Token].
-     * @param isRemovable flag indicating if token should be removed when it is empty or left with default value 0.
-     * @return result indicating success of operation.
+     * @param [index] position of editable object.
+     * @param [isRemovable] flag indicating if token should be removed when it is empty or left with default value 0.
+     * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
     fun deleteAt(index: Int, isRemovable: Boolean) : Boolean {
         if (index < 0 || index > _expression.lastIndex)
@@ -169,15 +192,16 @@ class Expression {
                 val number = numberParser.parse(tokenToEdit)
 
                 if (number.valueAsTokens.isNotEmpty()) {
+                    // Exponent
                     if (isExponent(index)) {
+                        @Suppress("NAME_SHADOWING")
                         var index = -1
+
                         while (index < number.valueAsTokens.size)
                             if (number.valueAsTokens[index + 1] == Numbers.EXPONENT)
                                 break
                             else
                                 index++
-
-
 
                         number.valueAsTokens = number.valueAsTokens.slice(0..index) as MutableList<Numbers>
                     }
@@ -188,9 +212,7 @@ class Expression {
                 }
             }
             TokenTypes.Operator -> {
-                //slow...
                 _expression.removeAt(index)
-                return true
             }
             TokenTypes.Function -> { TODO("Not yet implemented") }
         }
@@ -214,9 +236,9 @@ class Expression {
     }
 
     /**
-     * Deletes all tokens currently stored in the expression.
+     * Deletes all object currently stored in the [Expression].
      *
-     * @return result indicating success of operation.
+     * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
     fun deleteAll() : Boolean {
         _expression = mutableListOf()
@@ -224,25 +246,36 @@ class Expression {
     }
 
     /**
-     * Deletes all tokens currently stored at specified *index* in the expression.
+     * Deletes all [Functions], [Numbers], or [Operators] stored in [Expression]'s object at specified [index]
      *
-     * @param index the position of editable [Token].
-     * @return result indicating success of operation.
+     * @param [index] position of editable object in [Expression]
+     * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
     fun deleteAllAt(index: Int) : Boolean {
         val tokenToEdit = _expression[index]
 
-        if (tokenToEdit.type == TokenTypes.Number)
+        if (tokenToEdit.type == TokenTypes.Number) {
             _expression[index] = numberParser.parse(Number(Numbers.ZERO))
 
-        return true
+            return true
+        }
+
+        return false
     }
 
+    /**
+     * Replaces old object in [Expression] at specified [index] to [operator]
+     *
+     * @param  [operator] [Operator] object that stores representation of an operator
+     * @param [index] position of [operator] in [Expression]
+     * @return [TRUE] upon successful operation, otherwise [FALSE]
+     */
     fun setOperator(operator: Operator, index: Int): Boolean {
         if (index < 0 || index > _expression.lastIndex)
             return false
 
         _expression[index] = operatorParser.parse(operator)
+
         return true
     }
 }
