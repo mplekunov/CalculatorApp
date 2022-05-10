@@ -82,7 +82,6 @@ class CalculatorFragment : Fragment() {
         secondaryColor = typedValue.data
 
         binding?.input?.text = spannableInput
-
         binding?.input?.movementMethod = LinkMovementMethod.getInstance()
         binding?.input?.highlightColor = requireContext().getColor(com.google.android.material.R.color.mtrl_btn_transparent_bg_color)
 
@@ -250,23 +249,28 @@ class CalculatorFragment : Fragment() {
             val end: Int get() = start + TokenFormatter.convertTokenToString(viewModel.inputAsTokens[index], false).length
 
             override fun onClick(view: View) {
+                // Resets All other "selected" spannable
+                resetSpannableFocus(view as TextView)
+                applyColorToSpan(view, start, end, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
+
                 when (token.type) {
                     TokenTypes.Number -> bindNumbersToEditableToken()
                     TokenTypes.Operator -> bindOperatorsToEditableToken()
                     TokenTypes.Function -> bindFunctionsToEditableToken()
                 }
 
-                applyColorToSpan(view as TextView, this.start, this.end, ContextCompat.getColor(requireContext(), R.color.calc_image_button_normal))
 
                 binding?.equalSign?.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_check, requireContext().theme))
                 binding?.equalSign?.setOnClickListener {
-                    setDefaultButtonBindings()
-                    setButtonsAsClickable()
-
-                    applyColorToSpan(binding?.input!!, this.start, this.end, ContextCompat.getColor(requireContext(), R.color.white))
-
+                    resetSpannableFocus(view)
                     binding?.equalSign?.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_equal, requireContext().theme))
                 }
+            }
+
+            private fun resetSpannableFocus(view: TextView) {
+                applyColorToSpan(view, 0, spannableInput.length, ContextCompat.getColor(requireContext(), R.color.white))
+                setDefaultButtonBindings()
+                setButtonsAsClickable()
             }
 
             private fun bindFunctionsToEditableToken() {
