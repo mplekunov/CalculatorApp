@@ -44,8 +44,14 @@ object ExpressionEvaluator {
                     var percentage = division(first, second)
 
                     if (postfix.isNotEmpty()) {
+                        // Percentage bug
                         val lastKnownOperator = opStack.peek()
-                        val lastKnownNumber = BigDecimal(postfix.last().value).setScale(10, RoundingMode.HALF_UP)
+
+                        var last = postfix.last()
+                        if (postfix.lastIndex - 1 >= 0 && last.type == TokenTypes.Operator)
+                            last = postfix[postfix.lastIndex - 1]
+
+                        val lastKnownNumber = BigDecimal(last.value).setScale(10, RoundingMode.HALF_UP)
 
                         percentage =
                             if (lastKnownOperator.type == Operators.SUBTRACTION || lastKnownOperator.type == Operators.ADDITION)

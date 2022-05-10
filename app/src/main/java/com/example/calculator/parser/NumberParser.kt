@@ -1,7 +1,5 @@
 package com.example.calculator.parser
 
-import android.icu.text.NumberFormat.Field.EXPONENT
-import com.example.calculator.algorithms.TokenFormatter
 import com.example.calculator.datastructure.BiMap
 import com.example.calculator.miscellaneous.Numbers
 import com.example.calculator.miscellaneous.TokenTypes
