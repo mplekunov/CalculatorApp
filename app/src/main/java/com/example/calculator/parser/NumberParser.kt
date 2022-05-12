@@ -7,24 +7,24 @@ import com.example.calculator.miscellaneous.TokenTypes
 import com.example.calculator.model.Token
 import com.example.calculator.model.Number
 
-class NumberParser : TokenParser<Number, String, Numbers> {
-    override val TokenParser<Number, String, Numbers>.map: BiMap<String, Numbers>
-        get() = BiMap<String, Numbers>().apply { putAll(mutableListOf(
-            "0" to Numbers.ZERO,
-            "1" to Numbers.ONE,
-            "2" to Numbers.TWO,
-            "3" to Numbers.THREE,
-            "4" to Numbers.FOUR,
-            "5" to Numbers.FIVE,
-            "6" to Numbers.SIX,
-            "7" to Numbers.SEVEN,
-            "8" to Numbers.EIGHT,
-            "9" to Numbers.NINE,
-            "." to Numbers.DOT,
-            "E" to Numbers.EXPONENT,
-            "-" to Numbers.NEGATIVE,
-            "+" to Numbers.POSITIVE,
-            Double.POSITIVE_INFINITY.toString() to Numbers.INFINITY
+class NumberParser : TokenParser<Number, String, Numbers.Kind> {
+    override val TokenParser<Number, String, Numbers.Kind>.map: BiMap<String, Numbers.Kind>
+        get() = BiMap<String, Numbers.Kind>().apply { putAll(mutableListOf(
+            "0" to Numbers.Kind.ZERO,
+            "1" to Numbers.Kind.ONE,
+            "2" to Numbers.Kind.TWO,
+            "3" to Numbers.Kind.THREE,
+            "4" to Numbers.Kind.FOUR,
+            "5" to Numbers.Kind.FIVE,
+            "6" to Numbers.Kind.SIX,
+            "7" to Numbers.Kind.SEVEN,
+            "8" to Numbers.Kind.EIGHT,
+            "9" to Numbers.Kind.NINE,
+            "." to Numbers.Kind.DOT,
+            "E" to Numbers.Kind.EXPONENT,
+            "-" to Numbers.Kind.NEGATIVE,
+            "+" to Numbers.Kind.POSITIVE,
+            Double.POSITIVE_INFINITY.toString() to Numbers.Kind.INFINITY
         )) }
 
     override fun parse(input: Number): Token {
@@ -33,7 +33,7 @@ class NumberParser : TokenParser<Number, String, Numbers> {
             override val type: TokenTypes = TokenTypes.Number
         }
 
-        if (input.type != Numbers.INFINITY)
+        if (input.type != Numbers.Kind.INFINITY)
             input.valueAsTokens.forEach { number -> token.value += map[number] }
         else
             token.value = map[input.type]!!
@@ -44,14 +44,14 @@ class NumberParser : TokenParser<Number, String, Numbers> {
     fun parse(token: Token): Number {
         val number = Number()
 
-        if (map.containsKey(token.value) && map[token.value] == Numbers.INFINITY)
-            return Number(Numbers.INFINITY)
+        if (map.containsKey(token.value) && map[token.value] == Numbers.Kind.INFINITY)
+            return Number(Numbers.Kind.INFINITY)
 
         token.value.forEach { ch ->
             run {
                 number.valueAsTokens.add(map[ch.toString()]!!)
-                if (map[ch.toString()]!! == Numbers.DOT)
-                    number.type = Numbers.FLOAT
+                if (map[ch.toString()]!! == Numbers.Kind.DOT)
+                    number.type = Numbers.Kind.FLOAT
             }
         }
 

@@ -23,8 +23,8 @@ object ExpressionEvaluator {
 
     /**
      * Converts infix into Postfix.
-     * @param infix representation of a mathematical expression.
-     * @return postfix representation of a mathematical expression.
+     * @param [infix] representation of a mathematical expression.
+     * @return [postfix] representation of a mathematical expression.
      */
     private fun infixToPostfix(expression: MutableList<Token>) : MutableList<Token> {
         val infix = mutableListOf<Token>(). apply { addAll(expression) }
@@ -38,7 +38,7 @@ object ExpressionEvaluator {
 
             // Operator or Function
             if (token.type == TokenTypes.Function) {
-                if (functionParser.parse(token).type == Functions.PERCENTAGE) {
+                if (functionParser.parse(token).type == Functions.Kind.PERCENTAGE) {
                     val first = BigDecimal(postfix.removeLast().value).setScale(10, RoundingMode.HALF_UP)
                     val second = BigDecimal(100.0).setScale(10, RoundingMode.HALF_UP)
                     var percentage = division(first, second)
@@ -54,7 +54,7 @@ object ExpressionEvaluator {
                         val lastKnownNumber = BigDecimal(last.value).setScale(10, RoundingMode.HALF_UP)
 
                         percentage =
-                            if (lastKnownOperator.type == Operators.SUBTRACTION || lastKnownOperator.type == Operators.ADDITION)
+                            if (lastKnownOperator.type == Operators.Kind.SUBTRACTION || lastKnownOperator.type == Operators.Kind.ADDITION)
                                 multiplication(lastKnownNumber, percentage)
                             else
                                 percentage
@@ -70,9 +70,9 @@ object ExpressionEvaluator {
                 val operatorToken = operatorParser.parse(token)
 
                 when (operatorToken.type) {
-                    Operators.LEFT_BRACKET -> opStack.push(operatorToken)
-                    Operators.RIGHT_BRACKET -> {
-                        while (opStack.peek().type != Operators.LEFT_BRACKET)
+                    Operators.Kind.LEFT_BRACKET -> opStack.push(operatorToken)
+                    Operators.Kind.RIGHT_BRACKET -> {
+                        while (opStack.peek().type != Operators.Kind.LEFT_BRACKET)
                             postfix.add(operatorParser.parse(opStack.pop()))
 
                         opStack.pop()
@@ -159,11 +159,11 @@ object ExpressionEvaluator {
                 val left = BigDecimal(s.pop().value).setScale(10, RoundingMode.HALF_UP)
 
                 val result = when(operator.type) {
-                    Operators.ADDITION -> addition(left, right)
-                    Operators.SUBTRACTION -> subtraction(left, right)
-                    Operators.MULTIPLICATION -> multiplication(left, right)
-                    Operators.DIVISION -> division(left, right)
-                    Operators.POWER -> power(left, right)
+                    Operators.Kind.ADDITION -> addition(left, right)
+                    Operators.Kind.SUBTRACTION -> subtraction(left, right)
+                    Operators.Kind.MULTIPLICATION -> multiplication(left, right)
+                    Operators.Kind.DIVISION -> division(left, right)
+                    Operators.Kind.POWER -> power(left, right)
                     else -> TODO("Not Implemented Yet")
                 }
 

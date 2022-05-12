@@ -7,22 +7,22 @@ import com.example.calculator.miscellaneous.TokenTypes
 import com.example.calculator.model.Function
 import com.example.calculator.model.Token
 
-class FunctionParser : TokenParser<Function, String, Functions> {
-    override val TokenParser<Function, String, Functions>.map: BiMap<String, Functions>
-        get() = BiMap<String, Functions>().apply { putAll(mutableMapOf(
-            "%" to Functions.PERCENTAGE,
-            "log" to Functions.LOG,
-            "ln" to Functions.NATURAL_LOG,
-            "cos" to Functions.COS,
-            "sin" to Functions.SIN
+class FunctionParser : TokenParser<Function, String, Functions.Kind> {
+    override val TokenParser<Function, String, Functions.Kind>.map: BiMap<String, Functions.Kind>
+        get() = BiMap<String, Functions.Kind>().apply { putAll(mutableMapOf(
+            "%" to Functions.Kind.PERCENTAGE,
+            "log" to Functions.Kind.LOG,
+            "ln" to Functions.Kind.NATURAL_LOG,
+            "cos" to Functions.Kind.COS,
+            "sin" to Functions.Kind.SIN
         )) }
 
     private val functionsMap = mutableMapOf(
-        Functions.PERCENTAGE to Function(Functions.PERCENTAGE),
-        Functions.LOG to Function(Functions.LOG),
-        Functions.NATURAL_LOG to Function(Functions.NATURAL_LOG),
-        Functions.COS to Function(Functions.COS),
-        Functions.SIN to Function(Functions.SIN)
+        Functions.Kind.PERCENTAGE to Function(Functions.Kind.PERCENTAGE),
+        Functions.Kind.LOG to Function(Functions.Kind.LOG),
+        Functions.Kind.NATURAL_LOG to Function(Functions.Kind.NATURAL_LOG),
+        Functions.Kind.COS to Function(Functions.Kind.COS),
+        Functions.Kind.SIN to Function(Functions.Kind.SIN)
     )
 
     override fun parse(input: Function): Token {

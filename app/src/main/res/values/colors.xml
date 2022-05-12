@@ -8,4 +8,8 @@
     <color name="calc_button_pressed">#bcbcbc</color>
     <color name="grey">#757575</color>
     <color name="calc_image_button_normal">@android:color/holo_orange_dark</color>
+    <color name="highlighted_text"> </color>
+    <color name="default_text"> </color>
+    <color name="enabled_button"> </color>
+    <color name="disabled_button"> </color>
 </resources>
