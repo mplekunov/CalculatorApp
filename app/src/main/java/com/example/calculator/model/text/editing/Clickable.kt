@@ -14,18 +14,20 @@ import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.ImageViewCompat
+import androidx.lifecycle.MutableLiveData
 import com.example.calculator.R
-import com.example.calculator.databinding.FragmentCalculatorBinding
 import com.example.calculator.model.wrapper.Buttons
 import com.example.calculator.viewmodel.CalculatorViewModel
 
 abstract class Clickable(
     protected val context: Context,
-    protected val binding: FragmentCalculatorBinding,
+    protected val buttons: Buttons,
     protected val viewModel: CalculatorViewModel,
-    protected val spannableInput: SpannableStringBuilder,
+    protected val liveInput: MutableLiveData<SpannableStringBuilder>,
     protected val index: Int
 ) : ClickableSpan() {
+    protected val spannable get() = liveInput.value ?: SpannableStringBuilder()
+
     open var highlightedColor: Int = ResourcesCompat.getColor(context.resources, R.color.yellow_dark, context.theme)
     open var defaultTextColor: Int = ResourcesCompat.getColor(context.resources, R.color.white, context.theme)
 
@@ -37,8 +39,6 @@ abstract class Clickable(
 
     open var disabledButtonColor: Int = ResourcesCompat.getColor(context.resources, R.color.grey, context.theme)
 
-    protected val buttons = Buttons(binding)
-
     protected open val start : Int get()
     {
         var startingIndex = 0
@@ -48,7 +48,7 @@ abstract class Clickable(
 
     protected val end: Int get() { return viewModel.input[index].length + start}
 
-    protected lateinit var textView: TextView
+    private lateinit var textView: TextView
 
     override fun onClick(view: View) {
         textView = view as TextView
@@ -61,7 +61,7 @@ abstract class Clickable(
         buttons.equal.setImageDrawable(ResourcesCompat.getDrawable(context.resources, R.drawable.ic_check, context.theme))
 
         buttons.equal.setOnClickListener {
-            InputAdapter(context, binding, viewModel, spannableInput).setBindings()
+            InputAdapter(context, buttons, viewModel, liveInput).setBindings()
             resetSpannableFocus()
             buttons.equal.setImageDrawable(ResourcesCompat.getDrawable(context.resources, R.drawable.ic_equal, context.theme))
         }
@@ -75,10 +75,20 @@ abstract class Clickable(
 
     protected abstract fun bindToEditableToken()
 
-    protected fun applyColorToSpan(@ColorInt color: Int, start: Int = 0, end: Int = spannableInput.length) {
-        spannableInput.setSpan(ForegroundColorSpan(color), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        textView.text = spannableInput
+    protected fun applyColorToSpan(@ColorInt color: Int, start: Int = 0, end: Int = liveInput.value?.length!!) {
+        spannable.highlight(color, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
+
+    fun SpannableStringBuilder.setSpan(start: Int, end: Int, flags: Int) {
+        this@setSpan.setSpan(what, start, end, flags)
+        liveInput.value = this@setSpan
+    }
+
+    private fun SpannableStringBuilder.highlight(color: Int, start: Int, end: Int, flags: Int) {
+        this@highlight.setSpan(ForegroundColorSpan(color), start, end, flags)
+        liveInput.value = this@highlight
+    }
+
 
     protected fun setButtonState(btn: View?, @ColorInt color: Int, isClickable: Boolean = true) {
         if (btn is ImageButton)
