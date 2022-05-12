@@ -1,6 +1,6 @@
 package com.example.calculator.parser
 
-import com.example.calculator.model.Token
+import com.example.calculator.model.expression.Token
 
 import com.example.calculator.datastructure.BiMap
 

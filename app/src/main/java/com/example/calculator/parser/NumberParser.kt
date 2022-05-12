@@ -4,8 +4,8 @@ import com.example.calculator.datastructure.BiMap
 import com.example.calculator.miscellaneous.Numbers
 import com.example.calculator.miscellaneous.TokenTypes
 
-import com.example.calculator.model.Token
-import com.example.calculator.model.Number
+import com.example.calculator.model.expression.Token
+import com.example.calculator.model.expression.Number
 
 class NumberParser : TokenParser<Number, String, Numbers.Kind> {
     override val TokenParser<Number, String, Numbers.Kind>.map: BiMap<String, Numbers.Kind>

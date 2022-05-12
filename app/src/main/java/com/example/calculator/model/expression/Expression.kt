@@ -1,4 +1,4 @@
-package com.example.calculator.model
+package com.example.calculator.model.expression
 
 import com.example.calculator.miscellaneous.Functions
 import com.example.calculator.miscellaneous.Numbers
@@ -225,7 +225,9 @@ class Expression {
         if (tokenToEdit.value.isEmpty()) {
             when {
                 isRemovable -> _expression.removeAt(index)
-                !isRemovable && tokenToEdit.type == TokenTypes.Number -> _expression[index] = numberParser.parse(Number(Numbers.Kind.ZERO))
+                !isRemovable && tokenToEdit.type == TokenTypes.Number -> _expression[index] = numberParser.parse(
+                    Number(Numbers.Kind.ZERO)
+                )
             }
         }
         else

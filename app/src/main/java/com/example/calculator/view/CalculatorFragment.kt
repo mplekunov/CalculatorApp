@@ -13,7 +13,7 @@ import androidx.lifecycle.Observer
 
 import com.example.calculator.R
 import com.example.calculator.databinding.FragmentCalculatorBinding
-import com.example.calculator.model.text.EditableInput
+import com.example.calculator.model.input.EditableInput
 import com.example.calculator.model.wrapper.Buttons
 
 import com.example.calculator.viewmodel.CalculatorViewModel

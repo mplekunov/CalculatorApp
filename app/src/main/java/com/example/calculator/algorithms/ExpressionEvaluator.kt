@@ -6,13 +6,13 @@ import com.example.calculator.miscellaneous.Operators
 import com.example.calculator.miscellaneous.TokenTypes
 
 import com.example.calculator.model.*
+import com.example.calculator.model.expression.Operator
+import com.example.calculator.model.expression.Token
 import com.example.calculator.parser.FunctionParser
-import com.example.calculator.parser.NumberParser
 import com.example.calculator.parser.OperatorParser
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
-import kotlin.NoSuchElementException
 
 /**
  * Helper class that evaluates [Expression].

@@ -9,16 +9,15 @@ import com.example.calculator.miscellaneous.Functions
 import com.example.calculator.miscellaneous.Numbers
 import com.example.calculator.miscellaneous.Operators
 
-import com.example.calculator.model.Operator
-import com.example.calculator.model.Number
-import com.example.calculator.model.Function
-import com.example.calculator.model.Token
-import com.example.calculator.model.Expression
+import com.example.calculator.model.expression.Operator
+import com.example.calculator.model.expression.Number
+import com.example.calculator.model.expression.Function
+import com.example.calculator.model.expression.Token
+import com.example.calculator.model.expression.Expression
 
 import com.example.calculator.parser.NumberParser
 
 import kotlinx.coroutines.*
-import kotlin.math.exp
 
 class CalculatorViewModel : ViewModel() {
     private val expression = Expression()

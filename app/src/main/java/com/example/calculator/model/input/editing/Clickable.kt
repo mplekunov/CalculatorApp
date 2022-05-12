@@ -1,4 +1,4 @@
-package com.example.calculator.model.text.editing
+package com.example.calculator.model.input.editing
 
 import android.content.Context
 import android.content.res.ColorStateList

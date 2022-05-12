@@ -1,4 +1,4 @@
-package com.example.calculator.model
+package com.example.calculator.model.expression
 
 import com.example.calculator.miscellaneous.Associativity
 import com.example.calculator.miscellaneous.Operators

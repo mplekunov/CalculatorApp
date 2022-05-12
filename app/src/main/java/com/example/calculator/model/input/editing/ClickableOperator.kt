@@ -1,4 +1,4 @@
-package com.example.calculator.model.text.editing
+package com.example.calculator.model.input.editing
 
 import android.content.Context
 import android.text.Spannable
@@ -7,24 +7,24 @@ import androidx.lifecycle.MutableLiveData
 import com.example.calculator.model.wrapper.Buttons
 import com.example.calculator.viewmodel.CalculatorViewModel
 
-class ClickableFunction(
+class ClickableOperator(
     context: Context,
     buttons: Buttons,
     viewModel: CalculatorViewModel,
     liveInput: MutableLiveData<SpannableStringBuilder>,
     index: Int
     ) : Clickable(context, buttons, viewModel, liveInput, index) {
-    override val what get() = ClickableFunction(context, buttons, viewModel, liveInput, index)
+    override val what get() = ClickableOperator(context, buttons, viewModel, liveInput, index)
 
     override fun bindToEditableToken() {
-        buttons.operators.operatorButtons.forEach { (button, _) -> setButtonState(button, disabledButtonColor, false) }
+        buttons.functions.functionButtons.forEach { (button, _) -> setButtonState(button, disabledButtonColor, false) }
         buttons.numbers.numberButtons.forEach { (button, _) -> setButtonState(button, disabledButtonColor, false) }
 
-        buttons.functions.functionButtons.forEach { (button, function) ->
+        buttons.operators.operatorButtons.forEach { (button, operator) ->
             button?.setOnClickListener {
                 val oldString = viewModel.input[index]
 
-                if (viewModel.set(function, index)) {
+                if (viewModel.set(operator, index)) {
                     replaceSpan(viewModel.input[index], oldString)
                     applyColorToSpan(highlightedColor, start, end)
                 }

@@ -6,8 +6,8 @@ import com.example.calculator.miscellaneous.Associativity
 import com.example.calculator.miscellaneous.Operators
 import com.example.calculator.miscellaneous.TokenTypes
 
-import com.example.calculator.model.Operator
-import com.example.calculator.model.Token
+import com.example.calculator.model.expression.Operator
+import com.example.calculator.model.expression.Token
 
 class OperatorParser: TokenParser<Operator, String, Operators.Kind> {
     override val TokenParser<Operator, String, Operators.Kind>.map: BiMap<String, Operators.Kind>

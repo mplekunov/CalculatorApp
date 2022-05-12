@@ -228,7 +228,7 @@
                 <ImageButton
                     android:id="@+id/equal_sign"
                     android:src="@drawable/ic_equal"
-                    android:padding="@dimen/button_icon_padding"
+                    android:padding="15dp"
                     style="@style/Widget.Calculator.CalcButton"/>
             </GridLayout>
         </FrameLayout>

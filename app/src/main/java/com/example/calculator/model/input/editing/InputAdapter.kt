@@ -1,10 +1,9 @@
-package com.example.calculator.model.text.editing
+package com.example.calculator.model.input.editing
 
 import android.content.Context
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import androidx.lifecycle.MutableLiveData
-import com.example.calculator.databinding.FragmentCalculatorBinding
 import com.example.calculator.miscellaneous.TokenTypes
 import com.example.calculator.model.wrapper.Buttons
 import com.example.calculator.viewmodel.CalculatorViewModel

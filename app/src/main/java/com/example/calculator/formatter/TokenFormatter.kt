@@ -3,7 +3,7 @@ package com.example.calculator.formatter
 import com.example.calculator.miscellaneous.Numbers
 import com.example.calculator.miscellaneous.TokenTypes
 
-import com.example.calculator.model.Token
+import com.example.calculator.model.expression.Token
 import com.example.calculator.parser.NumberParser
 
 import java.math.BigDecimal
