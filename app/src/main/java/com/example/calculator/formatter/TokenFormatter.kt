@@ -33,7 +33,6 @@ object TokenFormatter {
         val list = mutableListOf<String>()
 
         tokens.forEach { list.add(convertTokenToString(it, false)) }
-        list[list.lastIndex] += " "
 
         return list
     }
@@ -47,16 +46,16 @@ object TokenFormatter {
      */
     fun convertTokenToString(token: Token?, removeTrailingZeroes: Boolean): String {
         if (token == null || token.value.isEmpty())
-            return " 0 "
+            return "0"
 
         return if (token.type == TokenTypes.Number) {
             var formattedToken = token.value
 
-            if (NumberParser().parse(token).type != Numbers.INFINITY && removeTrailingZeroes)
+            if (NumberParser().parse(token).type != Numbers.Kind.INFINITY && removeTrailingZeroes)
                 formattedToken = BigDecimal(formattedToken).stripTrailingZeros().toString()
 
-            " $formattedToken"
+            formattedToken
         } else
-            " ${token.value}"
+            token.value
     }
 }

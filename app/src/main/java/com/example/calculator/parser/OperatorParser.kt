@@ -9,22 +9,22 @@ import com.example.calculator.miscellaneous.TokenTypes
 import com.example.calculator.model.Operator
 import com.example.calculator.model.Token
 
-class OperatorParser: TokenParser<Operator, String, Operators> {
-    override val TokenParser<Operator, String, Operators>.map: BiMap<String, Operators>
-        get() = BiMap<String, Operators>().apply { putAll(mutableMapOf(
-            "+" to Operators.ADDITION,
-            "-" to Operators.SUBTRACTION,
-            "/" to Operators.DIVISION,
-            "*" to Operators.MULTIPLICATION,
-            "^" to Operators.POWER
+class OperatorParser: TokenParser<Operator, String, Operators.Kind> {
+    override val TokenParser<Operator, String, Operators.Kind>.map: BiMap<String, Operators.Kind>
+        get() = BiMap<String, Operators.Kind>().apply { putAll(mutableMapOf(
+            "+" to Operators.Kind.ADDITION,
+            "-" to Operators.Kind.SUBTRACTION,
+            "/" to Operators.Kind.DIVISION,
+            "*" to Operators.Kind.MULTIPLICATION,
+            "^" to Operators.Kind.POWER
         )) }
 
     private val operatorsMap = mutableMapOf(
-        Operators.ADDITION to Operator(Operators.ADDITION, Associativity.LEFT, 0),
-        Operators.SUBTRACTION to Operator(Operators.SUBTRACTION, Associativity.LEFT, 0),
-        Operators.MULTIPLICATION to Operator(Operators.MULTIPLICATION, Associativity.LEFT, 5),
-        Operators.DIVISION to Operator(Operators.DIVISION, Associativity.LEFT, 5),
-        Operators.POWER to Operator(Operators.POWER, Associativity.RIGHT, 10)
+        Operators.Kind.ADDITION to Operator(Operators.Kind.ADDITION, Associativity.LEFT, 0),
+        Operators.Kind.SUBTRACTION to Operator(Operators.Kind.SUBTRACTION, Associativity.LEFT, 0),
+        Operators.Kind.MULTIPLICATION to Operator(Operators.Kind.MULTIPLICATION, Associativity.LEFT, 5),
+        Operators.Kind.DIVISION to Operator(Operators.Kind.DIVISION, Associativity.LEFT, 5),
+        Operators.Kind.POWER to Operator(Operators.Kind.POWER, Associativity.RIGHT, 10)
     )
 
     override fun parse(input: Operator): Token {

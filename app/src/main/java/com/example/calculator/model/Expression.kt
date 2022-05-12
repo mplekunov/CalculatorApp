@@ -35,7 +35,7 @@ class Expression {
     fun addNumber(number: Number, index: Int) : Boolean {
         val token = numberParser.parse(number)
 
-        if (_expression.isEmpty() && number.type != Numbers.DOT) {
+        if (_expression.isEmpty() && number.type != Numbers.Kind.DOT) {
             _expression.add(token)
             return true
         }
@@ -47,7 +47,7 @@ class Expression {
         @Suppress("NAME_SHADOWING")
         val index = if (index > _expression.lastIndex) _expression.lastIndex else index
 
-        if (index < 0 || (number.type == Numbers.DOT && _expression[index].type != TokenTypes.Number))
+        if (index < 0 || (number.type == Numbers.Kind.DOT && _expression[index].type != TokenTypes.Number))
             return false
 
         val tokenToEdit = _expression[index]
@@ -58,11 +58,11 @@ class Expression {
             val numberToken = numberParser.parse(tokenToEdit)
 
             // Dot can only be part of number
-            if (number.valueAsTokens.contains(Numbers.DOT))
+            if (number.valueAsTokens.contains(Numbers.Kind.DOT))
                 return parseDot(index)
 
             // Numbers can't have leading zeroes, unless we are dealing with floats
-            if (numberToken.valueAsTokens.size == 1 && numberToken.valueAsTokens.last() == Numbers.ZERO) {
+            if (numberToken.valueAsTokens.size == 1 && numberToken.valueAsTokens.last() == Numbers.Kind.ZERO) {
                 _expression[index] = token
                 return true
             }
@@ -75,7 +75,7 @@ class Expression {
                 _expression[index] = numberParser.parse(numberToken)
                 return true
             }
-        } else if (tokenToEdit.type == TokenTypes.Operator || (tokenToEdit.type == TokenTypes.Function && functionParser.parse(tokenToEdit).type != Functions.PERCENTAGE))
+        } else if (tokenToEdit.type == TokenTypes.Operator || (tokenToEdit.type == TokenTypes.Function && functionParser.parse(tokenToEdit).type != Functions.Kind.PERCENTAGE))
             return _expression.add(token)
 
         return false
@@ -130,12 +130,12 @@ class Expression {
     fun addFunction(function: Function, index: Int) : Boolean {
         val token = functionParser.parse(function)
 
-        if (function.type == Functions.PERCENTAGE && _expression.isEmpty())
+        if (function.type == Functions.Kind.PERCENTAGE && _expression.isEmpty())
             return false
 
         // All functions have the same format fun ( expr )
         // The only exception is Percentage
-        if (function.type == Functions.PERCENTAGE && _expression.last().type == TokenTypes.Number) {
+        if (function.type == Functions.Kind.PERCENTAGE && _expression.last().type == TokenTypes.Number) {
             when {
                 index <= _expression.lastIndex ->_expression.add(index, token)
                 else -> _expression.add(token)
@@ -157,8 +157,8 @@ class Expression {
 
         val numberToken = numberParser.parse(_expression[curIndex])
 
-        if (numberToken.type == Numbers.INTEGER) {
-            numberToken.valueAsTokens.add(Numbers.DOT)
+        if (numberToken.type == Numbers.Kind.INTEGER) {
+            numberToken.valueAsTokens.add(Numbers.Kind.DOT)
             _expression[curIndex] = numberParser.parse(numberToken)
 
             return true
@@ -172,7 +172,12 @@ class Expression {
      *
      * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
-    fun delete() : Boolean = deleteAt(_expression.lastIndex, true)
+    fun delete(index: Int = _expression.size, isRemovable: Boolean = true) : Boolean {
+        return if (index == _expression.size)
+            deleteAt(_expression.lastIndex, true)
+        else
+            deleteAt(index, isRemovable)
+    }
 
     /**
      * Deletes last [Numbers], [Functions], or [Operators] of the object in [Expression] at specified [index].
@@ -198,12 +203,12 @@ class Expression {
                         var index = -1
 
                         while (index < number.valueAsTokens.size)
-                            if (number.valueAsTokens[index + 1] == Numbers.EXPONENT)
+                            if (number.valueAsTokens[index + 1] == Numbers.Kind.EXPONENT)
                                 break
                             else
                                 index++
 
-                        number.valueAsTokens = number.valueAsTokens.slice(0..index) as MutableList<Numbers>
+                        number.valueAsTokens = number.valueAsTokens.slice(0..index) as MutableList<Numbers.Kind>
                     }
                     else
                         number.valueAsTokens.removeLast()
@@ -220,7 +225,7 @@ class Expression {
         if (tokenToEdit.value.isEmpty()) {
             when {
                 isRemovable -> _expression.removeAt(index)
-                !isRemovable && tokenToEdit.type == TokenTypes.Number -> _expression[index] = numberParser.parse(Number(Numbers.ZERO))
+                !isRemovable && tokenToEdit.type == TokenTypes.Number -> _expression[index] = numberParser.parse(Number(Numbers.Kind.ZERO))
             }
         }
         else
@@ -232,7 +237,7 @@ class Expression {
     private fun isExponent(index: Int): Boolean {
         val number = numberParser.parse(_expression[index])
 
-        return number.valueAsTokens.contains(Numbers.EXPONENT)
+        return number.valueAsTokens.contains(Numbers.Kind.EXPONENT)
     }
 
     /**
@@ -240,8 +245,11 @@ class Expression {
      *
      * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
-    fun deleteAll() : Boolean {
-        _expression = mutableListOf()
+    fun deleteAll(index: Int = _expression.size) : Boolean {
+        if (index == _expression.size)
+            _expression = mutableListOf()
+        else
+            deleteAllAt(index)
         return true
     }
 
@@ -255,7 +263,7 @@ class Expression {
         val tokenToEdit = _expression[index]
 
         if (tokenToEdit.type == TokenTypes.Number) {
-            _expression[index] = numberParser.parse(Number(Numbers.ZERO))
+            _expression[index] = numberParser.parse(Number(Numbers.Kind.ZERO))
 
             return true
         }

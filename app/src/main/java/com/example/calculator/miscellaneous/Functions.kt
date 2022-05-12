@@ -1,12 +1,20 @@
 package com.example.calculator.miscellaneous
 
-enum class Functions {
-    PERCENTAGE,
-    LOG,
-    NATURAL_LOG,
-    FACTORIAL,
-    SIN,
-    COS,
-    TAN,
-    SQUARE_ROOT
+import com.example.calculator.databinding.FragmentCalculatorBinding
+
+class Functions(binding : FragmentCalculatorBinding?) {
+    enum class Kind {
+        PERCENTAGE,
+        LOG,
+        NATURAL_LOG,
+        FACTORIAL,
+        SIN,
+        COS,
+        TAN,
+        SQUARE_ROOT
+    }
+
+    val functionButtons = mapOf (
+        binding?.percentSign to Kind.PERCENTAGE
+    )
 }

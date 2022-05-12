@@ -3,15 +3,15 @@ package com.example.calculator.model
 import com.example.calculator.miscellaneous.Numbers
 
 class Number() {
-    var valueAsTokens: MutableList<Numbers> = mutableListOf()
-    var type: Numbers = Numbers.INTEGER
+    var valueAsTokens: MutableList<Numbers.Kind> = mutableListOf()
+    var type: Numbers.Kind = Numbers.Kind.INTEGER
 
-    constructor(number: Numbers) : this() {
+    constructor(number: Numbers.Kind) : this() {
         valueAsTokens.add(number)
 
-        if (number == Numbers.DOT)
-            type = Numbers.DOT
-        else if (number == Numbers.INFINITY)
-            type = Numbers.INFINITY
+        if (number == Numbers.Kind.DOT)
+            type = Numbers.Kind.DOT
+        else if (number == Numbers.Kind.INFINITY)
+            type = Numbers.Kind.INFINITY
     }
 }
