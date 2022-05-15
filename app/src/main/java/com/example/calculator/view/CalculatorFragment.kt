@@ -49,7 +49,7 @@ class CalculatorFragment : Fragment() {
 
         val observer = Observer<SpannableStringBuilder> {
             binding?.input?.text = it
-            binding?.output?.text = viewModel.result
+            binding?.output?.text = viewModel.formattedOutput
         }
 
         editingMode.liveInput.observe(viewLifecycleOwner, observer)
@@ -68,7 +68,7 @@ class CalculatorFragment : Fragment() {
 //    }
 
     fun onInputChange() {
-        if (viewModel.input.isEmpty() )
+        if (viewModel.formattedInput.isEmpty() )
             binding?.deleteAll?.text = getText(R.string.all_cleared)
         else
             binding?.deleteAll?.text = getText(R.string.clear)

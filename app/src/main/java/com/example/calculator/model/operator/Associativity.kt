@@ -1,4 +1,4 @@
-package com.example.calculator.miscellaneous
+package com.example.calculator.model.operator
 
 enum class Associativity {
     LEFT,

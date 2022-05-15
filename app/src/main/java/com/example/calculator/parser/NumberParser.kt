@@ -1,60 +1,34 @@
 package com.example.calculator.parser
 
 import com.example.calculator.datastructure.BiMap
-import com.example.calculator.miscellaneous.Numbers
-import com.example.calculator.miscellaneous.TokenTypes
+import com.example.calculator.model.number.Number
 
-import com.example.calculator.model.expression.Token
-import com.example.calculator.model.expression.Number
+import com.example.calculator.model.number.NumberKind
+import com.example.calculator.model.token.Token
 
-class NumberParser : TokenParser<Number, String, Numbers.Kind> {
-    override val TokenParser<Number, String, Numbers.Kind>.map: BiMap<String, Numbers.Kind>
-        get() = BiMap<String, Numbers.Kind>().apply { putAll(mutableListOf(
-            "0" to Numbers.Kind.ZERO,
-            "1" to Numbers.Kind.ONE,
-            "2" to Numbers.Kind.TWO,
-            "3" to Numbers.Kind.THREE,
-            "4" to Numbers.Kind.FOUR,
-            "5" to Numbers.Kind.FIVE,
-            "6" to Numbers.Kind.SIX,
-            "7" to Numbers.Kind.SEVEN,
-            "8" to Numbers.Kind.EIGHT,
-            "9" to Numbers.Kind.NINE,
-            "." to Numbers.Kind.DOT,
-            "E" to Numbers.Kind.EXPONENT,
-            "-" to Numbers.Kind.NEGATIVE,
-            "+" to Numbers.Kind.POSITIVE,
-            Double.POSITIVE_INFINITY.toString() to Numbers.Kind.INFINITY
+object NumberParser : TokenParser<NumberKind> {
+    override val TokenParser<NumberKind>.map: BiMap<String, NumberKind>
+        get() = BiMap<String, NumberKind>().apply { putAll(mutableListOf(
+            "0" to NumberKind.ZERO,
+            "1" to NumberKind.ONE,
+            "2" to NumberKind.TWO,
+            "3" to NumberKind.THREE,
+            "4" to NumberKind.FOUR,
+            "5" to NumberKind.FIVE,
+            "6" to NumberKind.SIX,
+            "7" to NumberKind.SEVEN,
+            "8" to NumberKind.EIGHT,
+            "9" to NumberKind.NINE,
+            "." to NumberKind.DOT,
+            "E" to NumberKind.EXPONENT,
+            "-" to NumberKind.NEGATIVE,
+            "+" to NumberKind.POSITIVE,
+            Double.POSITIVE_INFINITY.toString() to NumberKind.INFINITY
         )) }
 
-    override fun parse(input: Number): Token {
-        val token = object : Token {
-            override var value: String = ""
-            override val type: TokenTypes = TokenTypes.Number
-        }
-
-        if (input.type != Numbers.Kind.INFINITY)
-            input.valueAsTokens.forEach { number -> token.value += map[number] }
-        else
-            token.value = map[input.type]!!
-
-        return token
+    override fun parse(input: NumberKind): Number {
+        return Number(map[input] ?: throw NoSuchElementException("Number doesn't exist"))
     }
 
-    fun parse(token: Token): Number {
-        val number = Number()
-
-        if (map.containsKey(token.value) && map[token.value] == Numbers.Kind.INFINITY)
-            return Number(Numbers.Kind.INFINITY)
-
-        token.value.forEach { ch ->
-            run {
-                number.valueAsTokens.add(map[ch.toString()]!!)
-                if (map[ch.toString()]!! == Numbers.Kind.DOT)
-                    number.type = Numbers.Kind.FLOAT
-            }
-        }
-
-        return number
-    }
+    fun parse(token: Token) : Number = Number(token.value)
 }

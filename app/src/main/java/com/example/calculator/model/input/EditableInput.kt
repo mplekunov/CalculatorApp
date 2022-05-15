@@ -20,5 +20,4 @@ class EditableInput(
         inputAdapter = InputAdapter(context, buttons, viewModel, liveInput)
         inputAdapter.setBindings()
     }
-
 }

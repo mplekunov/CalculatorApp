@@ -1,44 +1,42 @@
 package com.example.calculator.parser
 
+import android.graphics.Region
 import com.example.calculator.datastructure.BiMap
+import com.example.calculator.model.operator.Associativity
+import com.example.calculator.model.operator.Operator
 
-import com.example.calculator.miscellaneous.Associativity
-import com.example.calculator.miscellaneous.Operators
-import com.example.calculator.miscellaneous.TokenTypes
+import com.example.calculator.model.operator.OperatorKind
+import com.example.calculator.model.token.Token
+import kotlin.Exception
 
-import com.example.calculator.model.expression.Operator
-import com.example.calculator.model.expression.Token
-
-class OperatorParser: TokenParser<Operator, String, Operators.Kind> {
-    override val TokenParser<Operator, String, Operators.Kind>.map: BiMap<String, Operators.Kind>
-        get() = BiMap<String, Operators.Kind>().apply { putAll(mutableMapOf(
-            "+" to Operators.Kind.ADDITION,
-            "-" to Operators.Kind.SUBTRACTION,
-            "/" to Operators.Kind.DIVISION,
-            "*" to Operators.Kind.MULTIPLICATION,
-            "^" to Operators.Kind.POWER
+object OperatorParser: TokenParser<OperatorKind> {
+    override val TokenParser<OperatorKind>.map: BiMap<String, OperatorKind>
+        get() = BiMap<String, OperatorKind>().apply { putAll(mutableMapOf(
+            "+" to OperatorKind.ADDITION,
+            "-" to OperatorKind.SUBTRACTION,
+            "/" to OperatorKind.DIVISION,
+            "*" to OperatorKind.MULTIPLICATION,
+            "^" to OperatorKind.POWER
         )) }
 
-    private val operatorsMap = mutableMapOf(
-        Operators.Kind.ADDITION to Operator(Operators.Kind.ADDITION, Associativity.LEFT, 0),
-        Operators.Kind.SUBTRACTION to Operator(Operators.Kind.SUBTRACTION, Associativity.LEFT, 0),
-        Operators.Kind.MULTIPLICATION to Operator(Operators.Kind.MULTIPLICATION, Associativity.LEFT, 5),
-        Operators.Kind.DIVISION to Operator(Operators.Kind.DIVISION, Associativity.LEFT, 5),
-        Operators.Kind.POWER to Operator(Operators.Kind.POWER, Associativity.RIGHT, 10)
+    @PublishedApi
+    internal val operatorsMap = mutableMapOf(
+        OperatorKind.ADDITION to Operator(map[OperatorKind.ADDITION]!!, Associativity.LEFT, 0),
+        OperatorKind.SUBTRACTION to Operator(map[OperatorKind.SUBTRACTION]!!, Associativity.LEFT, 0),
+        OperatorKind.MULTIPLICATION to Operator(map[OperatorKind.MULTIPLICATION]!!, Associativity.LEFT, 5),
+        OperatorKind.DIVISION to Operator(map[OperatorKind.DIVISION]!!, Associativity.LEFT, 5),
+        OperatorKind.POWER to Operator(map[OperatorKind.POWER]!!, Associativity.RIGHT, 10)
     )
 
-    override fun parse(input: Operator): Token {
-        val token = object : Token {
-            override var value: String = ""
-            override val type: TokenTypes = TokenTypes.Operator
-        }
-
-        token.value = map[input.type]!!
-
-        return token
+    override fun parse(input: OperatorKind): Operator {
+        return operatorsMap[input] ?: throw NoSuchElementException("Operator doesn't exist")
     }
 
-    fun parse(input: Token): Operator {
-        return operatorsMap[map[input.value]]!!
+    inline fun <reified T> parse(token: Token): T {
+        return when(T::class.java) {
+            OperatorKind::class.java -> map[token.value] as T ?: throw NoSuchElementException("Operator doesn't exist")
+            Operator::class.java -> operatorsMap[map[token.value]] as T ?: throw NoSuchElementException("Operator doesn't exist")
+            else -> throw Exception("Wrong return Type")
+        }
     }
 }

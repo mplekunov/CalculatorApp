@@ -16,6 +16,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.lifecycle.MutableLiveData
 import com.example.calculator.R
+import com.example.calculator.algorithm.Algorithms
 import com.example.calculator.model.wrapper.Buttons
 import com.example.calculator.viewmodel.CalculatorViewModel
 
@@ -33,30 +34,25 @@ abstract class Clickable(
 
     private var enabledButtonColor: Int = ResourcesCompat.getColor(context.resources, R.color.yellow_dark, context.theme)
 
-    open var enabledNumberButtonsColor: Int = ResourcesCompat.getColor(context.resources, R.color.white, context.theme)
-    open var enabledFunctionButtonsColor: Int = enabledButtonColor
-    open var enabledOperatorButtonsColor: Int = enabledButtonColor
+    open var enabledNumberButtonColor: Int = ResourcesCompat.getColor(context.resources, R.color.white, context.theme)
+    open var enabledFunctionButtonColor: Int = enabledButtonColor
+    open var enabledOperatorButtonColor: Int = enabledButtonColor
 
     open var disabledButtonColor: Int = ResourcesCompat.getColor(context.resources, R.color.grey, context.theme)
 
-    protected open val start : Int get()
-    {
-        var startingIndex = 0
-        viewModel.input.subList(0, index).forEach { str -> startingIndex += str.length }
-        return startingIndex
-    }
+    abstract var oldString: String
 
-    protected val end: Int get() { return viewModel.input[index].length + start}
+    protected val oldStart: Int get() = getStartingPos()
+    protected val oldEnd: Int get() = oldString.length + oldStart
 
-    private lateinit var textView: TextView
+    protected val newStart: Int get() = Algorithms.findStartingPosOfPattern(viewModel.formattedInput[index], viewModel.inputAsTokens[index].value) + oldStart
+    protected val newEnd: Int get() = viewModel.inputAsTokens[index].value.length + newStart
 
     override fun onClick(view: View) {
-        textView = view as TextView
-
         resetSpannableFocus()
         bindToEditableToken()
 
-        applyColorToSpan(highlightedColor, start, end)
+        applyColorToSpan(highlightedColor, newStart, newEnd)
 
         buttons.equal.setImageDrawable(ResourcesCompat.getDrawable(context.resources, R.drawable.ic_check, context.theme))
 
@@ -71,7 +67,7 @@ abstract class Clickable(
         ds.isUnderlineText = false
     }
 
-    protected abstract val what: Any
+    protected abstract val what: Clickable
 
     protected abstract fun bindToEditableToken()
 
@@ -89,7 +85,6 @@ abstract class Clickable(
         liveInput.value = this@highlight
     }
 
-
     protected fun setButtonState(btn: View?, @ColorInt color: Int, isClickable: Boolean = true) {
         if (btn is ImageButton)
             ImageViewCompat.setImageTintList(btn, ColorStateList.valueOf(color))
@@ -105,12 +100,23 @@ abstract class Clickable(
     }
 
     private fun setButtonsAsClickable() {
-        buttons.functions.functionButtons.forEach { (button, _) -> setButtonState(button, enabledFunctionButtonsColor) }
-        buttons.operators.operatorButtons.forEach { (button, _) -> setButtonState(button, enabledOperatorButtonsColor) }
-        buttons.numbers.numberButtons.forEach { (button, _) -> setButtonState(button, enabledNumberButtonsColor) }
+        buttons.functions.forEach { (button, _) -> setButtonState(button, enabledFunctionButtonColor) }
+        buttons.operators.forEach { (button, _) -> setButtonState(button, enabledOperatorButtonColor) }
+        buttons.numbers.forEach { (button, _) -> setButtonState(button, enabledNumberButtonColor) }
 
         setButtonState(buttons.clear, enabledButtonColor)
         setButtonState(buttons.clearAll, enabledButtonColor)
         setButtonState(buttons.equal, enabledButtonColor)
+    }
+
+    private fun getStartingPos() : Int {
+        var startingIndex = 0
+        viewModel.formattedInput.subList(0, index).forEach { str -> startingIndex += str.length }
+        return startingIndex
+    }
+
+    protected fun replaceSpan(newString: String) {
+        spannable.replace(oldStart, oldEnd, newString)
+        spannable.setSpan(newStart, newEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
 }

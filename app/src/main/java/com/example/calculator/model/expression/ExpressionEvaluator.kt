@@ -1,14 +1,16 @@
-package com.example.calculator.algorithms
+package com.example.calculator.model.expression
 
-import com.example.calculator.miscellaneous.Associativity
-import com.example.calculator.miscellaneous.Functions
-import com.example.calculator.miscellaneous.Operators
-import com.example.calculator.miscellaneous.TokenTypes
+import com.example.calculator.model.operator.Associativity
+import com.example.calculator.model.token.TokenTypes
 
 import com.example.calculator.model.*
-import com.example.calculator.model.expression.Operator
-import com.example.calculator.model.expression.Token
+import com.example.calculator.model.function.FunctionKind
+import com.example.calculator.model.number.NumberKind
+import com.example.calculator.model.operator.Operator
+import com.example.calculator.model.operator.OperatorKind
+import com.example.calculator.model.token.Token
 import com.example.calculator.parser.FunctionParser
+import com.example.calculator.parser.NumberParser
 import com.example.calculator.parser.OperatorParser
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -18,9 +20,6 @@ import java.util.*
  * Helper class that evaluates [Expression].
  */
 object ExpressionEvaluator {
-    private val operatorParser = OperatorParser()
-    private val functionParser = FunctionParser()
-
     /**
      * Converts infix into Postfix.
      * @param [infix] representation of a mathematical expression.
@@ -38,7 +37,7 @@ object ExpressionEvaluator {
 
             // Operator or Function
             if (token.type == TokenTypes.Function) {
-                if (functionParser.parse(token).type == Functions.Kind.PERCENTAGE) {
+                if (token.value == FunctionParser.parse(FunctionKind.PERCENTAGE).value) {
                     val first = BigDecimal(postfix.removeLast().value).setScale(10, RoundingMode.HALF_UP)
                     val second = BigDecimal(100.0).setScale(10, RoundingMode.HALF_UP)
                     var percentage = division(first, second)
@@ -54,7 +53,7 @@ object ExpressionEvaluator {
                         val lastKnownNumber = BigDecimal(last.value).setScale(10, RoundingMode.HALF_UP)
 
                         percentage =
-                            if (lastKnownOperator.type == Operators.Kind.SUBTRACTION || lastKnownOperator.type == Operators.Kind.ADDITION)
+                            if (lastKnownOperator.value == OperatorParser.parse(OperatorKind.SUBTRACTION).value || lastKnownOperator.value == OperatorParser.parse(OperatorKind.ADDITION).value)
                                 multiplication(lastKnownNumber, percentage)
                             else
                                 percentage
@@ -67,21 +66,20 @@ object ExpressionEvaluator {
                 }
             }
             else if (token.type == TokenTypes.Operator) {
-                val operatorToken = operatorParser.parse(token)
+                when(OperatorParser.parse(token) as OperatorKind) {
+                    OperatorKind.LEFT_BRACKET -> opStack.push(OperatorParser.parse(token))
+                    OperatorKind.RIGHT_BRACKET -> {
 
-                when (operatorToken.type) {
-                    Operators.Kind.LEFT_BRACKET -> opStack.push(operatorToken)
-                    Operators.Kind.RIGHT_BRACKET -> {
-                        while (opStack.peek().type != Operators.Kind.LEFT_BRACKET)
-                            postfix.add(operatorParser.parse(opStack.pop()))
+                        while (opStack.peek().value != OperatorParser.parse(OperatorKind.LEFT_BRACKET).value)
+                            postfix.add(opStack.pop() as Operator)
 
                         opStack.pop()
                     }
                     else -> {
-                        while (opStack.isNotEmpty() && isAssociativeRule(operatorToken, opStack.peek()))
-                            postfix.add(operatorParser.parse(opStack.pop()))
+                        while (opStack.isNotEmpty() && isAssociativeRule(OperatorParser.parse(token), opStack.peek()))
+                            postfix.add(OperatorParser.parse(opStack.pop()) as Operator)
 
-                        opStack.push(operatorToken)
+                        opStack.push(OperatorParser.parse(token))
                     }
                 }
             }
@@ -90,7 +88,7 @@ object ExpressionEvaluator {
         }
 
         while (opStack.isNotEmpty())
-            postfix.add(operatorParser.parse(opStack.pop()))
+            postfix.add(OperatorParser.parse(opStack.pop()) as Operator)
 
         return postfix
     }
@@ -132,11 +130,8 @@ object ExpressionEvaluator {
      */
     @Throws(ArithmeticException::class)
     fun getResult(expression: MutableList<Token>): Token {
-        if (expression.isNullOrEmpty())
-            return object : Token {
-                override var value = "0"
-                override val type = TokenTypes.Number
-            }
+        if (expression.isEmpty())
+            return NumberParser.parse(NumberKind.ZERO)
 
         val postfix = infixToPostfix(expression)
 
@@ -153,17 +148,17 @@ object ExpressionEvaluator {
                 if (s.size < 2)
                     break
 
-                val operator = operatorParser.parse(token)
+                val operator = OperatorParser.parse(token) as Operator
 
                 val right = BigDecimal(s.pop().value).setScale(10, RoundingMode.HALF_UP)
                 val left = BigDecimal(s.pop().value).setScale(10, RoundingMode.HALF_UP)
 
-                val result = when(operator.type) {
-                    Operators.Kind.ADDITION -> addition(left, right)
-                    Operators.Kind.SUBTRACTION -> subtraction(left, right)
-                    Operators.Kind.MULTIPLICATION -> multiplication(left, right)
-                    Operators.Kind.DIVISION -> division(left, right)
-                    Operators.Kind.POWER -> power(left, right)
+                val result = when(operator.value) {
+                    OperatorParser.parse(OperatorKind.ADDITION).value -> addition(left, right)
+                    OperatorParser.parse(OperatorKind.SUBTRACTION).value -> subtraction(left, right)
+                    OperatorParser.parse(OperatorKind.MULTIPLICATION).value -> multiplication(left, right)
+                    OperatorParser.parse(OperatorKind.DIVISION).value -> division(left, right)
+                    OperatorParser.parse(OperatorKind.POWER).value -> power(left, right)
                     else -> TODO("Not Implemented Yet")
                 }
 
@@ -174,12 +169,7 @@ object ExpressionEvaluator {
         return s.pop()
     }
 
-    private fun numberToToken(number: String) : Token {
-        return object : Token {
-            override var value = number
-            override val type = TokenTypes.Number
-        }
-    }
+    private fun numberToToken(number: String) : Token = Token(number, TokenTypes.Number)
 
     private fun addition(left: BigDecimal, right: BigDecimal): BigDecimal = left.plus(right).stripTrailingZeros()
     private fun subtraction(left: BigDecimal, right: BigDecimal): BigDecimal = left.minus(right).stripTrailingZeros()

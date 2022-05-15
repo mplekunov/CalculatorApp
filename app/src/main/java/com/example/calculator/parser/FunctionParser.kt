@@ -1,42 +1,33 @@
 package com.example.calculator.parser
 
 import com.example.calculator.datastructure.BiMap
-import com.example.calculator.miscellaneous.Functions
-import com.example.calculator.miscellaneous.TokenTypes
+import com.example.calculator.model.function.Function
+import com.example.calculator.model.token.TokenTypes
 
-import com.example.calculator.model.expression.Function
-import com.example.calculator.model.expression.Token
+import com.example.calculator.model.function.FunctionKind
+import com.example.calculator.model.token.Token
 
-class FunctionParser : TokenParser<Function, String, Functions.Kind> {
-    override val TokenParser<Function, String, Functions.Kind>.map: BiMap<String, Functions.Kind>
-        get() = BiMap<String, Functions.Kind>().apply { putAll(mutableMapOf(
-            "%" to Functions.Kind.PERCENTAGE,
-            "log" to Functions.Kind.LOG,
-            "ln" to Functions.Kind.NATURAL_LOG,
-            "cos" to Functions.Kind.COS,
-            "sin" to Functions.Kind.SIN
+object FunctionParser : TokenParser<FunctionKind> {
+    override val TokenParser<FunctionKind>.map: BiMap<String, FunctionKind>
+        get() = BiMap<String, FunctionKind>().apply { putAll(mutableMapOf(
+            "%" to FunctionKind.PERCENTAGE,
+            "log" to FunctionKind.LOG,
+            "ln" to FunctionKind.NATURAL_LOG,
+            "cos" to FunctionKind.COS,
+            "sin" to FunctionKind.SIN
         )) }
 
     private val functionsMap = mutableMapOf(
-        Functions.Kind.PERCENTAGE to Function(Functions.Kind.PERCENTAGE),
-        Functions.Kind.LOG to Function(Functions.Kind.LOG),
-        Functions.Kind.NATURAL_LOG to Function(Functions.Kind.NATURAL_LOG),
-        Functions.Kind.COS to Function(Functions.Kind.COS),
-        Functions.Kind.SIN to Function(Functions.Kind.SIN)
+        FunctionKind.PERCENTAGE to Function(map[FunctionKind.PERCENTAGE]!!),
+        FunctionKind.LOG to Function(map[FunctionKind.LOG]!!),
+        FunctionKind.NATURAL_LOG to Function(map[FunctionKind.NATURAL_LOG]!!),
+        FunctionKind.COS to Function(map[FunctionKind.COS]!!),
+        FunctionKind.SIN to Function(map[FunctionKind.SIN]!!)
     )
 
-    override fun parse(input: Function): Token {
-        val token = object : Token {
-            override var value: String = ""
-            override val type: TokenTypes = TokenTypes.Function
-        }
-
-        token.value += map[input.type]
-
-        return token
+    override fun parse(input: FunctionKind): Function {
+        return Function(map[input] ?: throw NoSuchElementException("Function doesn't exist"))
     }
 
-    fun parse(input: Token): Function {
-        return functionsMap[map[input.value]]!!
-    }
+    fun parse(token: Token) : Function = functionsMap[map[token.value]] ?: throw NoSuchElementException("Function doesn't exist")
 }

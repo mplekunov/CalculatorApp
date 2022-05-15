@@ -16,29 +16,24 @@ class ClickableOperator(
     ) : Clickable(context, buttons, viewModel, liveInput, index) {
     override val what get() = ClickableOperator(context, buttons, viewModel, liveInput, index)
 
-    override fun bindToEditableToken() {
-        buttons.functions.functionButtons.forEach { (button, _) -> setButtonState(button, disabledButtonColor, false) }
-        buttons.numbers.numberButtons.forEach { (button, _) -> setButtonState(button, disabledButtonColor, false) }
+    override lateinit var oldString: String
 
-        buttons.operators.operatorButtons.forEach { (button, operator) ->
-            button?.setOnClickListener {
-                val oldString = viewModel.input[index]
+    override fun bindToEditableToken() {
+        buttons.functions.forEach { (button, _) -> setButtonState(button, disabledButtonColor, false) }
+        buttons.numbers.forEach { (button, _) -> setButtonState(button, disabledButtonColor, false) }
+
+        buttons.operators.forEach { (button, operator) ->
+            button.setOnClickListener {
+                oldString = viewModel.formattedInput[index]
 
                 if (viewModel.set(operator, index)) {
-                    replaceSpan(viewModel.input[index], oldString)
-                    applyColorToSpan(highlightedColor, start, end)
+                    replaceSpan(viewModel.formattedInput[index])
+                    applyColorToSpan(highlightedColor, newStart, newEnd)
                 }
             }
         }
 
         setButtonState(buttons.clear, disabledButtonColor, false)
         setButtonState(buttons.clearAll, disabledButtonColor, false)
-    }
-
-    private fun replaceSpan(newString: String, oldString: String) {
-        val oldEnd = oldString.length + start
-
-        spannable.replace(start, oldEnd, newString)
-        spannable.setSpan(start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
 }
