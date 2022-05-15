@@ -1,9 +1,9 @@
 package com.example.calculator.formatter
 
-import com.example.calculator.miscellaneous.Numbers
-import com.example.calculator.miscellaneous.TokenTypes
+import com.example.calculator.model.number.NumberKind
+import com.example.calculator.model.token.TokenTypes
 
-import com.example.calculator.model.Token
+import com.example.calculator.model.token.Token
 import com.example.calculator.parser.NumberParser
 
 import java.math.BigDecimal
@@ -46,16 +46,16 @@ object TokenFormatter {
      */
     fun convertTokenToString(token: Token?, removeTrailingZeroes: Boolean): String {
         if (token == null || token.value.isEmpty())
-            return "0"
+            return " 0 "
 
         return if (token.type == TokenTypes.Number) {
             var formattedToken = token.value
 
-            if (NumberParser().parse(token).type != Numbers.Kind.INFINITY && removeTrailingZeroes)
+            if (NumberParser.parse(token).value != NumberParser.parse(NumberKind.INFINITY).value && removeTrailingZeroes)
                 formattedToken = BigDecimal(formattedToken).stripTrailingZeros().toString()
 
-            formattedToken
+            " $formattedToken"
         } else
-            token.value
+            " ${token.value}"
     }
 }

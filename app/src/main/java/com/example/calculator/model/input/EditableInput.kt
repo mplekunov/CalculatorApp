@@ -1,11 +1,9 @@
-package com.example.calculator.model.text
+package com.example.calculator.model.input
 
 import android.content.Context
 import android.text.SpannableStringBuilder
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import com.example.calculator.databinding.FragmentCalculatorBinding
-import com.example.calculator.model.text.editing.InputAdapter
+import com.example.calculator.model.input.editing.InputAdapter
 import com.example.calculator.model.wrapper.Buttons
 import com.example.calculator.viewmodel.CalculatorViewModel
 
@@ -22,5 +20,4 @@ class EditableInput(
         inputAdapter = InputAdapter(context, buttons, viewModel, liveInput)
         inputAdapter.setBindings()
     }
-
 }

@@ -3,38 +3,34 @@ package com.example.calculator.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
-import com.example.calculator.algorithms.ExpressionEvaluator
+import com.example.calculator.model.expression.ExpressionEvaluator
 import com.example.calculator.formatter.TokenFormatter
-import com.example.calculator.miscellaneous.Functions
-import com.example.calculator.miscellaneous.Numbers
-import com.example.calculator.miscellaneous.Operators
 
-import com.example.calculator.model.Operator
-import com.example.calculator.model.Number
-import com.example.calculator.model.Function
-import com.example.calculator.model.Token
-import com.example.calculator.model.Expression
+import com.example.calculator.model.token.Token
+import com.example.calculator.model.expression.Expression
+import com.example.calculator.model.function.FunctionKind
+import com.example.calculator.model.number.NumberKind
+import com.example.calculator.model.operator.OperatorKind
+import com.example.calculator.parser.FunctionParser
 
 import com.example.calculator.parser.NumberParser
+import com.example.calculator.parser.OperatorParser
 
 import kotlinx.coroutines.*
-import kotlin.math.exp
 
 class CalculatorViewModel : ViewModel() {
     private val expression = Expression()
 
-    private val numberParser = NumberParser()
-
     private var _inputAsTokens: MutableList<Token> = mutableListOf()
-    private var _resultAsToken: Token = numberParser.parse(Number(Numbers.Kind.ZERO))
+    private var _outputAsToken: Token = NumberParser.parse(NumberKind.ZERO)
 
     val inputAsTokens: List<Token>
         get() = _inputAsTokens
 
-    val input: List<String>
+    val formattedInput: List<String>
         get() = TokenFormatter.convertTokensToStrings(_inputAsTokens)
-    val result: String
-        get() = TokenFormatter.convertTokenToString(_resultAsToken, true)
+    val formattedOutput: String
+        get() = TokenFormatter.convertTokenToString(_outputAsToken, true)
 
     private val inputSize: Int
         get() = expression.expression.size
@@ -46,8 +42,8 @@ class CalculatorViewModel : ViewModel() {
      * @param [index] position of an object to which [number] will be appended
      * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
-    fun add(number: Numbers.Kind, index: Int = inputSize) : Boolean {
-        val result = expression.addNumber(Number(number), index)
+    fun add(number: NumberKind, index: Int = inputSize) : Boolean {
+        val result = expression.add(NumberParser.parse(number), index)
 
         if (result)
             calculateExpression()
@@ -62,8 +58,8 @@ class CalculatorViewModel : ViewModel() {
      * @param [index] position of an object to which [operator] will be appended
      * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
-    fun add(operator: Operators.Kind, index: Int = inputSize) : Boolean {
-        return expression.addOperator(Operator(operator), index)
+    fun add(operator: OperatorKind, index: Int = inputSize) : Boolean {
+        return expression.add(OperatorParser.parse(operator), index)
     }
 
     /**
@@ -73,8 +69,8 @@ class CalculatorViewModel : ViewModel() {
      * @param [index] position of an object to which [function] will be appended
      * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
-    fun add(function: Functions.Kind, index: Int = inputSize) : Boolean {
-        val result = expression.addFunction(Function(function), index)
+    fun add(function: FunctionKind, index: Int = inputSize) : Boolean {
+        val result = expression.add(FunctionParser.parse(function), index)
 
         if (result)
             calculateExpression()
@@ -89,8 +85,8 @@ class CalculatorViewModel : ViewModel() {
      * @param [index] position of an object to be replaced
      * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
-    fun set(operator: Operators.Kind, index: Int = inputSize) : Boolean {
-        val result = expression.setOperator(Operator(operator), index)
+    fun set(operator: OperatorKind, index: Int = inputSize) : Boolean {
+        val result = expression.setOperator(OperatorParser.parse(operator), index)
 
         if (result)
             calculateExpression()
@@ -105,7 +101,7 @@ class CalculatorViewModel : ViewModel() {
      * @param [index] position of an object to be replaced
      * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
-    fun set(function: Functions.Kind, index: Int = inputSize) : Boolean {
+    fun set(function: FunctionKind, index: Int = inputSize) : Boolean {
         TODO("Not yet implemented")
     }
 
@@ -141,21 +137,20 @@ class CalculatorViewModel : ViewModel() {
 
 
     private fun resetResult() {
-        _resultAsToken = numberParser.parse(Number(Numbers.Kind.ZERO))
+        _outputAsToken = NumberParser.parse(NumberKind.ZERO)
     }
 
-
     /**
-     * Saves the [result] of calculation and assigns it as the first [Token] of [Expression] in [CalculatorViewModel]
+     * Saves the [formattedOutput] of calculation and assigns it as the first [Token] of [Expression] in [CalculatorViewModel]
      */
     fun saveResult() {
-        val result = numberParser.parse(_resultAsToken)
+        val result = _outputAsToken
         deleteAll()
 
-        if (result.type == Numbers.Kind.INFINITY)
-            expression.addNumber(Number(Numbers.Kind.ZERO), inputSize)
+        if (result.value == NumberParser.parse(NumberKind.INFINITY).value)
+            expression.add(NumberParser.parse(NumberKind.ZERO), inputSize)
         else
-            expression.addNumber(result, expression.expression.lastIndex)
+            expression.add(result, expression.expression.lastIndex)
 
         calculateExpression()
     }
@@ -163,12 +158,12 @@ class CalculatorViewModel : ViewModel() {
     private fun calculateExpression() {
         _inputAsTokens = expression.expression as MutableList<Token>
         viewModelScope.launch {
-            _resultAsToken = try {
+            _outputAsToken = try {
                 ExpressionEvaluator.getResult(_inputAsTokens)
             } catch (e: ArithmeticException) {
                 // Can't divide by zero
                 // Error msg?!
-                numberParser.parse(Number(Numbers.Kind.INFINITY))
+                NumberParser.parse(NumberKind.INFINITY)
             }
         }
     }

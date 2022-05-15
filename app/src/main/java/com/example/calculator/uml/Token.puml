@@ -1,0 +1,27 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+interface Token {
+    +kind: Any
+    +value: String
+}
+
+
+interface TokenParser<V: Any> {
+    +map: BiMap<String, V>
+    +parse(V): Any
+}
+
+
+
+Token <|.. Number
+Token <|.. Function
+Token <|.. Operator
+
+
+
+TokenParser <|.. NumberParser
+TokenParser <|.. FunctionParser
+TokenParser <|.. OperatorParser
+
+@enduml

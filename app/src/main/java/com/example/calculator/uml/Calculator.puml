@@ -1,0 +1,166 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+class Main
+
+class CalculatorFragment {
+    +binding: FragmentCalculatorBinding
+    +viewModel: CalculatorViewModel
+    +buttons: Buttons
+    +editingMode: EditableInput
+
+    +onViewCreated()
+}
+
+class Buttons {
+    +functions: Map<ImageButton, FunctionKind>
+    +operators: Map<ImageButton, OperatorKind>
+    +numbers: Map<Button, NumberKind>
+    +clear: Button
+    +clearAll: Button
+    +equal: ImageButton
+}
+
+class EditableInput {
+    -context: Context
+    -buttons: Buttons
+    -viewModel: CalculatorViewModel
+   +liveInput: LiveData<SpannableStringBuilder>
+
+   +setBindings()
+}
+
+class InputAdapter {
+    -context: Context
+    -buttons: Buttons
+    -viewModel: CalculatorViewModel
+    -spannableInput: LiveData<SpannableStringBuilder>
+
+    -index: Int
+    -newString: String
+
+    -oldStart: Int
+    -oldEnd: Int
+
+    -newStart: int
+    -newEnd: Int
+
+    -spannable: SpannableStringBuilder
+
+    -what: Clickable
+
+    -replaceSpan()
+    -getStartingPos()
+    -resetSpannableInput()
+    -setSpan()
+    -clearAll()
+    +setBindings()
+
+}
+
+class ClickableFunction
+class ClickableOperator
+class ClickableNumber
+
+abstract class Clickable {
+    #context: Context
+    #buttons: Buttons
+    #viewModel: CalculatorViewModel
+    #liveInput: LiveData<SpannableStringBuilder>
+    #index: Int
+
+    #spannable: SpannableStringBuilder
+
+    - enabledButtonColor: Int
+    + enabledNumberButtonColor: Int
+    + enabledFunctionButtonColor: Int
+    + enabledOperatorButtonColor: Int
+
+    + disabledButtonColor: Int
+
+    +highlightedTextColor: Int
+    +defaultTextColor: Int
+
+    +<abstract> oldString: String
+
+    #oldStart: Int
+    #oldEnd: Int
+
+    #newStart: Int
+    #newEnd: Int
+
+    #what: Clickable
+
+    +onClick()
+    +updateDrawState()
+
+    +spannable.setSpan()
+    +spannable.highlight()
+
+    #<abstract> bindToEditableToken()
+    #applyColorToSpan()
+    #setButtonState()
+
+    -resetSpannableFocus()
+    -setButtonAsClickable()
+    -getStartingPos()
+
+}
+
+class CalculatorViewModel {
+    -expression: Expression
+
+    -numberParser: NumberParser
+    -operatorParser: OperatorParser
+    -functionParser: FunctionParser
+
+    -_inputAsTokens: List<Token>
+    -_outputAsToken: Token
+
+    -inputSize: Int
+
+    +inputAsTokens: List<Token>
+
+    +formattedInput: List<String>
+    +formattedOutput: String
+
+    +add()
+    +set()
+    +delete()
+    -deleteAt()
+    +deleteAll()
+    +saveResult()
+    -calculateExpression()
+}
+
+interface Parser
+
+Main *-down- CalculatorFragment
+
+CalculatorFragment *-right- CalculatorViewModel
+CalculatorFragment *--down Buttons
+CalculatorFragment *-down- EditableInput
+
+EditableInput *---- InputAdapter
+EditableInput o-left- Buttons
+EditableInput o-right- CalculatorViewModel
+
+InputAdapter *-- ClickableNumber
+InputAdapter *-- ClickableOperator
+InputAdapter *-- ClickableFunction
+
+ClickableNumber --|> Clickable
+ClickableFunction --|> Clickable
+ClickableOperator --|> Clickable
+
+CalculatorViewModel *-right- Expression
+CalculatorViewModel *-- NumberParser
+CalculatorViewModel *-- FunctionParser
+CalculatorViewModel *-- OperatorParser
+
+OperatorParser --|> Parser
+NumberParser --|> Parser
+FunctionParser --|> Parser
+
+
+@enduml
