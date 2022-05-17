@@ -50,6 +50,7 @@ object TokenFormatter {
         return if (token.type == TokenTypes.Number) {
             return when {
                 token == NumberParser.parse(NumberKind.INFINITY) -> " $token"
+                token == NumberParser.parse(NumberKind.NAN) -> " $token"
                 else -> {
                     var formatted: String = token.toString()
 

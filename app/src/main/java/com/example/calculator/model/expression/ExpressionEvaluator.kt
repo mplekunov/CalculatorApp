@@ -55,7 +55,7 @@ class ExpressionEvaluator(var expression: MutableList<Token>) {
                     OperatorParser.parse(OperatorKind.MULTIPLICATION) -> multiplication(left, right)
                     OperatorParser.parse(OperatorKind.DIVISION) -> {
                         if (right.toDouble() == 0.0)
-                            return NumberParser.parse(NumberKind.INFINITY)
+                            return NumberParser.parse(NumberKind.NAN)
 
                         division(left, right)
                     }

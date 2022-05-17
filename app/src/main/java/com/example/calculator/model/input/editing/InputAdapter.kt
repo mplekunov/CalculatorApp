@@ -15,21 +15,23 @@ class InputAdapter(
     private val viewModel: CalculatorViewModel,
     private val spannableInput: MutableLiveData<SpannableStringBuilder>,
 ) {
-    private val index get() = viewModel.formattedInput.lastIndex
+    private var index = 0
+//        get() = viewModel.formattedInput.lastIndex
 
-    private val newString get() = viewModel.formattedInput[index]
+    private val string get() = viewModel.formattedInput[index]
+    private val token get() = viewModel.inputAsTokens[index]
 
     private val oldStart get() = getStartingPos()
     private val oldEnd get() = spannableInput.value?.length ?: 0
 
-    private val newStart get() = Algorithms.findStartingPosOfPattern(viewModel.formattedInput[index], viewModel.inputAsTokens[index].toString()) + oldStart
-    private val newEnd get() = viewModel.inputAsTokens[index].length + newStart
+    private val newStart get() = Algorithms.findStartingPosOfPattern(string, token.toString()) + oldStart
+    private val newEnd get() = token.length + newStart
 
     private val spannable = spannableInput.value ?: SpannableStringBuilder()
 
     private val what: Clickable
         get() {
-            return when(viewModel.inputAsTokens[index].type) {
+            return when(token.type) {
                 TokenTypes.Number -> ClickableNumber(context, buttons, viewModel, spannableInput, index)
                 TokenTypes.Function -> ClickableFunction(context, buttons, viewModel, spannableInput, index)
                 TokenTypes.Operator -> ClickableOperator(context, buttons, viewModel, spannableInput, index)
@@ -80,12 +82,25 @@ class InputAdapter(
     }
 
     private fun replaceSpan() {
-        spannable.replace(oldStart, oldEnd, newString)
-        spannable.setSpan(newStart, newEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        if (spannable.isEmpty()) {
+            for (i in viewModel.inputAsTokens.indices) {
+                index = i
+
+                spannable.replace(oldStart, oldEnd, string)
+                spannable.setSpan(newStart, newEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+        }
+        else {
+            index = viewModel.inputAsTokens.lastIndex
+
+            spannable.replace(oldStart, oldEnd, string)
+            spannable.setSpan(newStart, newEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
     }
 
     private fun getStartingPos() : Int {
         var startingIndex = 0
+
         viewModel.formattedInput.subList(0, index).forEach { str -> startingIndex += str.length }
         return startingIndex
     }

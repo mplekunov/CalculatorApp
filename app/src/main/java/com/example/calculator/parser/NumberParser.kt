@@ -24,7 +24,8 @@ object NumberParser : TokenParser<NumberKind> {
             Token("E", TokenTypes.Number) to NumberKind.EXPONENT,
             Token("-", TokenTypes.Number) to NumberKind.NEGATIVE,
             Token("+", TokenTypes.Number) to NumberKind.POSITIVE,
-            Token(Double.POSITIVE_INFINITY.toString(), TokenTypes.Number) to NumberKind.INFINITY
+            Token(Double.POSITIVE_INFINITY.toString(), TokenTypes.Number) to NumberKind.INFINITY,
+            Token("NaN", TokenTypes.Number) to NumberKind.NAN
         )) }
 
     override fun parse(input: NumberKind): Token {
@@ -38,8 +39,10 @@ object NumberParser : TokenParser<NumberKind> {
             Number::class.java -> {
                 if (map[token] == NumberKind.NEGATIVE)
                     return Number("-0") as T
-                else if (map[token] == NumberKind.INFINITY)
+                else if (map[token] == NumberKind.INFINITY )
                     return Number(Double.POSITIVE_INFINITY.toString()) as T
+                else if (map[token] == NumberKind.NAN)
+                    return Number(map[token].toString()) as T
 
                 return Number(token.toString()) as T
             }
