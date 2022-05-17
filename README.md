@@ -28,6 +28,14 @@ While in Edit Mode, user can freely choose any other operand/operator and change
 
 ![Different Tokens 480x](https://user-images.githubusercontent.com/38502074/168490135-135269b0-f173-4652-8ffe-ac0dd3c0d7e9.gif)
 
-
-
 Edit Mode has type safety, which means operators can only be replaced by other operators, and numbers can only be replaced by other numbers. All other buttons, are turned off for safety. 
+
+
+#### Negative Numbers
+Currently only "first-in-line" negative numbers are supported. That means, user can only enter negative number if it's the first number in an expression:
+
+![Negative Numbers 480x](https://user-images.githubusercontent.com/38502074/168862259-b1a9d4e6-6234-4569-9231-7f384d60f1a4.gif)
+
+There also exist typesafety... Changing "number" sign on anything other than "-" will result in "Infinity" result:
+
+![Negative Numbers TypeSafety 480x](https://user-images.githubusercontent.com/38502074/168862471-da75bbc8-f4ba-4e90-ac9e-91aa51fdb285.gif)
