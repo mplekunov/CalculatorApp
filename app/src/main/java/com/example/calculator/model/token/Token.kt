@@ -26,8 +26,8 @@ open class Token(
         return this._value.contains(other._value)
     }
 
-    operator fun plusAssign(other: Token) {
-        this._value += other._value
+    operator fun plus(other: Token): Token {
+        return Token(this._value + other._value, TokenTypes.Number)
     }
 
     override fun toString(): String {
