@@ -13,6 +13,7 @@ import androidx.lifecycle.Observer
 
 import com.example.calculator.R
 import com.example.calculator.databinding.FragmentCalculatorBinding
+import com.example.calculator.formatter.TokenFormatter
 import com.example.calculator.model.input.EditableInput
 import com.example.calculator.model.wrapper.Buttons
 
@@ -57,15 +58,6 @@ class CalculatorFragment : Fragment() {
         binding?.input?.movementMethod = LinkMovementMethod.getInstance()
         binding?.input?.highlightColor = requireContext().getColor(com.google.android.material.R.color.mtrl_btn_transparent_bg_color)
     }
-
-//
-//    private fun applyInputOutputStyling(min: Float, max: Float, @ColorInt primaryColor: Int, @ColorInt secondaryColor: Int) {
-//        binding?.input?.setTextColor(primaryColor)
-//        binding?.output?.setTextColor(secondaryColor)
-//
-//        binding?.output!!.setTextSize(TypedValue.COMPLEX_UNIT_SP, max)
-//        binding?.input!!.setTextSize(TypedValue.COMPLEX_UNIT_SP, min)
-//    }
 
     fun onInputChange() {
         if (viewModel.formattedInput.isEmpty() )

@@ -1,5 +1,6 @@
 package com.example.calculator.formatter
 
+import com.example.calculator.model.number.Number
 import com.example.calculator.model.number.NumberKind
 import com.example.calculator.model.token.TokenTypes
 
@@ -45,17 +46,21 @@ object TokenFormatter {
      * @return formatted [String].
      */
     fun convertTokenToString(token: Token?, removeTrailingZeroes: Boolean): String {
-        if (token == null || token.value.isEmpty())
+        if (token == null || token.isEmpty())
             return " 0 "
 
         return if (token.type == TokenTypes.Number) {
-            var formattedToken = token.value
-
-            if (NumberParser.parse(token).value != NumberParser.parse(NumberKind.INFINITY).value && removeTrailingZeroes)
-                formattedToken = BigDecimal(formattedToken).stripTrailingZeros().toString()
-
-            " $formattedToken"
+            return when {
+                token == NumberParser.parse(NumberKind.INFINITY) -> " $token"
+                token.last() == NumberParser.parse(NumberKind.DOT) -> " $token"
+                else -> {
+                    if (removeTrailingZeroes)
+                        " ${BigDecimal(token.toString()).stripTrailingZeros()}"
+                    else
+                        " ${BigDecimal(token.toString())}"
+                }
+            }
         } else
-            " ${token.value}"
+            " $token"
     }
 }

@@ -22,8 +22,8 @@ class InputAdapter(
     private val oldStart get() = getStartingPos()
     private val oldEnd get() = spannableInput.value?.length ?: 0
 
-    private val newStart get() = Algorithms.findStartingPosOfPattern(viewModel.formattedInput[index], viewModel.inputAsTokens[index].value) + oldStart
-    private val newEnd get() = viewModel.inputAsTokens[index].value.length + newStart
+    private val newStart get() = Algorithms.findStartingPosOfPattern(viewModel.formattedInput[index], viewModel.inputAsTokens[index].toString()) + oldStart
+    private val newEnd get() = viewModel.inputAsTokens[index].length + newStart
 
     private val spannable = spannableInput.value ?: SpannableStringBuilder()
 

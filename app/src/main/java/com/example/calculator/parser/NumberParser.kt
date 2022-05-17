@@ -5,30 +5,45 @@ import com.example.calculator.model.number.Number
 
 import com.example.calculator.model.number.NumberKind
 import com.example.calculator.model.token.Token
+import com.example.calculator.model.token.TokenTypes
 
 object NumberParser : TokenParser<NumberKind> {
-    override val TokenParser<NumberKind>.map: BiMap<String, NumberKind>
-        get() = BiMap<String, NumberKind>().apply { putAll(mutableListOf(
-            "0" to NumberKind.ZERO,
-            "1" to NumberKind.ONE,
-            "2" to NumberKind.TWO,
-            "3" to NumberKind.THREE,
-            "4" to NumberKind.FOUR,
-            "5" to NumberKind.FIVE,
-            "6" to NumberKind.SIX,
-            "7" to NumberKind.SEVEN,
-            "8" to NumberKind.EIGHT,
-            "9" to NumberKind.NINE,
-            "." to NumberKind.DOT,
-            "E" to NumberKind.EXPONENT,
-            "-" to NumberKind.NEGATIVE,
-            "+" to NumberKind.POSITIVE,
-            Double.POSITIVE_INFINITY.toString() to NumberKind.INFINITY
+    override val TokenParser<NumberKind>.map: BiMap<Token, NumberKind>
+        get() = BiMap<Token, NumberKind>().apply { putAll(mutableListOf(
+            Token("0", TokenTypes.Number) to NumberKind.ZERO,
+            Token("1", TokenTypes.Number) to NumberKind.ONE,
+            Token("2", TokenTypes.Number) to NumberKind.TWO,
+            Token("3", TokenTypes.Number) to NumberKind.THREE,
+            Token("4", TokenTypes.Number) to NumberKind.FOUR,
+            Token("5", TokenTypes.Number) to NumberKind.FIVE,
+            Token("6", TokenTypes.Number) to NumberKind.SIX,
+            Token("7", TokenTypes.Number) to NumberKind.SEVEN,
+            Token("8", TokenTypes.Number) to NumberKind.EIGHT,
+            Token("9", TokenTypes.Number) to NumberKind.NINE,
+            Token(".", TokenTypes.Number) to NumberKind.DOT,
+            Token("E", TokenTypes.Number) to NumberKind.EXPONENT,
+            Token("-", TokenTypes.Number) to NumberKind.NEGATIVE,
+            Token("+", TokenTypes.Number) to NumberKind.POSITIVE,
+            Token(Double.POSITIVE_INFINITY.toString(), TokenTypes.Number) to NumberKind.INFINITY
         )) }
 
-    override fun parse(input: NumberKind): Number {
-        return Number(map[input] ?: throw NoSuchElementException("Number doesn't exist"))
+    override fun parse(input: NumberKind): Token {
+        return map[input] ?: throw NoSuchElementException("Number doesn't exist")
     }
 
-    fun parse(token: Token) : Number = Number(token.value)
+    inline fun <reified T> parse(token: Token): T {
+        return when (T::class.java) {
+            NumberKind::class.java -> map[token] as T
+                ?: throw NoSuchElementException("Operator doesn't exist")
+            Number::class.java -> {
+                if (map[token] == NumberKind.NEGATIVE)
+                    return Number("-0") as T
+                else if (map[token] == NumberKind.INFINITY)
+                    return Number(Double.POSITIVE_INFINITY.toString()) as T
+
+                return Number(token.toString()) as T
+            }
+            else -> throw Exception("Wrong return Type")
+        }
+    }
 }

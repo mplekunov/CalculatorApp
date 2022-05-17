@@ -10,7 +10,6 @@ import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
-import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.ImageViewCompat
@@ -45,8 +44,8 @@ abstract class Clickable(
     protected val oldStart: Int get() = getStartingPos()
     protected val oldEnd: Int get() = oldString.length + oldStart
 
-    protected val newStart: Int get() = Algorithms.findStartingPosOfPattern(viewModel.formattedInput[index], viewModel.inputAsTokens[index].value) + oldStart
-    protected val newEnd: Int get() = viewModel.inputAsTokens[index].value.length + newStart
+    protected val newStart: Int get() = Algorithms.findStartingPosOfPattern(viewModel.formattedInput[index], viewModel.inputAsTokens[index].toString()) + oldStart
+    protected val newEnd: Int get() = viewModel.inputAsTokens[index].length + newStart
 
     override fun onClick(view: View) {
         resetSpannableFocus()
