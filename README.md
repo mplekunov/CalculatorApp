@@ -36,6 +36,6 @@ Currently only "first-in-line" negative numbers are supported. That means, user 
 
 ![Negative Numbers 480x](https://user-images.githubusercontent.com/38502074/168862259-b1a9d4e6-6234-4569-9231-7f384d60f1a4.gif)
 
-There also exist typesafety... Changing "number" sign on anything other than "-" will result in "Infinity" result:
+There also exist typesafety... Changing "number" sign on anything other than "-" will result in "NaN" result:
 
 ![Negative Numbers TypeSafety 480x](https://user-images.githubusercontent.com/38502074/168896802-56977ba3-c7b0-416b-8dc9-e690dc4fbfc4.gif)
