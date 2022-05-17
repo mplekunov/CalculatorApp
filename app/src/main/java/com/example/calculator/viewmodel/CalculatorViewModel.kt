@@ -117,7 +117,7 @@ class CalculatorViewModel : ViewModel() {
         val result = outputAsToken
         deleteAll()
 
-        if (result == NumberParser.parse(NumberKind.INFINITY))
+        if (result == NumberParser.parse(NumberKind.INFINITY) || result == NumberParser.parse(NumberKind.NAN))
             expression.add(NumberParser.parse(NumberKind.ZERO), inputSize)
         else {
             if (result.first() == NumberParser.parse(NumberKind.NEGATIVE)) {
