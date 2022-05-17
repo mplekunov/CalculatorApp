@@ -38,4 +38,4 @@ Currently only "first-in-line" negative numbers are supported. That means, user 
 
 There also exist typesafety... Changing "number" sign on anything other than "-" will result in "Infinity" result:
 
-![Negative Numbers TypeSafety 480x](https://user-images.githubusercontent.com/38502074/168862471-da75bbc8-f4ba-4e90-ac9e-91aa51fdb285.gif)
+![Negative Numbers TypeSafety 480x](https://user-images.githubusercontent.com/38502074/168896802-56977ba3-c7b0-416b-8dc9-e690dc4fbfc4.gif)
