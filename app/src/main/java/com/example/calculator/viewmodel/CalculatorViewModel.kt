@@ -21,16 +21,13 @@ import kotlinx.coroutines.*
 class CalculatorViewModel : ViewModel() {
     private val expression = Expression()
 
-    private var _inputAsTokens: MutableList<Token> = mutableListOf()
-    private var _outputAsToken: Token = NumberParser.parse(NumberKind.ZERO)
-
-    val inputAsTokens: List<Token>
-        get() = _inputAsTokens
+    val inputAsTokens: List<Token> get() = expression.expression as MutableList<Token>
+    val outputAsToken: Token get() = expression.result
 
     val formattedInput: List<String>
-        get() = TokenFormatter.convertTokensToStrings(_inputAsTokens)
+        get() = TokenFormatter.convertTokensToStrings(inputAsTokens)
     val formattedOutput: String
-        get() = TokenFormatter.convertTokenToString(_outputAsToken, true)
+        get() = TokenFormatter.convertTokenToString(outputAsToken, true)
 
     private val inputSize: Int
         get() = expression.expression.size
@@ -43,12 +40,7 @@ class CalculatorViewModel : ViewModel() {
      * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
     fun add(number: NumberKind, index: Int = inputSize) : Boolean {
-        val result = expression.add(NumberParser.parse(number), index)
-
-        if (result)
-            calculateExpression()
-
-        return result
+        return expression.add(NumberParser.parse(number), index)
     }
 
     /**
@@ -70,12 +62,7 @@ class CalculatorViewModel : ViewModel() {
      * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
     fun add(function: FunctionKind, index: Int = inputSize) : Boolean {
-        val result = expression.add(FunctionParser.parse(function), index)
-
-        if (result)
-            calculateExpression()
-
-        return result
+        return expression.add(FunctionParser.parse(function), index)
     }
 
     /**
@@ -86,12 +73,7 @@ class CalculatorViewModel : ViewModel() {
      * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
     fun set(operator: OperatorKind, index: Int = inputSize) : Boolean {
-        val result = expression.setOperator(OperatorParser.parse(operator), index)
-
-        if (result)
-            calculateExpression()
-
-        return result
+        return expression.setOperator(OperatorParser.parse(operator), index)
     }
 
     /**
@@ -112,15 +94,10 @@ class CalculatorViewModel : ViewModel() {
      * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
     fun delete(index: Int = inputSize) : Boolean {
-        val result = if (index == inputSize)
+        return if (index == inputSize)
             expression.delete(index)
         else
             expression.delete(index, false)
-
-        if (result)
-            calculateExpression()
-
-        return result
     }
 
     /**
@@ -130,41 +107,19 @@ class CalculatorViewModel : ViewModel() {
      * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
     fun deleteAll(index: Int = inputSize) : Boolean {
-        resetResult()
-
         return expression.deleteAll(index)
-    }
-
-
-    private fun resetResult() {
-        _outputAsToken = NumberParser.parse(NumberKind.ZERO)
     }
 
     /**
      * Saves the [formattedOutput] of calculation and assigns it as the first [Token] of [Expression] in [CalculatorViewModel]
      */
     fun saveResult() {
-        val result = _outputAsToken
+        val result = outputAsToken
         deleteAll()
 
-        if (result.value == NumberParser.parse(NumberKind.INFINITY).value)
+        if (result == NumberParser.parse(NumberKind.INFINITY))
             expression.add(NumberParser.parse(NumberKind.ZERO), inputSize)
         else
             expression.add(result, expression.expression.lastIndex)
-
-        calculateExpression()
-    }
-
-    private fun calculateExpression() {
-        _inputAsTokens = expression.expression as MutableList<Token>
-        viewModelScope.launch {
-            _outputAsToken = try {
-                ExpressionEvaluator.getResult(_inputAsTokens)
-            } catch (e: ArithmeticException) {
-                // Can't divide by zero
-                // Error msg?!
-                NumberParser.parse(NumberKind.INFINITY)
-            }
-        }
     }
 }

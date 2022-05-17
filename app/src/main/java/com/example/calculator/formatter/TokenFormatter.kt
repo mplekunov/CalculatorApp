@@ -45,17 +45,21 @@ object TokenFormatter {
      * @return formatted [String].
      */
     fun convertTokenToString(token: Token?, removeTrailingZeroes: Boolean): String {
-        if (token == null || token.value.isEmpty())
+        if (token == null || token.isEmpty())
             return " 0 "
-
         return if (token.type == TokenTypes.Number) {
-            var formattedToken = token.value
+            return when {
+                token == NumberParser.parse(NumberKind.INFINITY) -> " $token"
+                else -> {
+                    var formatted: String = token.toString()
 
-            if (NumberParser.parse(token).value != NumberParser.parse(NumberKind.INFINITY).value && removeTrailingZeroes)
-                formattedToken = BigDecimal(formattedToken).stripTrailingZeros().toString()
+                    if (removeTrailingZeroes)
+                        formatted = BigDecimal(formatted).stripTrailingZeros().toPlainString()
 
-            " $formattedToken"
+                    return " $formatted"
+                }
+            }
         } else
-            " ${token.value}"
+            " $token"
     }
 }
