@@ -61,13 +61,17 @@ class PostfixEvaluator(val infix: MutableList<Token>) {
         val kind = OperatorParser.parse<OperatorKind>(token)
 
         if (index == 0 && index + 1 < infix.size) {
-            return if (kind == OperatorKind.SUBTRACTION) {
+            return if (kind == OperatorKind.SUBTRACTION || kind == OperatorKind.ADDITION) {
                 val right = BigDecimal(NumberParser.parse<Number>(infix[index + 1]).toString())
 
-                _postfix.add(Token("${BigDecimal(0).minus(right)}", TokenTypes.Number))
+                if (kind == OperatorKind.SUBTRACTION)
+                    _postfix.add(Token("${BigDecimal(0).minus(right)}", TokenTypes.Number))
+                else
+                    _postfix.add(Token("${BigDecimal(0).plus(right)}", TokenTypes.Number))
+
                 index + 2
             } else {
-                _postfix = mutableListOf(NumberParser.parse(NumberKind.INFINITY))
+                _postfix = mutableListOf(NumberParser.parse(NumberKind.NAN))
                 infix.size
             }
         }

@@ -119,7 +119,13 @@ class CalculatorViewModel : ViewModel() {
 
         if (result == NumberParser.parse(NumberKind.INFINITY))
             expression.add(NumberParser.parse(NumberKind.ZERO), inputSize)
-        else
-            expression.add(result, expression.expression.lastIndex)
+        else {
+            if (result.first() == NumberParser.parse(NumberKind.NEGATIVE)) {
+                expression.add(OperatorParser.parse(OperatorKind.SUBTRACTION), expression.expression.lastIndex)
+                expression.add(result.slice(1..result.lastIndex), expression.expression.lastIndex)
+            }
+            else
+                expression.add(result, expression.expression.lastIndex)
+        }
     }
 }

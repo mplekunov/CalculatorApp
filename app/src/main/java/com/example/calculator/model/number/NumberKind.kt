@@ -15,5 +15,6 @@ enum class NumberKind {
     NEGATIVE,
     EXPONENT,
     POSITIVE,
-    INFINITY
+    INFINITY,
+    NAN
 }
