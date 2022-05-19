@@ -1,0 +1,15 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/btn_icon_size"
+    android:height="@dimen/btn_icon_size"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+  <path
+      android:fillColor="#FF000000"
+      android:pathData="M64,13.625c0,1.657 -1.343,3 -3,3H3c-1.657,0 -3,-1.343 -3,-3V3c0,-1.657 1.343,-3 3,-3h58c1.657,0 3,1.343 3,3V13.625z"/>
+  <path
+      android:fillColor="#FF000000"
+      android:pathData="M52.563,64c1.657,0 3,-1.102 3,-2.461V13.961c0,-1.359 -1.343,-2.461 -3,-2.461H41.938c-1.656,0 -3,1.102 -3,2.461v47.578c0,1.359 1.344,2.461 3,2.461H52.563z"/>
+  <path
+      android:fillColor="#FF000000"
+      android:pathData="M22.063,64c1.657,0 3,-1.102 3,-2.461V13.961c0,-1.359 -1.343,-2.461 -3,-2.461H11.438c-1.656,0 -3,1.102 -3,2.461v47.578c0,1.359 1.344,2.461 3,2.461H22.063z"/>
+</vector>

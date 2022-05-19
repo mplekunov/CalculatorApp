@@ -1,18 +1,16 @@
 package com.example.calculator.model.expression
 
-import com.example.calculator.model.token.Token
-import com.example.calculator.model.token.TokenTypes
-
+import com.example.calculator.model.function.Function
 import com.example.calculator.model.function.FunctionKind
 import com.example.calculator.model.number.NumberKind
-import com.example.calculator.model.operator.OperatorKind
-
-import com.example.calculator.model.function.Function
 import com.example.calculator.model.operator.Operator
-
+import com.example.calculator.model.operator.OperatorKind
+import com.example.calculator.model.token.Token
+import com.example.calculator.model.token.TokenTypes
 import com.example.calculator.parser.FunctionParser
 import com.example.calculator.parser.NumberParser
 import com.example.calculator.parser.OperatorParser
+import kotlinx.coroutines.*
 
 /**
  * [Expression] data structure which contains expression in the infix format.
@@ -25,11 +23,23 @@ class Expression {
     private var _expression = mutableListOf<Token>()
     private var _result = NumberParser.parse(NumberKind.ZERO)
 
-    val result: Token
-        get() = _result
+    private var _expressionEvaluator: ExpressionEvaluator? = null
 
-    val expression: List<Token>
-        get() = _expression
+    val result: Token get() {
+//        CoroutineScope(Dispatchers.Default).launch { _expressionEvaluator = getResultAsync().await() }
+        return _expressionEvaluator?.result ?: _result
+//        return ExpressionEvaluator(_expression).result
+//        return _result
+    }
+
+    val expression: List<Token> get() {
+//        GlobalScope.launch { _expressionEvaluator = getResultAsync().await() }
+//        _result = _expressionEvaluator?.result ?: _result
+        return _expressionEvaluator?.expression ?: _expression
+
+//        return ExpressionEvaluator(_expression).expression
+    }
+
 
     /**
      * Adds specified object to [Expression] at [index]
@@ -46,7 +56,8 @@ class Expression {
             TokenTypes.Number -> {
                val result = addNumber(token, index)
                 if (result)
-                   getResult()
+                    getResult()
+//                    CoroutineScope(Dispatchers.Default).launch { getResultAsync() }
 
                 return result
             }
@@ -54,6 +65,7 @@ class Expression {
                 val result = addFunction(token, index)
                 if (result)
                     getResult()
+//                    CoroutineScope(Dispatchers.Default).launch { getResultAsync() }
 
                 return result
             }
@@ -70,14 +82,14 @@ class Expression {
 
         val prevToken = _expression[index]
 
-        if (prevToken.type == TokenTypes.Operator) {
+        return if (prevToken.type == TokenTypes.Operator) {
             _expression[_expression.lastIndex] = token
-            return true
+            true
         } else
-           return _expression.add(token)
+            _expression.add(token)
     }
 
-    protected fun addNumber(token: Token, index: Int) : Boolean {
+    private fun addNumber(token: Token, index: Int) : Boolean {
         if (token == NumberParser.parse(NumberKind.DOT))
             return parseDot(index)
 
@@ -123,7 +135,7 @@ class Expression {
      * @param [index] position of [operator] in [Expression]
      * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
-    protected fun addOperator(token: Token, index: Int) : Boolean {
+    private fun addOperator(token: Token, index: Int) : Boolean {
         // Expression can't start with an operator
         if (_expression.isEmpty()) {
             return false
@@ -212,6 +224,7 @@ class Expression {
             deleteAt(index, isRemovable)
 
         getResult()
+//        CoroutineScope(Dispatchers.Default).launch { getResultAsync() }
 
         return status
     }
@@ -285,6 +298,8 @@ class Expression {
             deleteAllAt(index)
 
         getResult()
+//        CoroutineScope(Dispatchers.Default).launch { getResultAsync() }
+
         return true
     }
 
@@ -320,15 +335,20 @@ class Expression {
         _expression[index] = token
 
         getResult()
+//        CoroutineScope(Dispatchers.Default).launch { getResultAsync() }
 
         return true
     }
 
     private fun getResult() {
-//        CoroutineScope(Dispatchers.Default).launch {
-        val expressionEvaluator = ExpressionEvaluator(_expression)
-        _result = expressionEvaluator.result
-        _expression = expressionEvaluator.expression
+//        CoroutineScope(Dispatchers.Main).launch {
+            _expressionEvaluator = ExpressionEvaluator(_expression)
+//        }
+
+//        return withContext(CoroutineScope(Dispatchers.Default).coroutineContext) {
+////            delay(5000)
+//
+//            ExpressionEvaluator(_expression)
 //        }
     }
 }

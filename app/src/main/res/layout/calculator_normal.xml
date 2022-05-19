@@ -14,6 +14,7 @@
     </data>
 
     <GridLayout
+        android:id="@+id/calculator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
@@ -21,145 +22,174 @@
         android:rowCount="5">
 
         <Button
-            android:id="@+id/all_cleared"
+            android:id="@+id/clearAll"
+            style="@style/Widget.Calculator.CalcButton"
+
             android:fontFamily="sans-serif-condensed"
             android:text="@string/all_cleared"
             android:textColor="@color/calc_image_button_normal"
-            android:textSize="20sp"
+            android:textSize="@dimen/button_ac_text_size"
+
             android:layout_marginStart="@dimen/button_margin"
+            android:layout_marginTop="@dimen/button_margin" />
+
+        <ImageButton
+            android:id="@+id/clear"
+            android:src="@drawable/clear_ic"
+
+            android:padding="@dimen/btn_padding_default"
             android:layout_marginTop="@dimen/button_margin"
+
             style="@style/Widget.Calculator.CalcButton" />
 
         <ImageButton
-            android:id="@+id/delete"
-            android:src="@drawable/ic_delete"
-            android:padding="@dimen/button_icon_padding"
+            android:id="@+id/percent"
+            style="@style/Widget.Calculator.CalcButton"
+
+            android:padding="@dimen/btn_padding_default"
             android:layout_marginTop="@dimen/button_margin"
-            style="@style/Widget.Calculator.CalcButton"/>
+
+            android:src="@drawable/percentage_ic" />
 
         <ImageButton
-            android:id="@+id/percent_sign"
-            android:src="@drawable/ic_percent"
+            android:id="@+id/divide"
+            style="@style/Widget.Calculator.CalcButton"
+
+            android:padding="@dimen/btn_padding_default"
             android:layout_marginTop="@dimen/button_margin"
-            android:padding="@dimen/button_icon_padding"
-            style="@style/Widget.Calculator.CalcButton"/>
+
+            android:src="@drawable/divide_ic" />
 
         <ImageButton
-            android:id="@+id/division_sign"
-            android:src="@drawable/ic_divide"
-            android:layout_marginTop="@dimen/button_margin"
-            android:padding="@dimen/button_icon_padding"
-            style="@style/Widget.Calculator.CalcButton"/>
-
-        <Button
             android:id="@+id/number_7"
-            android:text="@string/number_7"
-            android:textColor="@color/black"
-            android:textSize="@dimen/button_text_size"
+            style="@style/Widget.Calculator.CalcButton"
+
+            android:padding="@dimen/btn_padding_default"
             android:layout_marginStart="@dimen/button_margin"
-            style="@style/Widget.Calculator.CalcButton"/>
 
-        <Button
+            android:src="@drawable/seven_ic" />
+
+        <ImageButton
             android:id="@+id/number_8"
-            android:text="@string/number_8"
-            android:textColor="@color/black"
-            android:textSize="@dimen/button_text_size"
-            style="@style/Widget.Calculator.CalcButton"/>
+            style="@style/Widget.Calculator.CalcButton"
 
-        <Button
+            android:padding="@dimen/btn_padding_default"
+
+            android:src="@drawable/eight_ic"/>
+
+        <ImageButton
             android:id="@+id/number_9"
-            android:text="@string/number_9"
-            android:textColor="@color/black"
-            android:textSize="@dimen/button_text_size"
-            style="@style/Widget.Calculator.CalcButton"/>
+            style="@style/Widget.Calculator.CalcButton"
+
+            android:padding="@dimen/btn_padding_default"
+
+            android:src="@drawable/nine_ic" />
 
         <ImageButton
-            android:id="@+id/multiplication_sign"
-            android:src="@drawable/ic_multiply"
-            android:padding="@dimen/button_icon_padding"
-            style="@style/Widget.Calculator.CalcButton"/>
+            android:id="@+id/multiply"
+            style="@style/Widget.Calculator.CalcButton"
 
-        <Button
+            android:padding="@dimen/btn_padding_default"
+
+            android:src="@drawable/multiply_ic" />
+
+        <ImageButton
             android:id="@+id/number_4"
-            android:text="@string/number_4"
-            android:textColor="@color/black"
-            android:textSize="@dimen/button_text_size"
-            android:layout_marginStart="20dp"
-            style="@style/Widget.Calculator.CalcButton"/>
+            style="@style/Widget.Calculator.CalcButton"
 
-        <Button
+            android:layout_marginStart="@dimen/button_margin"
+            android:padding="@dimen/btn_padding_default"
+
+            android:src="@drawable/four_ic"/>
+
+        <ImageButton
             android:id="@+id/number_5"
-            android:text="@string/number_5"
-            android:textColor="@color/black"
-            android:textSize="@dimen/button_text_size"
-            style="@style/Widget.Calculator.CalcButton"/>
+            style="@style/Widget.Calculator.CalcButton"
 
-        <Button
+            android:padding="@dimen/btn_padding_default"
+
+            android:src="@drawable/five_ic"/>
+
+        <ImageButton
             android:id="@+id/number_6"
-            android:text="@string/number_6"
-            android:textColor="@color/black"
-            android:textSize="@dimen/button_text_size"
-            style="@style/Widget.Calculator.CalcButton"/>
+            style="@style/Widget.Calculator.CalcButton"
+
+            android:padding="@dimen/btn_padding_default"
+
+            android:src="@drawable/six_ic"/>
 
         <ImageButton
-            android:id="@+id/minus_sign"
-            android:src="@drawable/ic_minus"
-            android:padding="@dimen/button_icon_padding"
-            style="@style/Widget.Calculator.CalcButton"/>
+            android:id="@+id/subtract"
+            style="@style/Widget.Calculator.CalcButton"
 
-        <Button
+            android:padding="@dimen/btn_padding_default"
+
+            android:src="@drawable/subtract_ic" />
+
+        <ImageButton
             android:id="@+id/number_1"
-            android:text="@string/number_1"
-            android:textColor="@color/black"
-            android:textSize="@dimen/button_text_size"
-            android:layout_marginStart="20dp"
-            style="@style/Widget.Calculator.CalcButton"/>
+            style="@style/Widget.Calculator.CalcButton"
 
-        <Button
-            android:id="@+id/number_2"
-            android:text="@string/number_2"
-            android:textColor="@color/black"
-            android:textSize="@dimen/button_text_size"
-            style="@style/Widget.Calculator.CalcButton"/>
+            android:padding="@dimen/btn_padding_default"
+            android:layout_marginStart="@dimen/button_margin"
 
-        <Button
-            android:id="@+id/number_3"
-            android:text="@string/number_3"
-            android:textColor="@color/black"
-            android:textSize="@dimen/button_text_size"
-            style="@style/Widget.Calculator.CalcButton"/>
+            android:src="@drawable/one_ic" />
 
         <ImageButton
-            android:id="@+id/addition_sign"
-            android:src="@drawable/ic_plus"
-            android:padding="@dimen/button_icon_padding"
-            style="@style/Widget.Calculator.CalcButton"/>
+            android:id="@+id/number_2"
+            style="@style/Widget.Calculator.CalcButton"
+
+            android:padding="@dimen/btn_padding_default"
+
+            android:src="@drawable/two_ic" />
+
+        <ImageButton
+            android:id="@+id/number_3"
+            style="@style/Widget.Calculator.CalcButton"
+
+            android:padding="@dimen/btn_padding_default"
+
+            android:src="@drawable/three_ic" />
+
+        <ImageButton
+            android:id="@+id/add"
+            style="@style/Widget.Calculator.CalcButton"
+
+            android:padding="@dimen/btn_padding_default"
+
+            android:src="@drawable/add_ic" />
 
         <ImageButton
             android:id="@+id/change_layout"
-            android:src="@drawable/ic_expand"
-            android:layout_marginStart="20dp"
-            android:padding="@dimen/button_icon_padding"
-            style="@style/Widget.Calculator.CalcButton"/>
+            style="@style/Widget.Calculator.CalcButton"
 
-        <Button
-            android:id="@+id/number_0"
-            android:text="@string/number_0"
-            android:textColor="@color/black"
-            android:textSize="@dimen/button_text_size"
-            style="@style/Widget.Calculator.CalcButton"/>
+            android:padding="@dimen/btn_padding_default"
+            android:layout_marginStart="@dimen/button_margin"
 
-        <Button
-            android:id="@+id/dot_sign"
-            android:text="@string/dot_sign"
-            android:textColor="@color/black"
-            android:textSize="@dimen/button_text_size"
-            style="@style/Widget.Calculator.CalcButton"/>
+            android:src="@drawable/expand_ic" />
 
         <ImageButton
-            android:id="@+id/equal_sign"
-            android:src="@drawable/ic_equal"
-            android:padding="@dimen/button_icon_padding"
-            style="@style/Widget.Calculator.CalcButton"/>
+            android:id="@+id/number_0"
+            style="@style/Widget.Calculator.CalcButton"
+
+            android:padding="@dimen/btn_padding_default"
+
+            android:src="@drawable/zero_ic" />
+
+        <ImageButton
+            android:id="@+id/dot"
+            style="@style/Widget.Calculator.CalcButton"
+
+            android:padding="@dimen/btn_padding_default"
+
+            android:src="@drawable/dot_ic"/>
+
+        <ImageButton
+            android:id="@+id/equal"
+            style="@style/Widget.Calculator.CalcButton"
+
+            android:padding="@dimen/btn_padding_equal_default"
+
+            android:src="@drawable/equal_ic" />
     </GridLayout>
 </layout>

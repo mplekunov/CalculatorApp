@@ -32,7 +32,9 @@ object TokenFormatter {
 
         val list = mutableListOf<String>()
 
-        tokens.forEach { list.add(convertTokenToString(it, false)) }
+        val it = tokens.iterator()
+        while (it.hasNext())
+            list.add(convertTokenToString(it.next(), false))
 
         return list
     }
