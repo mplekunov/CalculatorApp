@@ -1,4 +1,4 @@
-package com.example.calculator.model.input.editing
+package com.example.calculator.model.input.defaultEditing
 
 import android.content.Context
 import android.text.Spannable
@@ -9,27 +9,26 @@ import com.example.calculator.model.token.TokenTypes
 import com.example.calculator.model.wrapper.Buttons
 import com.example.calculator.viewmodel.CalculatorViewModel
 
-class InputAdapter(
-    private val context: Context,
-    private val buttons: Buttons,
-    private val viewModel: CalculatorViewModel,
-    private val spannableInput: MutableLiveData<SpannableStringBuilder>,
+open class InputAdapter(
+    val context: Context,
+    val buttons: Buttons,
+    val viewModel: CalculatorViewModel,
+    val spannableInput: MutableLiveData<SpannableStringBuilder>,
 ) {
-    private var index = 0
-//        get() = viewModel.formattedInput.lastIndex
+    var index = 0
 
-    private val string get() = viewModel.formattedInput[index]
-    private val token get() = viewModel.inputAsTokens[index]
+    protected val string get() = viewModel.formattedInput[index]
+    protected val token get() = viewModel.inputAsTokens[index]
 
-    private val oldStart get() = getStartingPos()
-    private val oldEnd get() = spannableInput.value?.length ?: 0
+    protected val oldStart get() = getStartingPos()
+    protected val oldEnd get() = spannableInput.value?.length ?: 0
 
-    private val newStart get() = Algorithms.findStartingPosOfPattern(string, token.toString()) + oldStart
-    private val newEnd get() = token.length + newStart
+    protected val newStart get() = Algorithms.findStartingPosOfPattern(string, token.toString()) + oldStart
+    protected val newEnd get() = token.length + newStart
 
     private val spannable = spannableInput.value ?: SpannableStringBuilder()
 
-    private val what: Clickable
+    protected open val what: Clickable
         get() {
             return when(token.type) {
                 TokenTypes.Number -> ClickableNumber(context, buttons, viewModel, spannableInput, index)
@@ -38,7 +37,7 @@ class InputAdapter(
             }
         }
 
-    fun setBindings() {
+    open fun setBindings() {
         buttons.equal.setOnClickListener {
             viewModel.saveResult()
             resetSpannableInput()
@@ -81,7 +80,7 @@ class InputAdapter(
         }
     }
 
-    private fun replaceSpan() {
+    protected fun replaceSpan() {
         if (spannable.isEmpty()) {
             for (i in viewModel.inputAsTokens.indices) {
                 index = i
@@ -100,13 +99,13 @@ class InputAdapter(
 
     private fun getStartingPos() : Int {
         var startingIndex = 0
-
-        viewModel.formattedInput.subList(0, index).forEach { str -> startingIndex += str.length }
+        val list = viewModel.formattedInput.subList(0, index)
+        list.forEach { str -> startingIndex += str.length }
         return startingIndex
     }
 
 
-    private fun resetSpannableInput() {
+    protected fun resetSpannableInput() {
         spannable.clearAll()
     }
 

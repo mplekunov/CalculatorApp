@@ -17,15 +17,18 @@ import java.util.*
  * Helper class that evaluates [Expression].
  */
 class ExpressionEvaluator(var expression: MutableList<Token>) {
-    val result: Token get() = calculateResult()
+    var result: Token
 
+    init {
+        result = calculateResult()
+    }
     /**
      * Computes result of a mathematical expression.
      *
      * @param expression as a collection of [Token].
      * @return [Token] containing result of computation.
      */
-    private fun calculateResult(): Token {
+    private fun calculateResult() : Token {
         if (expression.isEmpty())
             return NumberParser.parse(NumberKind.ZERO)
 

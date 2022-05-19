@@ -1,13 +1,12 @@
-package com.example.calculator.model.input.editing
+package com.example.calculator.model.input.defaultEditing
 
 import android.content.Context
-import android.text.Spannable
 import android.text.SpannableStringBuilder
 import androidx.lifecycle.MutableLiveData
 import com.example.calculator.model.wrapper.Buttons
 import com.example.calculator.viewmodel.CalculatorViewModel
 
-class ClickableNumber(
+open class ClickableNumber(
     context: Context,
     buttons: Buttons,
     viewModel: CalculatorViewModel,

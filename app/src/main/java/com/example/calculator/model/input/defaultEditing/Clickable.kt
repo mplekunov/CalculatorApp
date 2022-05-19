@@ -1,4 +1,4 @@
-package com.example.calculator.model.input.editing
+package com.example.calculator.model.input.defaultEditing
 
 import android.content.Context
 import android.content.res.ColorStateList
@@ -53,12 +53,12 @@ abstract class Clickable(
 
         applyColorToSpan(highlightedColor, newStart, newEnd)
 
-        buttons.equal.setImageDrawable(ResourcesCompat.getDrawable(context.resources, R.drawable.ic_check, context.theme))
+        buttons.equal.setImageDrawable(ResourcesCompat.getDrawable(context.resources, R.drawable.check_mark_ic, context.theme))
 
         buttons.equal.setOnClickListener {
             InputAdapter(context, buttons, viewModel, liveInput).setBindings()
             resetSpannableFocus()
-            buttons.equal.setImageDrawable(ResourcesCompat.getDrawable(context.resources, R.drawable.ic_equal, context.theme))
+            buttons.equal.setImageDrawable(ResourcesCompat.getDrawable(context.resources, R.drawable.equal_ic, context.theme))
         }
     }
 

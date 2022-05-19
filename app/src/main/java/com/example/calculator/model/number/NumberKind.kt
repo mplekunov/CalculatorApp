@@ -12,9 +12,10 @@ enum class NumberKind {
     EIGHT,
     NINE,
     DOT,
-    NEGATIVE,
     EXPONENT,
-    POSITIVE,
     INFINITY,
-    NAN
+    NAN,
+    NEGATIVE,
+    PI,
+    EPSILON
 }

@@ -5,8 +5,6 @@ enum class FunctionKind {
     LOG,
     NATURAL_LOG,
     FACTORIAL,
-    SIN,
-    COS,
-    TAN,
-    SQUARE_ROOT
+    SQUARE_ROOT,
+    SQUARED,
 }

@@ -23,7 +23,6 @@ object NumberParser : TokenParser<NumberKind> {
             Token(".", TokenTypes.Number) to NumberKind.DOT,
             Token("E", TokenTypes.Number) to NumberKind.EXPONENT,
             Token("-", TokenTypes.Number) to NumberKind.NEGATIVE,
-            Token("+", TokenTypes.Number) to NumberKind.POSITIVE,
             Token(Double.POSITIVE_INFINITY.toString(), TokenTypes.Number) to NumberKind.INFINITY,
             Token("NaN", TokenTypes.Number) to NumberKind.NAN
         )) }
@@ -37,9 +36,7 @@ object NumberParser : TokenParser<NumberKind> {
             NumberKind::class.java -> map[token] as T
                 ?: throw NoSuchElementException("Operator doesn't exist")
             Number::class.java -> {
-                if (map[token] == NumberKind.NEGATIVE)
-                    return Number("-0") as T
-                else if (map[token] == NumberKind.INFINITY )
+                if (map[token] == NumberKind.INFINITY )
                     return Number(Double.POSITIVE_INFINITY.toString()) as T
                 else if (map[token] == NumberKind.NAN)
                     return Number(map[token].toString()) as T

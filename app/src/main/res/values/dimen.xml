@@ -3,8 +3,13 @@
     <dimen name="button_margin">10dp</dimen>
     <dimen name="button_size">82dp</dimen>
 
-    <dimen name="button_icon_size">10dp</dimen>
-    <dimen name="button_icon_padding">29dp</dimen>
+    <dimen name="btn_icon_size">10dp</dimen>
+
+    <dimen name="btn_padding_expanded">26dp</dimen>
+    <dimen name="btn_padding_default">31dp</dimen>
+
+    <dimen name="btn_padding_equal_expanded">20dp</dimen>
+    <dimen name="btn_padding_equal_default">25dp</dimen>
 
     <dimen name="button_text_size">27sp</dimen>
     <dimen name="button_ac_text_size">20sp</dimen>
