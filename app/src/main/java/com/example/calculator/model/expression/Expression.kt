@@ -41,7 +41,6 @@ class Expression {
         return when(token.type) {
             TokenTypes.Number -> return  addNumber(token, index)
             TokenTypes.Function -> return addFunction(token, index)
-
             TokenTypes.Operator -> addOperator(token, index)
         }
     }
@@ -59,8 +58,9 @@ class Expression {
 
         val prevToken = _expression.last()
 
-        if (token == leftParenthesis)
+        if (token == leftParenthesis && (prevToken != rightParenthesis && prevToken.type == TokenTypes.Operator))
             return _expression.add(token)
+
 
         if (token == rightParenthesis) {
             var parentheses = 0
