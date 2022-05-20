@@ -8,6 +8,7 @@ import com.example.calculator.formatter.TokenFormatter
 
 import com.example.calculator.model.token.Token
 import com.example.calculator.model.expression.Expression
+import com.example.calculator.model.expression.PostfixEvaluator
 import com.example.calculator.model.function.FunctionKind
 import com.example.calculator.model.number.NumberKind
 import com.example.calculator.model.operator.OperatorKind
@@ -20,9 +21,11 @@ import kotlinx.coroutines.*
 
 class CalculatorViewModel : ViewModel() {
     private val expression = Expression()
+    private val postfixEvaluator get() = PostfixEvaluator(inputAsTokens as MutableList<Token>)
+
 
     val inputAsTokens: List<Token> get() = expression.expression as MutableList<Token>
-    val outputAsToken: Token get() = expression.result
+    val outputAsToken: Token get() = ExpressionEvaluator(postfixEvaluator).result
 
     val formattedInput: List<String>
         get() = TokenFormatter.convertTokensToStrings(inputAsTokens)

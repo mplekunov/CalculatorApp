@@ -26,15 +26,12 @@ class PostfixEvaluator(val infix: MutableList<Token>) {
             return _postfix
         }
 
-    /**
-     * Converts infix into Postfix.
-     * @param [infix] representation of a mathematical expression.
-     * @return [_postfix] representation of a mathematical expression.
-     */
-    private fun getPostfix() {
+    private fun fixParentheses() {
         val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
         val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
+
         var parentheses = 0
+
         for (i in infix.indices) {
             if (infix[i] == leftParenthesis)
                 parentheses++
@@ -42,15 +39,30 @@ class PostfixEvaluator(val infix: MutableList<Token>) {
                 parentheses--
         }
 
-        var i = 0
-        if (infix[infix.lastIndex].type == TokenTypes.Operator && infix[infix.lastIndex] != rightParenthesis)
-            infix.removeLast()
-
         while (parentheses > 0) {
             infix.add(rightParenthesis)
             parentheses--
         }
+    }
 
+    /**
+     * Converts infix into Postfix.
+     * @param [infix] representation of a mathematical expression.
+     * @return [_postfix] representation of a mathematical expression.
+     */
+    private fun getPostfix() {
+        if (infix.isEmpty()) {
+            _postfix.add(NumberParser.parse(NumberKind.ZERO))
+            return
+        }
+
+        val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
+        if (infix[infix.lastIndex].type == TokenTypes.Operator && infix[infix.lastIndex] != rightParenthesis)
+            infix.removeLast()
+
+        fixParentheses()
+
+        var i = 0
         while (i < infix.size) {
             i = when (infix[i].type) {
                 TokenTypes.Number -> processNumber(i)
@@ -165,7 +177,7 @@ class PostfixEvaluator(val infix: MutableList<Token>) {
             if (infix.subList(index + 2, i).isEmpty())
                 _postfix.add(NumberParser.parse(NumberKind.ZERO))
             else {
-                val result = ExpressionEvaluator(infix.subList(index + 2, i)).result.toString()
+                val result = ExpressionEvaluator(PostfixEvaluator(infix.subList(index + 2, i))).result.toString()
                 _postfix.add(Token(log(result.toDouble(), Math.E).toString(), TokenTypes.Number))
             }
 

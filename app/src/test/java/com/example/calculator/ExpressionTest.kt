@@ -32,20 +32,22 @@ class ExpressionTest {
         // ( 5 + ((
         Token("+", TokenTypes.Operator) to false,
         Token("10", TokenTypes.Number) to true,
-        Token(")", TokenTypes.Number) to true,
+        Token(")", TokenTypes.Operator) to true,
         Token("+", TokenTypes.Operator) to true,
         // ( 5 + ( ( 10 ) +
         Token("5", TokenTypes.Number) to true,
-        Token(")", TokenTypes.Number) to true,
-        Token(")", TokenTypes.Number) to true,
+        Token(")", TokenTypes.Operator) to true,
+        Token(")", TokenTypes.Operator) to true,
         // ( 5 + ( ( 10 ) + 5 ) )
-    )
+        Token(")", TokenTypes.Operator) to false,
+
+        )
 
     @TestFactory
     fun `test adding parenthesis operator to expression`() = operations
         .map { (token, expected) ->
             DynamicTest.dynamicTest("Did it add $token? - $expected") {
-                assertEquals(expected, expression.add(token, expression.expression.lastIndex + 1))
+                assertEquals(expected, expression.add(token))
                 print(expression.expression)
             }
         }

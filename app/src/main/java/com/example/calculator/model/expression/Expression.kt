@@ -21,13 +21,8 @@ class Expression {
     protected val _tokenLengthLimit = 18
 
     private var _expression = mutableListOf<Token>()
-    private var _result = NumberParser.parse(NumberKind.ZERO)
 
-    private var _expressionEvaluator: ExpressionEvaluator? = null
-
-    val result: Token get() = _expressionEvaluator?.result ?: _result
-
-    val expression: List<Token> get() = _expressionEvaluator?.expression ?: _expression
+    val expression: List<Token> get() = _expression
 
     /**
      * Adds specified object to [Expression] at [index]
@@ -36,7 +31,7 @@ class Expression {
      * @param [index] position of [number] in [Expression]
      * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
-    fun add(token: Token, index: Int) : Boolean {
+    fun add(token: Token, index: Int = _expression.size) : Boolean {
         if (token.type == TokenTypes.Operator && OperatorParser.parse(token) as OperatorKind == OperatorKind.SUBTRACTION)
             return processMinusSign(token, index)
 
@@ -44,20 +39,9 @@ class Expression {
             return processParentheses(token)
 
         return when(token.type) {
-            TokenTypes.Number -> {
-               val result = addNumber(token, index)
-                if (result)
-                    getResult()
+            TokenTypes.Number -> return  addNumber(token, index)
+            TokenTypes.Function -> return addFunction(token, index)
 
-                return result
-            }
-            TokenTypes.Function -> {
-                val result = addFunction(token, index)
-                if (result)
-                    getResult()
-
-                return result
-            }
             TokenTypes.Operator -> addOperator(token, index)
         }
     }
@@ -75,33 +59,27 @@ class Expression {
 
         val prevToken = _expression.last()
 
-        if (token == leftParenthesis && prevToken.type == TokenTypes.Operator)
+        if (token == leftParenthesis)
             return _expression.add(token)
 
         if (token == rightParenthesis) {
-            var isClosingParenthesis = false
+            var parentheses = 0
 
-            var index = _expression.lastIndex
-
-            while (index >= 0) {
-                if (_expression[index] == leftParenthesis) {
-                    isClosingParenthesis = true
-                    break
-                }
+            for (index in _expression.indices) {
+                if (_expression[index] == leftParenthesis)
+                    parentheses++
 
                 if (_expression[index] == rightParenthesis)
-                    break
-
-                index--
+                    parentheses--
             }
 
-            if (!isClosingParenthesis)
+            if (parentheses <= 0)
                 return false
 
             if (prevToken.type == TokenTypes.Number)
                 return _expression.add(token)
 
-            if (prevToken.type == TokenTypes.Operator && prevToken == rightParenthesis)
+            if (prevToken == rightParenthesis)
                 return _expression.add(token)
         }
 
@@ -109,7 +87,15 @@ class Expression {
     }
 
     private fun processMinusSign(token: Token, index: Int) : Boolean {
+        // " - 5"
+        // "( - 5 )"
+
+        val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
+
         if (_expression.isEmpty())
+            return _expression.add(OperatorParser.parse(OperatorKind.SUBTRACTION))
+
+        if (_expression.last().type == TokenTypes.Operator && _expression.last() == leftParenthesis)
             return _expression.add(OperatorParser.parse(OperatorKind.SUBTRACTION))
 
         return addOperator(token, index)
@@ -181,7 +167,7 @@ class Expression {
             return true
         }
 
-        if (prevToken.type == TokenTypes.Function || prevToken.type == TokenTypes.Number)
+        if (prevToken != leftParenthesis)
             return _expression.add(token)
 
         return false
@@ -261,9 +247,6 @@ class Expression {
         else
             deleteAt(index, isRemovable)
 
-        getResult()
-//        CoroutineScope(Dispatchers.Default).launch { getResultAsync() }
-
         return status
     }
 
@@ -335,9 +318,6 @@ class Expression {
         else
             deleteAllAt(index)
 
-        getResult()
-//        CoroutineScope(Dispatchers.Default).launch { getResultAsync() }
-
         return true
     }
 
@@ -372,21 +352,6 @@ class Expression {
 
         _expression[index] = token
 
-        getResult()
-//        CoroutineScope(Dispatchers.Default).launch { getResultAsync() }
-
         return true
-    }
-
-    private fun getResult() {
-//        CoroutineScope(Dispatchers.Main).launch {
-//            _expressionEvaluator = ExpressionEvaluator(_expression)
-//        }
-
-//        return withContext(CoroutineScope(Dispatchers.Default).coroutineContext) {
-////            delay(5000)
-//
-//            ExpressionEvaluator(_expression)
-//        }
     }
 }

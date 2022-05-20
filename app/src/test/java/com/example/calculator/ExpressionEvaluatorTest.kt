@@ -1,11 +1,13 @@
 package com.example.calculator
 
 import com.example.calculator.model.expression.ExpressionEvaluator
+import com.example.calculator.model.expression.PostfixEvaluator
 import com.example.calculator.model.token.Token
 import com.example.calculator.model.token.TokenTypes
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DynamicTest
+import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.TestFactory
 
@@ -84,9 +86,14 @@ class ExpressionEvaluatorTest {
     fun `test evaluation of an expression with parentheses`() = expressionsWithParentheses
         .map { (expression, expected) ->
         DynamicTest.dynamicTest("$expression evaluates to $expected") {
-            assertEquals(expected, ExpressionEvaluator(expression).result.toString().toInt())
+            assertEquals(expected, ExpressionEvaluator(PostfixEvaluator(expression)).result.toString().toInt())
         }
     }
 
 
+    @Test
+    fun `test empty expression`() = assertEquals(0, ExpressionEvaluator(
+        PostfixEvaluator(
+            mutableListOf())
+    ).result.toString().toInt())
 }

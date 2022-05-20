@@ -19,7 +19,7 @@ open class Token(
     operator fun get(int: Int): Token = Token(_value[int].toString(), type)
 
     override fun equals(other: Any?): Boolean {
-        return this._value == (other as Token)._value
+        return this._value == (other as Token)._value && this.type == other.type
     }
 
     fun contains(other: Token): Boolean {

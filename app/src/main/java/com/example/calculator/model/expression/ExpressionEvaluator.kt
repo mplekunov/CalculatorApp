@@ -16,7 +16,7 @@ import java.util.*
 /**
  * Helper class that evaluates [Expression].
  */
-class ExpressionEvaluator(var expression: MutableList<Token>) {
+class ExpressionEvaluator(private val postfixEvaluator: PostfixEvaluator) {
     var result: Token
 
     init {
@@ -29,12 +29,7 @@ class ExpressionEvaluator(var expression: MutableList<Token>) {
      * @return [Token] containing result of computation.
      */
     private fun calculateResult() : Token {
-        if (expression.isEmpty())
-            return NumberParser.parse(NumberKind.ZERO)
-
-        val postfixEvaluator = PostfixEvaluator(expression)
         val postfix = postfixEvaluator.postfix
-        expression = postfixEvaluator.infix
 
         val s = Stack<Token>()
 
