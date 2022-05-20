@@ -14,6 +14,7 @@ import com.example.calculator.parser.OperatorParser
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
+import kotlin.math.log
 
 class PostfixEvaluator(val infix: MutableList<Token>) {
     private var _postfix: MutableList<Token> = mutableListOf()
@@ -31,12 +32,26 @@ class PostfixEvaluator(val infix: MutableList<Token>) {
      * @return [_postfix] representation of a mathematical expression.
      */
     private fun getPostfix() {
-        var i = 0
-        var size = infix.size
-        if (infix[infix.lastIndex].type == TokenTypes.Operator)
-            size = infix.size - 1
+        val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
+        val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
+        var parentheses = 0
+        for (i in infix.indices) {
+            if (infix[i] == leftParenthesis)
+                parentheses++
+            else if (infix[i] == rightParenthesis)
+                parentheses--
+        }
 
-        while (i < size) {
+        var i = 0
+        if (infix[infix.lastIndex].type == TokenTypes.Operator && infix[infix.lastIndex] != rightParenthesis)
+            infix.removeLast()
+
+        while (parentheses > 0) {
+            infix.add(rightParenthesis)
+            parentheses--
+        }
+
+        while (i < infix.size) {
             i = when (infix[i].type) {
                 TokenTypes.Number -> processNumber(i)
                 TokenTypes.Operator -> processOperator(i)
@@ -60,7 +75,7 @@ class PostfixEvaluator(val infix: MutableList<Token>) {
 
         val kind = OperatorParser.parse<OperatorKind>(token)
 
-        if (index == 0 && index + 1 < infix.size) {
+        if (index == 0 && index + 1 < infix.size && (kind == OperatorKind.SUBTRACTION || kind == OperatorKind.ADDITION)) {
             return if (kind == OperatorKind.SUBTRACTION || kind == OperatorKind.ADDITION) {
                 val right = BigDecimal(NumberParser.parse<Number>(infix[index + 1]).toString())
 
@@ -79,7 +94,6 @@ class PostfixEvaluator(val infix: MutableList<Token>) {
         when (kind) {
             OperatorKind.LEFT_BRACKET -> _opStack.push(OperatorParser.parse(token))
             OperatorKind.RIGHT_BRACKET -> {
-
                 while (_opStack.peek() != OperatorParser.parse(OperatorKind.LEFT_BRACKET))
                     _postfix.add(_opStack.pop() as Operator)
 
@@ -137,6 +151,25 @@ class PostfixEvaluator(val infix: MutableList<Token>) {
                 infix[infix.lastIndex] = Token(percentage.toPlainString(), TokenTypes.Number)
 
             _postfix.add(Token(percentage.toPlainString(), TokenTypes.Number))
+        }
+        else if (token == FunctionParser.parse(FunctionKind.NATURAL_LOG)) {
+            var i = index + 1
+
+            while (i < infix.size) {
+                if (infix[i].type == TokenTypes.Function && FunctionParser.parse(FunctionKind.RIGHT_PARENTHESIS) == infix[i])
+                    break
+                else
+                    i++
+            }
+
+            if (infix.subList(index + 2, i).isEmpty())
+                _postfix.add(NumberParser.parse(NumberKind.ZERO))
+            else {
+                val result = ExpressionEvaluator(infix.subList(index + 2, i)).result.toString()
+                _postfix.add(Token(log(result.toDouble(), Math.E).toString(), TokenTypes.Number))
+            }
+
+            return i
         }
 
         return index + 1

@@ -25,21 +25,9 @@ class Expression {
 
     private var _expressionEvaluator: ExpressionEvaluator? = null
 
-    val result: Token get() {
-//        CoroutineScope(Dispatchers.Default).launch { _expressionEvaluator = getResultAsync().await() }
-        return _expressionEvaluator?.result ?: _result
-//        return ExpressionEvaluator(_expression).result
-//        return _result
-    }
+    val result: Token get() = _expressionEvaluator?.result ?: _result
 
-    val expression: List<Token> get() {
-//        GlobalScope.launch { _expressionEvaluator = getResultAsync().await() }
-//        _result = _expressionEvaluator?.result ?: _result
-        return _expressionEvaluator?.expression ?: _expression
-
-//        return ExpressionEvaluator(_expression).expression
-    }
-
+    val expression: List<Token> get() = _expressionEvaluator?.expression ?: _expression
 
     /**
      * Adds specified object to [Expression] at [index]
@@ -52,12 +40,14 @@ class Expression {
         if (token.type == TokenTypes.Operator && OperatorParser.parse(token) as OperatorKind == OperatorKind.SUBTRACTION)
             return processMinusSign(token, index)
 
+        if (token.type == TokenTypes.Operator && (token == OperatorParser.parse(OperatorKind.LEFT_BRACKET) || token == OperatorParser.parse(OperatorKind.RIGHT_BRACKET)))
+            return processParentheses(token)
+
         return when(token.type) {
             TokenTypes.Number -> {
                val result = addNumber(token, index)
                 if (result)
                     getResult()
-//                    CoroutineScope(Dispatchers.Default).launch { getResultAsync() }
 
                 return result
             }
@@ -65,7 +55,6 @@ class Expression {
                 val result = addFunction(token, index)
                 if (result)
                     getResult()
-//                    CoroutineScope(Dispatchers.Default).launch { getResultAsync() }
 
                 return result
             }
@@ -73,20 +62,55 @@ class Expression {
         }
     }
 
+    private fun processParentheses(token: Token): Boolean {
+        if (_expression.isEmpty())
+            return _expression.add(token)
+
+        val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
+        val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
+
+        val prevToken = _expression.last()
+
+        if (token == leftParenthesis && prevToken.type == TokenTypes.Operator)
+            return _expression.add(token)
+
+        if (token == rightParenthesis) {
+            var isClosingParenthesis = false
+
+            var index = _expression.lastIndex
+
+            while (index >= 0) {
+                if (_expression[index] == leftParenthesis) {
+                    isClosingParenthesis = true
+                    break
+                }
+
+                if (_expression[index] == rightParenthesis)
+                    break
+
+                index--
+            }
+
+            if (!isClosingParenthesis)
+                return false
+
+            if (prevToken.type == TokenTypes.Number)
+                return _expression.add(token)
+
+            if (prevToken.type == TokenTypes.Operator && prevToken == rightParenthesis)
+                return _expression.add(token)
+        }
+
+        return false
+    }
+
     private fun processMinusSign(token: Token, index: Int) : Boolean {
         if (_expression.isEmpty())
             return _expression.add(OperatorParser.parse(OperatorKind.SUBTRACTION))
 
-        @Suppress("NAME_SHADOWING")
-        val index = if (index > _expression.lastIndex) _expression.lastIndex else index
 
-        val prevToken = _expression[index]
 
-        return if (prevToken.type == TokenTypes.Operator) {
-            _expression[_expression.lastIndex] = token
-            true
-        } else
-            _expression.add(token)
+        return addOperator(token, index)
     }
 
     private fun addNumber(token: Token, index: Int) : Boolean {
@@ -137,33 +161,31 @@ class Expression {
      */
     private fun addOperator(token: Token, index: Int) : Boolean {
         // Expression can't start with an operator
-        if (_expression.isEmpty()) {
+        if (_expression.isEmpty())
             return false
-        }
 
         // In case of Operators, each operator has its own token
         // No two operators can be appended to each other
-        val lastToken = _expression.last()
+        val prevToken = _expression.last()
 
         // Operators can't follow one another
         // In expression there is always a number between operators (or function)
         // However, user may want to replace previous operator by pressing new operator
-        if (lastToken.type == TokenTypes.Operator) {
+        val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
+        val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
+
+        if (prevToken.type == TokenTypes.Operator && prevToken != leftParenthesis && prevToken != rightParenthesis) {
             _expression[_expression.lastIndex] = token
             return true
         }
 
         // We are using operators on either Numbers or Functions
-        if (lastToken.type == TokenTypes.Number || lastToken.type == TokenTypes.Function) {
-            when {
-                index <= _expression.lastIndex -> _expression.add(index, token)
-                else -> _expression.add(token)
-            }
-
-            return true
+        when {
+            index <= _expression.lastIndex -> _expression.add(index, token)
+            else -> _expression.add(token)
         }
 
-        return false
+        return true
     }
 
     /**
@@ -187,6 +209,23 @@ class Expression {
 
             return true
         }
+
+        if (token == FunctionParser.parse(FunctionKind.NATURAL_LOG)) {
+            if (_expression.isNotEmpty()) {
+                val last = _expression.last()
+
+                if (last.type == TokenTypes.Number ||
+                    (last.type == TokenTypes.Function && last != FunctionParser.parse(FunctionKind.LEFT_PARENTHESIS))
+                )
+                    return false
+            }
+
+            _expression.add(token)
+            _expression.add(FunctionParser.parse(FunctionKind.LEFT_PARENTHESIS))
+
+            return true
+        }
+
 
         // Logic for fun ( expr ) format
 
@@ -342,7 +381,7 @@ class Expression {
 
     private fun getResult() {
 //        CoroutineScope(Dispatchers.Main).launch {
-            _expressionEvaluator = ExpressionEvaluator(_expression)
+//            _expressionEvaluator = ExpressionEvaluator(_expression)
 //        }
 
 //        return withContext(CoroutineScope(Dispatchers.Default).coroutineContext) {

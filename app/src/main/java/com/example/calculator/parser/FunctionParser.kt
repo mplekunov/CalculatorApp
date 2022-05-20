@@ -12,7 +12,12 @@ object FunctionParser : TokenParser<FunctionKind> {
         get() = BiMap<Token, FunctionKind>().apply { putAll(mutableMapOf(
             Token("%", TokenTypes.Function) to FunctionKind.PERCENTAGE,
             Token("log", TokenTypes.Function) to FunctionKind.LOG,
-            Token("ln", TokenTypes.Function) to FunctionKind.NATURAL_LOG
+            Token("ln", TokenTypes.Function) to FunctionKind.NATURAL_LOG,
+            Token("!", TokenTypes.Function) to FunctionKind.FACTORIAL,
+            Token("^2", TokenTypes.Function) to FunctionKind.SQUARED,
+            Token("v", TokenTypes.Function) to FunctionKind.SQUARE_ROOT,
+            Token("(", TokenTypes.Function) to FunctionKind.LEFT_PARENTHESIS,
+            Token(")", TokenTypes.Function) to FunctionKind.RIGHT_PARENTHESIS
         )) }
 
     override fun parse(input: FunctionKind): Token {

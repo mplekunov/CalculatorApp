@@ -7,4 +7,6 @@ enum class FunctionKind {
     FACTORIAL,
     SQUARE_ROOT,
     SQUARED,
+    LEFT_PARENTHESIS,
+    RIGHT_PARENTHESIS
 }
