@@ -42,7 +42,12 @@ class ExpressionTest {
         // ( 5 + ( ( 10 ) + 5 ) )
         Token(")", TokenTypes.Operator) to false,
         // )( is not allowed
-        Token("(", TokenTypes.Operator) to false
+        Token("(", TokenTypes.Operator) to false,
+        Token("-", TokenTypes.Operator) to true,
+        Token("(", TokenTypes.Operator) to true,
+        Token("-", TokenTypes.Operator) to true,
+        Token("5", TokenTypes.Number) to true
+        // ( 5 + ( ( 10 ) + 5 ) ) - ( - 5
         )
 
     @TestFactory

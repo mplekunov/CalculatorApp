@@ -79,7 +79,33 @@ class ExpressionEvaluatorTest {
             Token(")", TokenTypes.Operator),
             Token("+", TokenTypes.Operator),
 
-        ) to 121
+        ) to 121,
+
+        //  - ( - 5
+        mutableListOf(
+        Token("-", TokenTypes.Operator),
+        Token("(", TokenTypes.Operator),
+        Token("-", TokenTypes.Operator),
+        Token("5", TokenTypes.Number),
+        ) to 5,
+
+        // - 5 - 5
+        mutableListOf(
+            Token("-", TokenTypes.Operator),
+            Token("5", TokenTypes.Number),
+            Token("-", TokenTypes.Operator),
+            Token("5", TokenTypes.Number),
+        ) to -10,
+
+        // - 5 + ( - 5
+        mutableListOf(
+            Token("-", TokenTypes.Operator),
+            Token("5", TokenTypes.Number),
+            Token("+", TokenTypes.Operator),
+            Token("(", TokenTypes.Operator),
+            Token("-", TokenTypes.Operator),
+            Token("5", TokenTypes.Number),
+            ) to -10,
     )
 
     @TestFactory
