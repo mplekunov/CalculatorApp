@@ -63,11 +63,15 @@ class Expression {
     }
 
     private fun processParentheses(token: Token): Boolean {
-        if (_expression.isEmpty())
-            return _expression.add(token)
-
         val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
         val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
+
+        if (_expression.isEmpty()) {
+            return if (token == leftParenthesis)
+                _expression.add(token)
+            else
+                false
+        }
 
         val prevToken = _expression.last()
 
@@ -107,8 +111,6 @@ class Expression {
     private fun processMinusSign(token: Token, index: Int) : Boolean {
         if (_expression.isEmpty())
             return _expression.add(OperatorParser.parse(OperatorKind.SUBTRACTION))
-
-
 
         return addOperator(token, index)
     }
@@ -179,13 +181,10 @@ class Expression {
             return true
         }
 
-        // We are using operators on either Numbers or Functions
-        when {
-            index <= _expression.lastIndex -> _expression.add(index, token)
-            else -> _expression.add(token)
-        }
+        if (prevToken.type == TokenTypes.Function || prevToken.type == TokenTypes.Number)
+            return _expression.add(token)
 
-        return true
+        return false
     }
 
     /**
