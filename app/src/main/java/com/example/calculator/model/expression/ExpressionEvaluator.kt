@@ -28,6 +28,11 @@ class ExpressionEvaluator(private val postfixEvaluator: PostfixEvaluator) {
      * @param expression as a collection of [Token].
      * @return [Token] containing result of computation.
      */
+
+    private fun isError(token: Token): Boolean {
+        return token == NumberParser.parse(NumberKind.NAN)
+
+    }
     private fun calculateResult() : Token {
         val postfix = postfixEvaluator.postfix
 
@@ -35,6 +40,9 @@ class ExpressionEvaluator(private val postfixEvaluator: PostfixEvaluator) {
 
         for (i in postfix.indices) {
             val token = postfix[i]
+
+            if (isError(token))
+                return NumberParser.parse(NumberKind.NAN)
 
             if (token.type == TokenTypes.Number)
                 s.push(token)

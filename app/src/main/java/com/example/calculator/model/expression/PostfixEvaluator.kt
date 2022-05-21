@@ -172,7 +172,10 @@ class PostfixEvaluator(val infix: MutableList<Token>) {
             val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
             val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
 
-            while (i < infix.size || parenthesis == 0) {
+            while (i < infix.size) {
+                if (parenthesis == 0)
+                    break
+
                 if (infix[i] == leftParenthesis)
                     parenthesis++
                 else if (infix[i] == rightParenthesis)
@@ -185,6 +188,13 @@ class PostfixEvaluator(val infix: MutableList<Token>) {
                 _postfix.add(NumberParser.parse(NumberKind.ZERO))
             else {
                 val result = ExpressionEvaluator(PostfixEvaluator(infix.subList(index + 2, i - 1))).result.toString()
+
+                if (result.toDouble() < 0) {
+                    _postfix.clear()
+                    _opStack.clear()
+                    _postfix.add(NumberParser.parse(NumberKind.NAN))
+                    return infix.size
+                }
                 _postfix.add(Token(log(result.toDouble(), Math.E).toString(), TokenTypes.Number))
             }
 
