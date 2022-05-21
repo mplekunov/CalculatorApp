@@ -45,6 +45,13 @@ class PostfixEvaluator(val infix: MutableList<Token>) {
         }
     }
 
+    private fun removeUnusedOperators() {
+        val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
+
+        while (infix.size > 0 && infix.last().type == TokenTypes.Operator && infix.last() != rightParenthesis)
+            infix.removeLast()
+    }
+
     /**
      * Converts infix into Postfix.
      * @param [infix] representation of a mathematical expression.
@@ -56,9 +63,7 @@ class PostfixEvaluator(val infix: MutableList<Token>) {
             return
         }
 
-        val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
-        if (infix[infix.lastIndex].type == TokenTypes.Operator && infix[infix.lastIndex] != rightParenthesis)
-            infix.removeLast()
+        removeUnusedOperators()
 
         fixParentheses()
 
