@@ -3,11 +3,8 @@ package com.example.calculator
 import com.example.calculator.model.expression.Expression
 import com.example.calculator.model.token.Token
 import com.example.calculator.model.token.TokenTypes
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.DynamicTest
-import org.junit.jupiter.api.TestFactory
 
 class ExpressionTest {
     companion object {
@@ -59,3 +56,4 @@ class ExpressionTest {
             }
         }
 }
+

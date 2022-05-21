@@ -39,8 +39,8 @@ class Expression {
             return processParentheses(token)
 
         return when(token.type) {
-            TokenTypes.Number -> return  addNumber(token, index)
-            TokenTypes.Function -> return addFunction(token, index)
+            TokenTypes.Number -> addNumber(token, index)
+            TokenTypes.Function -> addFunction(token, index)
             TokenTypes.Operator -> addOperator(token, index)
         }
     }
@@ -199,14 +199,14 @@ class Expression {
             if (_expression.isNotEmpty()) {
                 val last = _expression.last()
 
-                if (last.type == TokenTypes.Number ||
-                    (last.type == TokenTypes.Function && last != FunctionParser.parse(FunctionKind.LEFT_PARENTHESIS))
-                )
+                val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
+
+                if (last.type == TokenTypes.Number || last == rightParenthesis)
                     return false
             }
 
             _expression.add(token)
-            _expression.add(FunctionParser.parse(FunctionKind.LEFT_PARENTHESIS))
+            _expression.add(OperatorParser.parse(OperatorKind.LEFT_BRACKET))
 
             return true
         }
