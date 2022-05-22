@@ -28,5 +28,12 @@ class ExpandedInputAdapter(
 
     override fun setBindings() {
         super.setBindings()
+
+        buttons.operators.forEach { (button, operator) ->
+            button.setOnClickListener {
+                if (viewModel.add(operator))
+                    replaceSpan()
+            }
+        }
     }
 }

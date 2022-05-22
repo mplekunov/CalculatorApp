@@ -120,6 +120,9 @@ class Expression {
 
         val tokenToEdit = _expression[index]
 
+        val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
+        val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
+
         // If last token is a number, we add new "token" to the previous number
         // Otherwise, we create new number
         if (tokenToEdit.type == TokenTypes.Number) {
@@ -134,7 +137,7 @@ class Expression {
 
                 return true
             }
-        } else if (tokenToEdit.type == TokenTypes.Operator || (tokenToEdit.type == TokenTypes.Function && tokenToEdit != FunctionParser.parse(FunctionKind.PERCENTAGE)))
+        } else if ((tokenToEdit.type == TokenTypes.Operator && tokenToEdit != rightParenthesis) || (tokenToEdit.type == TokenTypes.Function && tokenToEdit != FunctionParser.parse(FunctionKind.PERCENTAGE)))
             return _expression.add(token)
 
         return false

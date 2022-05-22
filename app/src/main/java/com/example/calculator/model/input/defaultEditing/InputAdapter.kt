@@ -30,7 +30,7 @@ open class InputAdapter(
         ) + oldStart
     protected val newEnd get() = token.length + newStart
 
-    private val spannable = spannableInput.value ?: SpannableStringBuilder()
+    val spannable = spannableInput.value ?: SpannableStringBuilder()
 
     protected open val what: Clickable
         get() {
