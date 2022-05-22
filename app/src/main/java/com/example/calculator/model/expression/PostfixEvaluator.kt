@@ -94,7 +94,7 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
 
         val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
 
-        if ((index == 0 || _infix[index - 1] == leftParenthesis) && index + 1 < _infix.size && (kind == OperatorKind.SUBTRACTION || kind == OperatorKind.ADDITION)) {
+        if ((index == 0 || _infix[index - 1] == leftParenthesis) && index + 1 < _infix.size) {
             if (kind == OperatorKind.SUBTRACTION || kind == OperatorKind.ADDITION)
                 _postfix.add(NumberParser.parse(NumberKind.ZERO))
             else {

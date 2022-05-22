@@ -58,6 +58,7 @@ abstract class Clickable(
 
         buttons.equal.setOnClickListener {
             InputAdapter(context, buttons, viewModel, liveInput).setBindings()
+
             resetSpannableFocus()
             buttons.equal.setImageDrawable(ResourcesCompat.getDrawable(context.resources, R.drawable.equal_ic, context.theme))
         }
@@ -75,7 +76,7 @@ abstract class Clickable(
         spannable.highlight(color, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
 
-    fun SpannableStringBuilder.setSpan(start: Int, end: Int, flags: Int) {
+    private fun SpannableStringBuilder.setSpan(start: Int, end: Int, flags: Int) {
         this@setSpan.setSpan(what, start, end, flags)
         liveInput.value = this@setSpan
     }

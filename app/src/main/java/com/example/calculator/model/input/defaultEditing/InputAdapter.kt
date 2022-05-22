@@ -23,17 +23,39 @@ open class InputAdapter(
     protected val oldStart get() = getStartingPos()
     protected val oldEnd get() = spannableInput.value?.length ?: 0
 
-    protected val newStart get() = Algorithms.findStartingPosOfPattern(string, token.toString()) + oldStart
+    protected val newStart
+        get() = Algorithms.findStartingPosOfPattern(
+            string,
+            token.toString()
+        ) + oldStart
     protected val newEnd get() = token.length + newStart
 
     private val spannable = spannableInput.value ?: SpannableStringBuilder()
 
     protected open val what: Clickable
         get() {
-            return when(token.type) {
-                TokenTypes.Number -> ClickableNumber(context, buttons, viewModel, spannableInput, index)
-                TokenTypes.Function -> ClickableFunction(context, buttons, viewModel, spannableInput, index)
-                TokenTypes.Operator -> ClickableOperator(context, buttons, viewModel, spannableInput, index)
+            return when (token.type) {
+                TokenTypes.Number -> ClickableNumber(
+                    context,
+                    buttons,
+                    viewModel,
+                    spannableInput,
+                    index
+                )
+                TokenTypes.Function -> ClickableFunction(
+                    context,
+                    buttons,
+                    viewModel,
+                    spannableInput,
+                    index
+                )
+                TokenTypes.Operator -> ClickableOperator(
+                    context,
+                    buttons,
+                    viewModel,
+                    spannableInput,
+                    index
+                )
             }
         }
 
@@ -41,7 +63,7 @@ open class InputAdapter(
         buttons.equal.setOnClickListener {
             viewModel.saveResult()
             resetSpannableInput()
-            replaceSpan(what)
+            replaceSpan()
         }
 
         buttons.clear.setOnClickListener {
@@ -49,7 +71,7 @@ open class InputAdapter(
                 if (viewModel.formattedInput.lastIndex < 0)
                     resetSpannableInput()
                 else
-                    replaceSpan(what)
+                    replaceSpan()
             }
         }
 
@@ -61,43 +83,42 @@ open class InputAdapter(
         buttons.numbers.forEach { (button, number) ->
             button.setOnClickListener {
                 if (viewModel.add(number))
-                    replaceSpan(what)
+                    replaceSpan()
             }
         }
 
         buttons.operators.forEach { (button, operator) ->
             button.setOnClickListener {
                 if (viewModel.add(operator))
-                    replaceSpan(what)
+                    replaceSpan()
             }
         }
 
         buttons.functions.forEach { (button, function) ->
             button.setOnClickListener {
                 if (viewModel.add(function))
-                    replaceSpan(what)
+                    replaceSpan()
             }
         }
     }
 
-    protected fun replaceSpan(what: Clickable) {
+    protected fun replaceSpan() {
         if (spannable.isEmpty()) {
             for (i in viewModel.inputAsTokens.indices) {
                 index = i
 
-                    spannable.replace(oldStart, oldEnd, string)
-                    spannable.setSpan(what, newStart, newEnd)
-                }
+                spannable.replace(oldStart, oldEnd, string)
+                spannable.setSpan(newStart, newEnd)
             }
-        else {
+        } else {
             index = viewModel.inputAsTokens.lastIndex
 
             spannable.replace(oldStart, oldEnd, string)
-            spannable.setSpan(what, newStart, newEnd)
+            spannable.setSpan(newStart, newEnd)
         }
     }
 
-    private fun getStartingPos() : Int {
+    private fun getStartingPos(): Int {
         var startingIndex = 0
         val list = viewModel.formattedInput.subList(0, index)
         list.forEach { str -> startingIndex += str.length }
@@ -108,7 +129,7 @@ open class InputAdapter(
         spannable.clearAll()
     }
 
-    private fun SpannableStringBuilder.setSpan(what: Clickable, start: Int, end: Int) {
+    private fun SpannableStringBuilder.setSpan(start: Int, end: Int) {
         this@setSpan.setSpan(what, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
         spannableInput.value = this@setSpan
