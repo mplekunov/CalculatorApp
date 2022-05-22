@@ -102,16 +102,9 @@ open class InputAdapter(
         }
     }
 
-    protected fun replaceSpan() {
-        if (spannable.isEmpty()) {
-            for (i in viewModel.inputAsTokens.indices) {
-                index = i
-
-                spannable.replace(oldStart, oldEnd, string)
-                spannable.setSpan(newStart, newEnd)
-            }
-        } else {
-            index = viewModel.inputAsTokens.lastIndex
+    protected open fun replaceSpan() {
+        for (i in viewModel.inputAsTokens.indices) {
+            index = i
 
             spannable.replace(oldStart, oldEnd, string)
             spannable.setSpan(newStart, newEnd)
@@ -129,7 +122,7 @@ open class InputAdapter(
         spannable.clearAll()
     }
 
-    private fun SpannableStringBuilder.setSpan(start: Int, end: Int) {
+    fun SpannableStringBuilder.setSpan(start: Int, end: Int) {
         this@setSpan.setSpan(what, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
         spannableInput.value = this@setSpan
