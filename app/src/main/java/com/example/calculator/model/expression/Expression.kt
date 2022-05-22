@@ -269,33 +269,19 @@ class Expression {
 
         when (tokenToEdit.type) {
             TokenTypes.Number -> {
-                if (tokenToEdit.isNotEmpty()) {
-                    // Exponent
-//                    if (isExponent(index)) {
-//                        @Suppress("NAME_SHADOWING")
-//                        var index = -1
-//
-//                        while (index < tokenToEdit.length)
-//                            if (tokenToEdit[index + 1] == NumberParser.parse(NumberKind.EXPONENT))
-//                                break
-//                            else
-//                                index++
-//
-//                        tokenToEdit = tokenToEdit.slice(0..index)
-//                    }
-//                    else
-
+                if (tokenToEdit.isNotEmpty())
                     tokenToEdit = tokenToEdit.slice(0 until tokenToEdit.lastIndex)
-                }
             }
             TokenTypes.Operator -> {
+                val lastIndex = index - 1
+                if (lastIndex >= 0 && _expression[lastIndex].type == TokenTypes.Function && tokenToEdit == OperatorParser.parse(OperatorKind.LEFT_BRACKET))
+                    _expression.removeLast()
+
                 _expression.removeAt(index)
+
                 return true
             }
             TokenTypes.Function -> {
-                if (FunctionParser.parse<Function>(tokenToEdit).functionBody == FunctionBody.RIGHT_SIDE)
-                    _expression.removeLast()
-
                 _expression.removeLast()
             }
         }
@@ -311,10 +297,6 @@ class Expression {
 
         return true
     }
-
-//    private fun isExponent(index: Int): Boolean {
-//        return _expression[index].contains(NumberParser.parse(NumberKind.EXPONENT))
-//    }
 
     /**
      * Deletes all object currently stored in the [Expression].

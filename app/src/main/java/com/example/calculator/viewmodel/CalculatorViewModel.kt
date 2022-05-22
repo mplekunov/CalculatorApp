@@ -44,12 +44,7 @@ class CalculatorViewModel : ViewModel() {
      * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
     fun add(number: NumberKind, index: Int = inputSize) : Boolean {
-        val result = expression.add(NumberParser.parse(number), index)
-
-//        if (result)
-//            inputAsTokens = postfixEvaluator.infix
-
-        return result
+        return expression.add(NumberParser.parse(number), index)
     }
 
     /**
