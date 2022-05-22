@@ -31,8 +31,8 @@ class ExpressionEvaluator(private val postfixEvaluator: PostfixEvaluator) {
 
     private fun isError(token: Token): Boolean {
         return token == NumberParser.parse(NumberKind.NAN)
-
     }
+
     private fun calculateResult() : Token {
         val postfix = postfixEvaluator.postfix
 

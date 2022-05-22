@@ -1,6 +1,7 @@
 package com.example.calculator.model.expression
 
 import com.example.calculator.model.function.Function
+import com.example.calculator.model.function.FunctionBody
 import com.example.calculator.model.function.FunctionKind
 import com.example.calculator.model.number.NumberKind
 import com.example.calculator.model.operator.Operator
@@ -60,7 +61,6 @@ class Expression {
 
         if (token == leftParenthesis && (prevToken != rightParenthesis && prevToken.type == TokenTypes.Operator))
             return _expression.add(token)
-
 
         if (token == rightParenthesis) {
             var parentheses = 0
@@ -267,28 +267,33 @@ class Expression {
             TokenTypes.Number -> {
                 if (tokenToEdit.isNotEmpty()) {
                     // Exponent
-                    if (isExponent(index)) {
-                        @Suppress("NAME_SHADOWING")
-                        var index = -1
+//                    if (isExponent(index)) {
+//                        @Suppress("NAME_SHADOWING")
+//                        var index = -1
+//
+//                        while (index < tokenToEdit.length)
+//                            if (tokenToEdit[index + 1] == NumberParser.parse(NumberKind.EXPONENT))
+//                                break
+//                            else
+//                                index++
+//
+//                        tokenToEdit = tokenToEdit.slice(0..index)
+//                    }
+//                    else
 
-                        while (index < tokenToEdit.length)
-                            if (tokenToEdit[index + 1] == NumberParser.parse(NumberKind.EXPONENT))
-                                break
-                            else
-                                index++
-
-                        tokenToEdit = tokenToEdit.slice(0..index)
-                    }
-                    else
-
-                        tokenToEdit = tokenToEdit.slice(0 until tokenToEdit.lastIndex)
+                    tokenToEdit = tokenToEdit.slice(0 until tokenToEdit.lastIndex)
                 }
             }
             TokenTypes.Operator -> {
                 _expression.removeAt(index)
                 return true
             }
-            TokenTypes.Function -> { TODO("Not yet implemented") }
+            TokenTypes.Function -> {
+                if (FunctionParser.parse<Function>(tokenToEdit).functionBody == FunctionBody.RIGHT_SIDE)
+                    _expression.removeLast()
+
+                _expression.removeLast()
+            }
         }
 
         if (tokenToEdit.isEmpty()) {
@@ -303,9 +308,9 @@ class Expression {
         return true
     }
 
-    private fun isExponent(index: Int): Boolean {
-        return _expression[index].contains(NumberParser.parse(NumberKind.EXPONENT))
-    }
+//    private fun isExponent(index: Int): Boolean {
+//        return _expression[index].contains(NumberParser.parse(NumberKind.EXPONENT))
+//    }
 
     /**
      * Deletes all object currently stored in the [Expression].

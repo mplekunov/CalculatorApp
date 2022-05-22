@@ -28,6 +28,7 @@ abstract class Clickable(
 ) : ClickableSpan() {
     protected val spannable get() = liveInput.value ?: SpannableStringBuilder()
 
+
     open var highlightedColor: Int = ResourcesCompat.getColor(context.resources, R.color.yellow_dark, context.theme)
     open var defaultTextColor: Int = ResourcesCompat.getColor(context.resources, R.color.white, context.theme)
 

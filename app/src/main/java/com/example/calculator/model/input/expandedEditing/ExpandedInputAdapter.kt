@@ -5,6 +5,7 @@ import android.text.SpannableStringBuilder
 import androidx.lifecycle.MutableLiveData
 import com.example.calculator.model.input.defaultEditing.Clickable
 import com.example.calculator.model.input.defaultEditing.InputAdapter
+import com.example.calculator.model.operator.OperatorKind
 import com.example.calculator.model.token.TokenTypes
 import com.example.calculator.model.wrapper.Buttons
 import com.example.calculator.viewmodel.CalculatorViewModel
@@ -27,6 +28,5 @@ class ExpandedInputAdapter(
 
     override fun setBindings() {
         super.setBindings()
-
     }
 }

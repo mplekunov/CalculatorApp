@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.TestFactory
 
-class ExpressionEvaluatorTest {
+class ParenthesesEvaluationTest {
     private val expressionsWithParentheses = listOf(
         mutableListOf(
             Token("(", TokenTypes.Operator),

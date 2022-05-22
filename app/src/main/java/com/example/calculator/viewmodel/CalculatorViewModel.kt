@@ -1,7 +1,6 @@
 package com.example.calculator.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 
 import com.example.calculator.model.expression.ExpressionEvaluator
 import com.example.calculator.formatter.TokenFormatter
@@ -21,19 +20,21 @@ import kotlinx.coroutines.*
 
 class CalculatorViewModel : ViewModel() {
     private val expression = Expression()
-    private val postfixEvaluator get() = PostfixEvaluator(inputAsTokens as MutableList<Token>)
 
+    private val postfixEvaluator get() = PostfixEvaluator(expression.expression as MutableList<Token>)
 
-    val inputAsTokens: List<Token> get() = expression.expression as MutableList<Token>
+    val inputAsTokens: List<Token> get() = postfixEvaluator.infix
+
     val outputAsToken: Token get() = ExpressionEvaluator(postfixEvaluator).result
 
     val formattedInput: List<String>
         get() = TokenFormatter.convertTokensToStrings(inputAsTokens)
+
     val formattedOutput: String
         get() = TokenFormatter.convertTokenToString(outputAsToken, true)
 
     private val inputSize: Int
-        get() = expression.expression.size
+        get() = inputAsTokens.size
 
     /**
      * Sends [Numbers.Kind] object to [CalculatorViewModel]
@@ -43,7 +44,12 @@ class CalculatorViewModel : ViewModel() {
      * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
     fun add(number: NumberKind, index: Int = inputSize) : Boolean {
-        return expression.add(NumberParser.parse(number), index)
+        val result = expression.add(NumberParser.parse(number), index)
+
+//        if (result)
+//            inputAsTokens = postfixEvaluator.infix
+
+        return result
     }
 
     /**

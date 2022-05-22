@@ -6,7 +6,7 @@ import com.example.calculator.model.token.TokenTypes
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 
-class ExpressionTest {
+class AddParenthesesTest {
     companion object {
         private lateinit var expression: Expression
 

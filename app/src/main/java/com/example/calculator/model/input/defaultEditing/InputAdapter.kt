@@ -41,7 +41,7 @@ open class InputAdapter(
         buttons.equal.setOnClickListener {
             viewModel.saveResult()
             resetSpannableInput()
-            replaceSpan()
+            replaceSpan(what)
         }
 
         buttons.clear.setOnClickListener {
@@ -49,7 +49,7 @@ open class InputAdapter(
                 if (viewModel.formattedInput.lastIndex < 0)
                     resetSpannableInput()
                 else
-                    replaceSpan()
+                    replaceSpan(what)
             }
         }
 
@@ -61,39 +61,39 @@ open class InputAdapter(
         buttons.numbers.forEach { (button, number) ->
             button.setOnClickListener {
                 if (viewModel.add(number))
-                    replaceSpan()
+                    replaceSpan(what)
             }
         }
 
         buttons.operators.forEach { (button, operator) ->
             button.setOnClickListener {
                 if (viewModel.add(operator))
-                    replaceSpan()
+                    replaceSpan(what)
             }
         }
 
         buttons.functions.forEach { (button, function) ->
             button.setOnClickListener {
                 if (viewModel.add(function))
-                    replaceSpan()
+                    replaceSpan(what)
             }
         }
     }
 
-    protected fun replaceSpan() {
+    protected fun replaceSpan(what: Clickable) {
         if (spannable.isEmpty()) {
             for (i in viewModel.inputAsTokens.indices) {
                 index = i
 
-                spannable.replace(oldStart, oldEnd, string)
-                spannable.setSpan(newStart, newEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    spannable.replace(oldStart, oldEnd, string)
+                    spannable.setSpan(what, newStart, newEnd)
+                }
             }
-        }
         else {
             index = viewModel.inputAsTokens.lastIndex
 
             spannable.replace(oldStart, oldEnd, string)
-            spannable.setSpan(newStart, newEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            spannable.setSpan(what, newStart, newEnd)
         }
     }
 
@@ -104,13 +104,12 @@ open class InputAdapter(
         return startingIndex
     }
 
-
     protected fun resetSpannableInput() {
         spannable.clearAll()
     }
 
-    private fun SpannableStringBuilder.setSpan(start: Int, end: Int, flags: Int) {
-        this@setSpan.setSpan(what, start, end, flags)
+    private fun SpannableStringBuilder.setSpan(what: Clickable, start: Int, end: Int) {
+        this@setSpan.setSpan(what, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
         spannableInput.value = this@setSpan
     }
