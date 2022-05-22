@@ -189,6 +189,13 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
                 i++
             }
 
+            if (index + 2 > _infix.lastIndex) {
+                _postfix.clear()
+                _opStack.clear()
+                _postfix.add(NumberParser.parse(NumberKind.NAN))
+                return _infix.size
+            }
+
             if (_infix.subList(index + 2, i - 1).isEmpty())
                 _postfix.add(NumberParser.parse(NumberKind.ZERO))
             else {

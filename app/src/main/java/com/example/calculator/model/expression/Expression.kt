@@ -137,6 +137,7 @@ class Expression {
 
                 return true
             }
+            // Dirty code needs to be fixed...
         } else if ((tokenToEdit.type == TokenTypes.Operator && tokenToEdit != rightParenthesis) || (tokenToEdit.type == TokenTypes.Function && tokenToEdit != FunctionParser.parse(FunctionKind.PERCENTAGE)))
             return _expression.add(token)
 

@@ -33,8 +33,8 @@ object FunctionParser : TokenParser<FunctionKind> {
 
     inline fun <reified T> parse(token: Token): T {
         return when(T::class.java) {
-            FunctionKind::class.java -> map[token] as T ?: throw NoSuchElementException("Operator doesn't exist")
-            Function::class.java -> functionMap[map[token]] as T ?: throw NoSuchElementException("Operator doesn't exist")
+            FunctionKind::class.java -> map[token] as T ?: throw NoSuchElementException("Function doesn't exist")
+            Function::class.java -> functionMap[map[token]] as T ?: throw NoSuchElementException("Function doesn't exist")
             else -> throw Exception("Wrong return Type")
         }
     }

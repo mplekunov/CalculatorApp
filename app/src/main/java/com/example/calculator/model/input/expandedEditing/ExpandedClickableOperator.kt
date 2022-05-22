@@ -29,22 +29,7 @@ class ExpandedClickableOperator(
     }
 
     override fun bindToEditableToken() {
-//        super.bindToEditableToken()
-
-        buttons.functions.forEach { (button, _) ->
-            setButtonState(
-                button,
-                disabledButtonColor,
-                false
-            )
-        }
-        buttons.numbers.forEach { (button, _) ->
-            setButtonState(
-                button,
-                disabledButtonColor,
-                false
-            )
-        }
+        super.bindToEditableToken()
 
         buttons.operators.forEach { (button, operator) ->
             if (operator == OperatorKind.LEFT_BRACKET || operator == OperatorKind.RIGHT_BRACKET)
@@ -58,9 +43,5 @@ class ExpandedClickableOperator(
                 }
             }
         }
-
-        setButtonState(buttons.clear, disabledButtonColor, false)
-        setButtonState(buttons.clearAll, disabledButtonColor, false)
-
     }
 }
