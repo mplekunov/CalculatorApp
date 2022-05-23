@@ -28,6 +28,7 @@ open class InputAdapter(
             string,
             token.toString()
         ) + oldStart
+
     protected val newEnd get() = token.length + newStart
 
     val spannable = spannableInput.value ?: SpannableStringBuilder()

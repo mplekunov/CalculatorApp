@@ -24,23 +24,21 @@
 
             android:src="@drawable/power_ic"/>
 
-        <Button
+        <ImageButton
             android:id="@+id/log"
             style="@style/Widget.Calculator.CalcButton"
 
-            android:text="log"
-            android:fontFamily="sans-serif-condensed"
-            android:textColor="@color/calc_image_button_normal"
-            android:textSize="@dimen/button_ac_text_size" />
+            android:padding="18dp"
 
-        <Button
+            android:src="@drawable/log_ic"/>
+
+        <ImageButton
             android:id="@+id/ln"
             style="@style/Widget.Calculator.CalcButton"
 
-            android:text="ln"
-            android:fontFamily="sans-serif-condensed"
-            android:textColor="@color/calc_image_button_normal"
-            android:textSize="@dimen/button_ac_text_size"/>
+            android:padding="@dimen/btn_padding_expanded"
+
+            android:src="@drawable/ln_ic"/>
 
         <ImageButton
             android:id="@+id/left_parenthesis"
