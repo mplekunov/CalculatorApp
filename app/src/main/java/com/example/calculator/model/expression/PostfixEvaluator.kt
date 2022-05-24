@@ -1,7 +1,6 @@
 package com.example.calculator.model.expression
 
 import com.example.calculator.model.function.FunctionKind
-import com.example.calculator.model.number.Number
 import com.example.calculator.model.number.NumberKind
 import com.example.calculator.model.operator.Associativity
 import com.example.calculator.model.operator.Operator
@@ -14,16 +13,45 @@ import com.example.calculator.parser.OperatorParser
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
+import kotlin.math.log
 
-class PostfixEvaluator(val infix: MutableList<Token>) {
+class PostfixEvaluator(var infix: MutableList<Token>) {
+    private var _infix: MutableList<Token> = mutableListOf<Token>().apply { addAll(infix) }
     private var _postfix: MutableList<Token> = mutableListOf()
     private var _opStack = Stack<Operator>()
 
-    val postfix: List<Token>
-        get() {
-            getPostfix()
-            return _postfix
+    val postfix get() = _postfix
+
+    init {
+        getPostfix()
+    }
+
+    private fun fixParentheses() {
+        val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
+        val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
+
+        var parentheses = 0
+
+        for (i in _infix.indices) {
+            if (_infix[i] == leftParenthesis)
+                parentheses++
+            else if (_infix[i] == rightParenthesis)
+                parentheses--
         }
+
+        while (parentheses > 0) {
+            _infix.add(rightParenthesis)
+            parentheses--
+        }
+    }
+
+    private fun removeUnusedOperators() {
+        val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
+        val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
+
+        while (_infix.size > 0 && _infix.last().type == TokenTypes.Operator && _infix.last() != rightParenthesis && _infix.last() != leftParenthesis)
+            _infix.removeLast()
+    }
 
     /**
      * Converts infix into Postfix.
@@ -31,13 +59,18 @@ class PostfixEvaluator(val infix: MutableList<Token>) {
      * @return [_postfix] representation of a mathematical expression.
      */
     private fun getPostfix() {
-        var i = 0
-        var size = infix.size
-        if (infix[infix.lastIndex].type == TokenTypes.Operator)
-            size = infix.size - 1
+        if (_infix.isEmpty()) {
+            _postfix.add(NumberParser.parse(NumberKind.ZERO))
+            return
+        }
 
-        while (i < size) {
-            i = when (infix[i].type) {
+        removeUnusedOperators()
+
+        fixParentheses()
+
+        var i = 0
+        while (i < _infix.size) {
+            i = when (_infix[i].type) {
                 TokenTypes.Number -> processNumber(i)
                 TokenTypes.Operator -> processOperator(i)
                 TokenTypes.Function -> processFunction(i)
@@ -49,41 +82,35 @@ class PostfixEvaluator(val infix: MutableList<Token>) {
     }
 
     private fun processNumber(index: Int): Int {
-        val token = infix[index]
+        val token = _infix[index]
 
         _postfix.add(token)
         return index + 1
     }
 
     private fun processOperator(index: Int): Int {
-        val token = infix[index]
+        val token = _infix[index]
 
         val kind = OperatorParser.parse<OperatorKind>(token)
 
-        if (index == 0 && index + 1 < infix.size) {
-            return if (kind == OperatorKind.SUBTRACTION || kind == OperatorKind.ADDITION) {
-                val right = BigDecimal(NumberParser.parse<Number>(infix[index + 1]).toString())
+        val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
+        val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
 
-                if (kind == OperatorKind.SUBTRACTION)
-                    _postfix.add(Token("${BigDecimal(0).minus(right)}", TokenTypes.Number))
-                else
-                    _postfix.add(Token("${BigDecimal(0).plus(right)}", TokenTypes.Number))
-
-                index + 2
-            } else {
-                _postfix = mutableListOf(NumberParser.parse(NumberKind.NAN))
-                infix.size
-            }
+        if ((index == 0 || _infix[index - 1] == leftParenthesis) && index + 1 < _infix.size && _infix[index] != leftParenthesis && _infix[index] != rightParenthesis) {
+            if (kind == OperatorKind.SUBTRACTION || kind == OperatorKind.ADDITION)
+                _postfix.add(NumberParser.parse(NumberKind.ZERO))
+            else
+                return processError()
         }
 
         when (kind) {
             OperatorKind.LEFT_BRACKET -> _opStack.push(OperatorParser.parse(token))
             OperatorKind.RIGHT_BRACKET -> {
-
-                while (_opStack.peek() != OperatorParser.parse(OperatorKind.LEFT_BRACKET))
+                while (_opStack.isNotEmpty() && _opStack.peek() != OperatorParser.parse(OperatorKind.LEFT_BRACKET))
                     _postfix.add(_opStack.pop() as Operator)
 
-                _opStack.pop()
+                if (_opStack.isNotEmpty())
+                    _opStack.pop()
             }
             else -> {
                 while (_opStack.isNotEmpty()
@@ -100,7 +127,7 @@ class PostfixEvaluator(val infix: MutableList<Token>) {
     }
 
     private fun processFunction(index: Int): Int {
-        val token = infix[index]
+        val token = _infix[index]
 
         if (token == FunctionParser.parse(FunctionKind.PERCENTAGE)) {
             val first = BigDecimal(_postfix.removeLast().toString()).setScale(10, RoundingMode.HALF_UP)
@@ -110,19 +137,32 @@ class PostfixEvaluator(val infix: MutableList<Token>) {
             if (_postfix.isNotEmpty()) {
                 val lastKnownOperator = _opStack.peek()
 
-                var last = _postfix.last()
 
-                if (_postfix.lastIndex - 1 >= 0 && last.type == TokenTypes.Operator)
-                    last = _postfix[_postfix.lastIndex - 1]
 
-                val lastKnownNumber = BigDecimal(last.toString()).setScale(10, RoundingMode.HALF_UP)
+                var i = _postfix.lastIndex
+                while (i >= 0 && _postfix[i].type != TokenTypes.Number)
+                    i--
+
+                val last = if (_postfix[i].type == TokenTypes.Number)
+                    _postfix[i]
+                else
+                    NumberParser.parse(NumberKind.ZERO)
+
+                var lastKnownNumber = BigDecimal(last.toString()).setScale(10, RoundingMode.HALF_UP)
 
                 percentage =
-                    if (lastKnownOperator == OperatorParser.parse(OperatorKind.SUBTRACTION) || lastKnownOperator == OperatorParser.parse(
-                            OperatorKind.ADDITION
-                        )
-                    )
+                    if (lastKnownOperator == OperatorParser.parse(OperatorKind.SUBTRACTION) ||
+                        lastKnownOperator == OperatorParser.parse(OperatorKind.ADDITION)) {
+
+                        if (lastKnownNumber.toDouble() == 0.0) {
+                            lastKnownNumber = if (lastKnownOperator == OperatorParser.parse(OperatorKind.SUBTRACTION))
+                                lastKnownNumber.minus(first)
+                            else
+                                lastKnownNumber.plus(first)
+                        }
+
                         lastKnownNumber.multiply(percentage)
+                    }
                     else
                         percentage
             }
@@ -130,16 +170,91 @@ class PostfixEvaluator(val infix: MutableList<Token>) {
             percentage = percentage.stripTrailingZeros()
 
             infix.removeLast()
+            _infix.removeLast()
+
             if (percentage < BigDecimal.ZERO)
-                infix[infix.lastIndex] =
+                _infix[_infix.lastIndex] =
                     Token(percentage.times(BigDecimal("-1")).toPlainString(), TokenTypes.Number)
             else
-                infix[infix.lastIndex] = Token(percentage.toPlainString(), TokenTypes.Number)
+                _infix[_infix.lastIndex] = Token(percentage.toPlainString(), TokenTypes.Number)
+
+            infix[infix.lastIndex] = _infix[_infix.lastIndex]
 
             _postfix.add(Token(percentage.toPlainString(), TokenTypes.Number))
         }
+        else if (token == FunctionParser.parse(FunctionKind.NATURAL_LOG)) {
+            val start = index + 2
+            var end = getEndOfFunctionBody(start, infix)
+
+            if (start > infix.lastIndex)
+                return processError()
+            else {
+                val postfixEvaluator = PostfixEvaluator(infix.subList(start, end))
+                val expression = ExpressionEvaluator(postfixEvaluator)
+
+                infix.replaceRange(start, postfixEvaluator.infix)
+
+                val result = expression.result
+
+                if (result == NumberParser.parse(NumberKind.NAN) || result.toString().toDouble() <= 0)
+                    return processError()
+
+                _postfix.add(Token(log(result.toString().toDouble(), Math.E).toString(), TokenTypes.Number))
+
+                end = getEndOfFunctionBody(start, _infix)
+
+                return end + 1
+            }
+        }
 
         return index + 1
+    }
+
+    private fun getEndOfFunctionBody(start: Int, source: List<Token>): Int {
+        val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
+        val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
+
+        var parenthesis = 1
+
+        var i = start
+        while (i < source.size) {
+            if (source[i] == leftParenthesis)
+                parenthesis++
+            else if (source[i] == rightParenthesis)
+                parenthesis--
+
+            if (parenthesis == 0)
+                break
+
+            i++
+        }
+
+        return i
+    }
+
+    private fun processError(): Int {
+        _postfix.clear()
+        _opStack.clear()
+        _postfix.add(NumberParser.parse(NumberKind.NAN))
+        return _infix.size
+    }
+
+    private fun MutableList<Token>.replaceRange(start: Int, source: MutableList<Token>) {
+        val newInfix = mutableListOf<Token>()
+
+        for (i in 0 until start)
+            newInfix.add(this[i])
+
+        for (i in start until start + source.size)
+            newInfix.add(source[i - start])
+
+        for (i in start + source.size until this.size) {
+            if (this[i] != FunctionParser.parse(FunctionKind.PERCENTAGE))
+                newInfix.add(this[i])
+        }
+
+        this.clear()
+        this.addAll(newInfix)
     }
 
     /**

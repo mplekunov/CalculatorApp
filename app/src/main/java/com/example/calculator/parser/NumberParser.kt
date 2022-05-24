@@ -24,7 +24,9 @@ object NumberParser : TokenParser<NumberKind> {
             Token("E", TokenTypes.Number) to NumberKind.EXPONENT,
             Token("-", TokenTypes.Number) to NumberKind.NEGATIVE,
             Token(Double.POSITIVE_INFINITY.toString(), TokenTypes.Number) to NumberKind.INFINITY,
-            Token("NaN", TokenTypes.Number) to NumberKind.NAN
+            Token("NaN", TokenTypes.Number) to NumberKind.NAN,
+            Token(Math.PI.toString(), TokenTypes.Number) to NumberKind.PI,
+            Token(Math.E.toString(), TokenTypes.Number) to NumberKind.EPSILON
         )) }
 
     override fun parse(input: NumberKind): Token {

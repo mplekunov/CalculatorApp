@@ -65,7 +65,6 @@ class CalculatorFragment : Fragment() {
         // Adds Default layout and assigns binding to default DataViewBinding object
         binding?.calculatorLayout?.addView(defaultCalculatorBinding!!.root)
 
-
         // initializes default InputAdapter
         initDefaultBindings()
 
@@ -98,15 +97,20 @@ class CalculatorFragment : Fragment() {
     }
 
     private fun initExpandedBindings() {
+        buttons.changeLayout = expandedCalculatorBinding?.changeLayout!!
+
         buttons.functions = mutableMapOf(
-            expandedCalculatorBinding?.percent!! to FunctionKind.PERCENTAGE
+            expandedCalculatorBinding?.percent!! to FunctionKind.PERCENTAGE,
+            expandedCalculatorBinding?.ln!! to FunctionKind.NATURAL_LOG
         )
 
         buttons.operators = mutableMapOf(
             expandedCalculatorBinding?.add!! to OperatorKind.ADDITION,
             expandedCalculatorBinding?.subtract!! to OperatorKind.SUBTRACTION,
             expandedCalculatorBinding?.multiply!! to OperatorKind.MULTIPLICATION,
-            expandedCalculatorBinding?.divide!! to OperatorKind.DIVISION
+            expandedCalculatorBinding?.divide!! to OperatorKind.DIVISION,
+            expandedCalculatorBinding?.leftParenthesis!! to OperatorKind.LEFT_BRACKET,
+            expandedCalculatorBinding?.rightParenthesis!! to OperatorKind.RIGHT_BRACKET
         )
 
         buttons.numbers = mutableMapOf(
@@ -130,10 +134,12 @@ class CalculatorFragment : Fragment() {
         buttons.equal = expandedCalculatorBinding?.equal!!
 
         expandedInputAdapter = ExpandedInputAdapter(requireContext(), buttons, viewModel, liveInput)
-        defaultInputAdapter.setBindings()
+        expandedInputAdapter.setBindings()
     }
 
     private fun initDefaultBindings() {
+        buttons.changeLayout = defaultCalculatorBinding?.changeLayout!!
+
         buttons.functions = mutableMapOf(
             defaultCalculatorBinding?.percent!! to FunctionKind.PERCENTAGE
         )

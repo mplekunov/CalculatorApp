@@ -5,11 +5,16 @@
     <color name="yellow_dark">#c17900</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="calc_button_pressed">#bcbcbc</color>
     <color name="grey">#757575</color>
-    <color name="calc_image_button_normal">@android:color/holo_orange_dark</color>
-    <color name="highlighted_text"> </color>
-    <color name="default_text"> </color>
+
+    <color name="calc_button_pressed">#bcbcbc</color>
+    <color name="calc_default_function_button">@android:color/holo_orange_dark</color>
+    <color name="calc_default_operation_button">@android:color/holo_orange_dark</color>
+    <color name="calc_default_number_button">@android:color/white</color>
+
+    <color name="highlighted_text">@android:color/holo_orange_dark </color>
+    <color name="default_text">@android:color/white</color>
+
     <color name="enabled_button"> </color>
     <color name="disabled_button"> </color>
 </resources>

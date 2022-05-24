@@ -1,13 +1,13 @@
 package com.example.calculator.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 
 import com.example.calculator.model.expression.ExpressionEvaluator
 import com.example.calculator.formatter.TokenFormatter
 
 import com.example.calculator.model.token.Token
 import com.example.calculator.model.expression.Expression
+import com.example.calculator.model.expression.PostfixEvaluator
 import com.example.calculator.model.function.FunctionKind
 import com.example.calculator.model.number.NumberKind
 import com.example.calculator.model.operator.OperatorKind
@@ -21,16 +21,20 @@ import kotlinx.coroutines.*
 class CalculatorViewModel : ViewModel() {
     private val expression = Expression()
 
-    val inputAsTokens: List<Token> get() = expression.expression as MutableList<Token>
-    val outputAsToken: Token get() = expression.result
+    private val postfixEvaluator get() = PostfixEvaluator(expression.expression as MutableList<Token>)
+
+    val inputAsTokens: List<Token> get() = postfixEvaluator.infix
+
+    val outputAsToken: Token get() = ExpressionEvaluator(postfixEvaluator).result
 
     val formattedInput: List<String>
         get() = TokenFormatter.convertTokensToStrings(inputAsTokens)
+
     val formattedOutput: String
         get() = TokenFormatter.convertTokenToString(outputAsToken, true)
 
     private val inputSize: Int
-        get() = expression.expression.size
+        get() = inputAsTokens.size
 
     /**
      * Sends [Numbers.Kind] object to [CalculatorViewModel]

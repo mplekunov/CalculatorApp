@@ -16,7 +16,7 @@ import java.util.*
 /**
  * Helper class that evaluates [Expression].
  */
-class ExpressionEvaluator(var expression: MutableList<Token>) {
+class ExpressionEvaluator(private val postfixEvaluator: PostfixEvaluator) {
     var result: Token
 
     init {
@@ -28,18 +28,21 @@ class ExpressionEvaluator(var expression: MutableList<Token>) {
      * @param expression as a collection of [Token].
      * @return [Token] containing result of computation.
      */
-    private fun calculateResult() : Token {
-        if (expression.isEmpty())
-            return NumberParser.parse(NumberKind.ZERO)
 
-        val postfixEvaluator = PostfixEvaluator(expression)
+    private fun isError(token: Token): Boolean {
+        return token == NumberParser.parse(NumberKind.NAN)
+    }
+
+    private fun calculateResult() : Token {
         val postfix = postfixEvaluator.postfix
-        expression = postfixEvaluator.infix
 
         val s = Stack<Token>()
 
         for (i in postfix.indices) {
             val token = postfix[i]
+
+            if (isError(token))
+                return NumberParser.parse(NumberKind.NAN)
 
             if (token.type == TokenTypes.Number)
                 s.push(token)
@@ -49,8 +52,11 @@ class ExpressionEvaluator(var expression: MutableList<Token>) {
                 if (s.isEmpty())
                     break
 
+                var left = BigDecimal.ZERO
                 val right = BigDecimal(NumberParser.parse<Number>(s.pop()).toString()).setScale(10, RoundingMode.HALF_UP)
-                val left = BigDecimal(NumberParser.parse<Number>(s.pop()).toString()).setScale(10, RoundingMode.HALF_UP)
+
+                if (s.isNotEmpty())
+                    left = BigDecimal(NumberParser.parse<Number>(s.pop()).toString()).setScale(10, RoundingMode.HALF_UP)
 
                 val result = when(OperatorParser.parse(token) as Operator) {
                     OperatorParser.parse(OperatorKind.ADDITION) -> addition(left, right)

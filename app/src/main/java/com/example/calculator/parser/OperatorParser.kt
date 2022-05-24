@@ -16,7 +16,9 @@ object OperatorParser: TokenParser<OperatorKind> {
             Token("-", TokenTypes.Operator) to OperatorKind.SUBTRACTION,
             Token("/", TokenTypes.Operator) to OperatorKind.DIVISION,
             Token("*", TokenTypes.Operator) to OperatorKind.MULTIPLICATION,
-            Token("^", TokenTypes.Operator) to OperatorKind.POWER
+            Token("^", TokenTypes.Operator) to OperatorKind.POWER,
+            Token("(", TokenTypes.Operator) to OperatorKind.LEFT_BRACKET,
+            Token(")", TokenTypes.Operator) to OperatorKind.RIGHT_BRACKET
         )) }
 
     @PublishedApi
@@ -25,7 +27,9 @@ object OperatorParser: TokenParser<OperatorKind> {
         OperatorKind.SUBTRACTION to Operator(map[OperatorKind.SUBTRACTION].toString(), Associativity.LEFT, 0),
         OperatorKind.MULTIPLICATION to Operator(map[OperatorKind.MULTIPLICATION].toString(), Associativity.LEFT, 5),
         OperatorKind.DIVISION to Operator(map[OperatorKind.DIVISION].toString(), Associativity.LEFT, 5),
-        OperatorKind.POWER to Operator(map[OperatorKind.POWER].toString(), Associativity.RIGHT, 10)
+        OperatorKind.POWER to Operator(map[OperatorKind.POWER].toString(), Associativity.RIGHT, 10),
+        OperatorKind.LEFT_BRACKET to Operator(map[OperatorKind.LEFT_BRACKET].toString(), Associativity.LEFT, -1),
+        OperatorKind.RIGHT_BRACKET to Operator(map[OperatorKind.RIGHT_BRACKET].toString(), Associativity.LEFT, -1)
     )
 
     override fun parse(input: OperatorKind): Token {
