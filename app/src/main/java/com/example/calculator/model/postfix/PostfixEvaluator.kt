@@ -182,7 +182,16 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
         // If _postfix is not empty... then there was a percent expression in the format:
         // parent_number +or-or*or/ percent_number %
         if (_postfix.isNotEmpty()) {
+            val tempStack = Stack<Operator>()
+
+            while (_opStack.isNotEmpty() && isParenthesis(_opStack.peek()))
+                tempStack.push(_opStack.pop())
+
             val lastKnownOperator = _opStack.peek()
+
+            while (tempStack.isNotEmpty())
+                _opStack.push(tempStack.pop())
+
 
             // Finds parent_number in the postfix expression that
             var i = _postfix.lastIndex
@@ -220,20 +229,20 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
 
         // We have to remove percent sign from both, infix and _infix
         infix.removeLast()
-        _infix.removeLast()
+        _infix.removeAt(index)
 
         // We have to make an in-place replacement of the "percent_number %" part for the calculated result
         if (percentage < BigDecimal.ZERO)
-            _infix[_infix.lastIndex] =
+            _infix[index - 1] =
                 Token(percentage.times(BigDecimal("-1")).toPlainString(), TokenTypes.Number)
         else
-            _infix[_infix.lastIndex] = Token(percentage.toPlainString(), TokenTypes.Number)
+            _infix[index - 1] = Token(percentage.toPlainString(), TokenTypes.Number)
 
-        infix[infix.lastIndex] = _infix[_infix.lastIndex]
+        infix[infix.lastIndex] = _infix[index - 1]
 
         _postfix.add(Token(percentage.toPlainString(), TokenTypes.Number))
 
-        return index + 1
+        return index
     }
 
     /**
