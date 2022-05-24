@@ -43,13 +43,6 @@ open class InputAdapter(
                     spannableInput,
                     index
                 )
-//                TokenTypes.Function -> ClickableFunction(
-//                    context,
-//                    buttons,
-//                    viewModel,
-//                    spannableInput,
-//                    index
-//                )
                 TokenTypes.Operator -> ClickableOperator(
                     context,
                     buttons,
@@ -62,9 +55,6 @@ open class InputAdapter(
         }
 
     open fun setBindings() {
-//        resetSpannableInput()
-//        setSpan()
-
         buttons.equal.setOnClickListener {
             viewModel.saveResult()
             resetSpannableInput()

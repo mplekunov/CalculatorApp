@@ -25,6 +25,8 @@ object FunctionParser : TokenParser<FunctionKind> {
     internal val functionMap = mutableMapOf(
         FunctionKind.PERCENTAGE to Function(map[FunctionKind.PERCENTAGE].toString(), FunctionBody.LEFT_SIDE),
         FunctionKind.NATURAL_LOG to Function(map[FunctionKind.NATURAL_LOG].toString(), FunctionBody.RIGHT_SIDE),
+        FunctionKind.LOG to Function(map[FunctionKind.LOG].toString(), FunctionBody.RIGHT_SIDE),
+        FunctionKind.SQUARE_ROOT to Function(map[FunctionKind.SQUARE_ROOT].toString(), FunctionBody.RIGHT_SIDE)
     )
 
     override fun parse(input: FunctionKind): Token {

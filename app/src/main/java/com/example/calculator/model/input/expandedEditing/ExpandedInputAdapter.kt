@@ -1,11 +1,13 @@
 package com.example.calculator.model.input.expandedEditing
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.DynamicDrawableSpan
 import android.text.style.ImageSpan
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import com.example.calculator.R
@@ -22,6 +24,7 @@ import com.example.calculator.model.wrapper.Buttons
 import com.example.calculator.parser.FunctionParser
 import com.example.calculator.parser.NumberParser
 import com.example.calculator.parser.OperatorParser
+import com.example.calculator.view.CalculatorFragment
 import com.example.calculator.viewmodel.CalculatorViewModel
 
 class ExpandedInputAdapter(
@@ -66,9 +69,8 @@ class ExpandedInputAdapter(
 
         buttons.functions.forEach { (button, function) ->
             button.setOnClickListener {
-                if (viewModel.add(function)) {
+                if (viewModel.add(function))
                     setSpan()
-                }
             }
         }
     }
@@ -100,7 +102,6 @@ class ExpandedInputAdapter(
         }
     }
 
-
     private fun setDrawableSpan() {
         spannable.replace(oldStart, oldEnd, string)
 
@@ -111,13 +112,17 @@ class ExpandedInputAdapter(
         }
 
         drawable.setTint(ContextCompat.getColor(context, R.color.white))
-        drawable.setBounds(0, 0, 80, 80)
+        val size: Int = (context as Activity).findViewById<TextView>(R.id.input).textSize.toInt()
+        drawable.setBounds(0, 0,  size - 15, size - 15)
+
+        if (FunctionParser.parse<FunctionKind>(token) == FunctionKind.LOG)
+            drawable.setBounds(0, 0, size + 45, size + 12)
 
 
         spannable.setSpan(
             ImageSpan(
                 drawable,
-                DynamicDrawableSpan.ALIGN_BASELINE
+                DynamicDrawableSpan.ALIGN_CENTER
             ), newStart, newEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
 

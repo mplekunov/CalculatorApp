@@ -15,6 +15,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
 import kotlin.math.log
+import kotlin.math.sqrt
 
 class PostfixEvaluator(var infix: MutableList<Token>) {
     private var _infix: MutableList<Token> = mutableListOf<Token>().apply { addAll(infix) }
@@ -98,7 +99,7 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
         return index + 1
     }
 
-    private fun isParenthesis(token: Token) : Boolean {
+    private fun isParenthesis(token: Token): Boolean {
         val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
         val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
 
@@ -123,7 +124,10 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
         // "new" expression is an expression defined by two rules:
         // 1. Beginning of the complete expression (e.g. "- 2", "+ 2")
         // 2. Beginning of an expression defined by parentheses (e.g. "(- 2)", "(+ 2)")
-        if ((index == 0 || prevToken == leftParenthesis) && index + 1 < _infix.size && !isParenthesis(token)) {
+        if ((index == 0 || prevToken == leftParenthesis) && index + 1 < _infix.size && !isParenthesis(
+                token
+            )
+        ) {
             if (operatorKind == OperatorKind.SUBTRACTION || operatorKind == OperatorKind.ADDITION)
                 _postfix.add(NumberParser.parse(NumberKind.ZERO))
             else
@@ -140,7 +144,10 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
                     _opStack.pop()
             }
             else -> {
-                while (_opStack.isNotEmpty() && isAssociativeRule(OperatorParser.parse(token), _opStack.peek())
+                while (_opStack.isNotEmpty() && isAssociativeRule(
+                        OperatorParser.parse(token),
+                        _opStack.peek()
+                    )
                 ) {
                     _postfix.add(OperatorParser.parse(_opStack.pop()) as Operator)
                 }
@@ -158,14 +165,80 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
      * @return [index] of the next element in [_infix]
      */
     private fun processFunction(index: Int): Int {
-        val token = _infix[index]
+        return when (_infix[index]) {
+            FunctionParser.parse(FunctionKind.PERCENTAGE) -> processPercent(index)
+            FunctionParser.parse(FunctionKind.NATURAL_LOG) -> processLogarithm(index, Math.E)
+            FunctionParser.parse(FunctionKind.LOG) -> processLogarithm(index, 10.0)
+            FunctionParser.parse(FunctionKind.SQUARE_ROOT) -> processSquareRoot(index)
+            else -> processError()
+        }
+    }
 
-        if (token == FunctionParser.parse(FunctionKind.PERCENTAGE))
-            return processPercent(index)
-        else if (token == FunctionParser.parse(FunctionKind.NATURAL_LOG))
-            return processNaturalLogarithm(index)
+    /**
+     * Process square root in [_infix] at specified position.
+     * @param [index] position of an element in [_infix]
+     * @return [index] of the next element in [_infix]
+     */
+    private fun processSquareRoot(index: Int): Int {
+        val start = index + 2
+        var end = getEndOfFunctionBody(start, infix)
 
-        return processError()
+        // When start > lastIndex it means we have an empty body... Therefore we return NaN
+        if (start > infix.lastIndex)
+            return processError()
+
+        // Calculates postfix of the "body" of the function
+        val postfixEvaluator = PostfixEvaluator(infix.subList(start, end))
+        val expression = ExpressionEvaluator(postfixEvaluator)
+
+        // Replaces current body of the function for its infix calculated/transformed by postfixEvaluator
+        infix.replaceRange(start, infix.size, postfixEvaluator.infix)
+
+        val result = expression.result
+
+        // Natural logarithm can't evaluate NaN and can't be <= 0
+        if (result == NumberParser.parse(NumberKind.NAN) ||  result.toString().toDouble() < 0)
+            return processError()
+
+        _postfix.add(Token(sqrt(result.toString().toDouble()).toString(), TokenTypes.Number))
+
+        // We need to know the "end" of the function body with respect of _infix
+        end = getEndOfFunctionBody(start, _infix)
+
+        return end + 1
+    }
+
+    /**
+     * Process logarithm function in [_infix] at specified position with specified [base].
+     * @param [index] position of an element in [_infix]
+     * @return [index] of the next element in [_infix]
+     */
+    private fun processLogarithm(index: Int, base: Double): Int {
+        val start = index + 2
+        var end = getEndOfFunctionBody(start, infix)
+
+        // When start > lastIndex it means we have an empty body... Therefore we return NaN
+        if (start > infix.lastIndex)
+            return processError()
+        // Calculates postfix of the "body" of the function
+        val postfixEvaluator = PostfixEvaluator(infix.subList(start, end))
+        val expression = ExpressionEvaluator(postfixEvaluator)
+
+        // Replaces current body of the function for its infix calculated/transformed by postfixEvaluator
+        infix.replaceRange(start, infix.size, postfixEvaluator.infix)
+
+        val result = expression.result
+
+        // Natural logarithm can't evaluate NaN and can't be <= 0
+        if (result == NumberParser.parse(NumberKind.NAN) || result.toString().toDouble() <= 0)
+            return processError()
+
+        _postfix.add(Token(log(result.toString().toDouble(), base).toString(), TokenTypes.Number))
+
+        // We need to know the "end" of the function body with respect of _infix
+        end = getEndOfFunctionBody(start, _infix)
+
+        return end + 1
     }
 
     /**
@@ -210,18 +283,19 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
 
             percentage =
                 if (lastKnownOperator == OperatorParser.parse(OperatorKind.SUBTRACTION) ||
-                    lastKnownOperator == OperatorParser.parse(OperatorKind.ADDITION)) {
+                    lastKnownOperator == OperatorParser.parse(OperatorKind.ADDITION)
+                ) {
 
                     if (lastKnownNumber.toDouble() == 0.0) {
-                        lastKnownNumber = if (lastKnownOperator == OperatorParser.parse(OperatorKind.SUBTRACTION))
-                            lastKnownNumber.minus(first)
-                        else
-                            lastKnownNumber.plus(first)
+                        lastKnownNumber =
+                            if (lastKnownOperator == OperatorParser.parse(OperatorKind.SUBTRACTION))
+                                lastKnownNumber.minus(first)
+                            else
+                                lastKnownNumber.plus(first)
                     }
 
                     lastKnownNumber.multiply(percentage)
-                }
-                else
+                } else
                     percentage
         }
 
@@ -245,40 +319,39 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
         return index
     }
 
-    /**
-     * Process natural logarithm function in [_infix] at specified position.
-     * @param [index] position of an element in [_infix]
-     * @return [index] of the next element in [_infix]
-     */
-    private fun processNaturalLogarithm(index: Int): Int {
-        val start = index + 2
-        var end = getEndOfFunctionBody(start, infix)
-
-        // When start > lastIndex it means we have an empty body... Therefore we return NaN
-        if (start > infix.lastIndex)
-            return processError()
-        else {
-            // Calculates postfix of the "body" of the function
-            val postfixEvaluator = PostfixEvaluator(infix.subList(start, end))
-            val expression = ExpressionEvaluator(postfixEvaluator)
-
-            // Replaces current body of the function for its infix calculated/transformed by postfixEvaluator
-            infix.replaceRange(start, infix.size, postfixEvaluator.infix)
-
-            val result = expression.result
-
-            // Natural logarithm can't evaluate NaN and can't be <= 0
-            if (result == NumberParser.parse(NumberKind.NAN) || result.toString().toDouble() <= 0)
-                return processError()
-
-            _postfix.add(Token(log(result.toString().toDouble(), Math.E).toString(), TokenTypes.Number))
-
-            // We need to know the "end" of the function body with respect of _infix
-            end = getEndOfFunctionBody(start, _infix)
-
-            return end + 1
-        }
-    }
+//    /**
+//     * Process natural logarithm function in [_infix] at specified position.
+//     * @param [index] position of an element in [_infix]
+//     * @return [index] of the next element in [_infix]
+//     */
+//    private fun processNaturalLogarithm(index: Int): Int {
+//        val start = index + 2
+//        var end = getEndOfFunctionBody(start, infix)
+//
+//        // When start > lastIndex it means we have an empty body... Therefore we return NaN
+//        if (start > infix.lastIndex)
+//            return processError()
+//
+//        // Calculates postfix of the "body" of the function
+//        val postfixEvaluator = PostfixEvaluator(infix.subList(start, end))
+//        val expression = ExpressionEvaluator(postfixEvaluator)
+//
+//        // Replaces current body of the function for its infix calculated/transformed by postfixEvaluator
+//        infix.replaceRange(start, infix.size, postfixEvaluator.infix)
+//
+//        val result = expression.result
+//
+//        // Natural logarithm can't evaluate NaN and can't be <= 0
+//        if (result == NumberParser.parse(NumberKind.NAN) || result.toString().toDouble() <= 0)
+//            return processError()
+//
+//        _postfix.add(Token(log(result.toString().toDouble(), Math.E).toString(), TokenTypes.Number))
+//
+//        // We need to know the "end" of the function body with respect of _infix
+//        end = getEndOfFunctionBody(start, _infix)
+//
+//        return end + 1
+//    }
 
     /**
      * Calculates the end of the function body.
