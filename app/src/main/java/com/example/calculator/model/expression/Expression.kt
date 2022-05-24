@@ -3,6 +3,7 @@ package com.example.calculator.model.expression
 import com.example.calculator.model.function.Function
 import com.example.calculator.model.function.FunctionBody
 import com.example.calculator.model.function.FunctionKind
+import com.example.calculator.model.number.Number
 import com.example.calculator.model.number.NumberKind
 import com.example.calculator.model.operator.Operator
 import com.example.calculator.model.operator.OperatorKind
@@ -131,10 +132,13 @@ class Expression {
                 _expression[index] = token
                 return true
             }
+            else if (NumberParser.parse<Number>(token).isConstant) {
+                _expression[index] = token
+                return true
+            }
             // There should be a limit to the number length
             else if (tokenToEdit.length < _tokenLengthLimit) {
                 _expression[index] += token
-
                 return true
             }
             // Dirty code needs to be fixed...

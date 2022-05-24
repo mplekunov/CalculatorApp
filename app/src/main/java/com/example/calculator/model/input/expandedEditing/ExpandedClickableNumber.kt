@@ -32,9 +32,9 @@ class ExpandedClickableNumber(
             }
         }
 
-        buttons.numbers.forEach { (button, number) ->
-            if (number == NumberKind.EPSILON || number == NumberKind.PI)
-                setButtonState(button, disabledButtonColor, false)
-        }
+//        buttons.numbers.forEach { (button, number) ->
+//            if (number == NumberKind.EPSILON || number == NumberKind.PI)
+//                setButtonState(button, disabledButtonColor, false)
+//        }
     }
 }
