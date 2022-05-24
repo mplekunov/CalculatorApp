@@ -189,12 +189,12 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
         infix.removeLast()
         _infix.removeAt(index)
 
-        _infix[index - 1] = Token(factorial.toString(), TokenTypes.Number)
+        _infix[index - 1] = Token(factorial.stripTrailingZeros(), TokenTypes.Number)
         infix[infix.lastIndex] = _infix[index - 1]
 
         _postfix.add(infix.last())
 
-            return index
+        return index
     }
 
 
@@ -363,40 +363,6 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
 
         return index
     }
-
-//    /**
-//     * Process natural logarithm function in [_infix] at specified position.
-//     * @param [index] position of an element in [_infix]
-//     * @return [index] of the next element in [_infix]
-//     */
-//    private fun processNaturalLogarithm(index: Int): Int {
-//        val start = index + 2
-//        var end = getEndOfFunctionBody(start, infix)
-//
-//        // When start > lastIndex it means we have an empty body... Therefore we return NaN
-//        if (start > infix.lastIndex)
-//            return processError()
-//
-//        // Calculates postfix of the "body" of the function
-//        val postfixEvaluator = PostfixEvaluator(infix.subList(start, end))
-//        val expression = ExpressionEvaluator(postfixEvaluator)
-//
-//        // Replaces current body of the function for its infix calculated/transformed by postfixEvaluator
-//        infix.replaceRange(start, infix.size, postfixEvaluator.infix)
-//
-//        val result = expression.result
-//
-//        // Natural logarithm can't evaluate NaN and can't be <= 0
-//        if (result == NumberParser.parse(NumberKind.NAN) || result.toString().toDouble() <= 0)
-//            return processError()
-//
-//        _postfix.add(Token(log(result.toString().toDouble(), Math.E).toString(), TokenTypes.Number))
-//
-//        // We need to know the "end" of the function body with respect of _infix
-//        end = getEndOfFunctionBody(start, _infix)
-//
-//        return end + 1
-//    }
 
     /**
      * Calculates the end of the function body.
