@@ -7,7 +7,7 @@ import com.example.calculator.formatter.TokenFormatter
 
 import com.example.calculator.model.token.Token
 import com.example.calculator.model.expression.Expression
-import com.example.calculator.model.expression.PostfixEvaluator
+import com.example.calculator.model.postfix.PostfixEvaluator
 import com.example.calculator.model.function.FunctionKind
 import com.example.calculator.model.number.NumberKind
 import com.example.calculator.model.operator.OperatorKind

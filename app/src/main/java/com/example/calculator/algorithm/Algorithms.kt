@@ -7,27 +7,6 @@ object Algorithms {
 
         var start = 0
 
-        // O(n^2)
-//        for (i in 0..source.length step 1) {
-//            var k = 0
-//
-//            for (j in start..i step 1) {
-//                if (source[j] != pattern[k]) {
-//                    start =
-//                        if (source[j] != pattern[0])
-//                            j + 1
-//                        else
-//                            j
-//
-//                    break
-//                }
-//                else k++
-//            }
-//
-//            if (k == pattern.length)
-//                return start
-//        }
-
         // O(n)
         var k = 0
         for (i in 0..source.length step 1) {

@@ -37,6 +37,7 @@ class ExpandedClickableOperator(
 
             button.setOnClickListener {
                 oldString = viewModel.formattedInput[index]
+
                 if (viewModel.set(operator, index)) {
                     replaceSpan(viewModel.formattedInput[index])
                     applyColorToSpan(highlightedColor, newStart, newEnd)

@@ -1,8 +1,8 @@
 package com.example.calculator.model.expression
 
+import com.example.calculator.model.postfix.PostfixEvaluator
 import com.example.calculator.model.token.TokenTypes
 
-import com.example.calculator.model.number.Number
 import com.example.calculator.model.number.NumberKind
 import com.example.calculator.model.operator.Operator
 import com.example.calculator.model.operator.OperatorKind
@@ -22,17 +22,19 @@ class ExpressionEvaluator(private val postfixEvaluator: PostfixEvaluator) {
     init {
         result = calculateResult()
     }
+
+
+    /**
+     * Checks if [token] is a non-applicable-number
+     */
+    private fun isError(token: Token): Boolean = token == NumberParser.parse(NumberKind.NAN)
+
     /**
      * Computes result of a mathematical expression.
      *
      * @param expression as a collection of [Token].
      * @return [Token] containing result of computation.
      */
-
-    private fun isError(token: Token): Boolean {
-        return token == NumberParser.parse(NumberKind.NAN)
-    }
-
     private fun calculateResult() : Token {
         val postfix = postfixEvaluator.postfix
 
@@ -47,16 +49,17 @@ class ExpressionEvaluator(private val postfixEvaluator: PostfixEvaluator) {
             if (token.type == TokenTypes.Number)
                 s.push(token)
             else if (token.type == TokenTypes.Operator) {
-                // All operators require 2 operands, therefore if we don't have two operands in our stack
-                // We can't calculate the result of an expression
+                // If stack is empty, we can't evaluate expression
                 if (s.isEmpty())
                     break
 
+                // All operators require 2 operands, therefore if we don't have two operands in our stack
+                // We can't calculate the result of an expression
                 var left = BigDecimal.ZERO
-                val right = BigDecimal(s.pop().toString()).setScale(10, RoundingMode.HALF_UP)
+                val right = BigDecimal(s.pop().toString())
 
                 if (s.isNotEmpty())
-                    left = BigDecimal(s.pop().toString()).setScale(10, RoundingMode.HALF_UP)
+                    left = BigDecimal(s.pop().toString())
 
                 val result = when(OperatorParser.parse(token) as Operator) {
                     OperatorParser.parse(OperatorKind.ADDITION) -> addition(left, right)
