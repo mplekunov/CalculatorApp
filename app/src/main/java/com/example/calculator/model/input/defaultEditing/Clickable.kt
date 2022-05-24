@@ -7,10 +7,14 @@ import android.text.SpannableStringBuilder
 import android.text.TextPaint
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
+import android.util.TypedValue
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
+import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.lifecycle.MutableLiveData
@@ -29,16 +33,16 @@ abstract class Clickable(
     protected val spannable get() = liveInput.value ?: SpannableStringBuilder()
 
 
-    open var highlightedColor: Int = ResourcesCompat.getColor(context.resources, R.color.yellow_dark, context.theme)
-    open var defaultTextColor: Int = ResourcesCompat.getColor(context.resources, R.color.white, context.theme)
+    open var highlightedColor: Int = ResourcesCompat.getColor(context.resources, R.color.highlighted_text, context.theme)
+    open var defaultTextColor: Int = ResourcesCompat.getColor(context.resources, R.color.default_text, context.theme)
 
-    private var enabledButtonColor: Int = ResourcesCompat.getColor(context.resources, R.color.yellow_dark, context.theme)
+    private var enabledButtonColor: Int = ResourcesCompat.getColor(context.resources, R.color.calc_default_function_button, context.theme)
 
-    open var enabledNumberButtonColor: Int = ResourcesCompat.getColor(context.resources, R.color.white, context.theme)
-    open var enabledFunctionButtonColor: Int = enabledButtonColor
-    open var enabledOperatorButtonColor: Int = enabledButtonColor
+    open var enabledNumberButtonColor: Int = context.resolveColorAttr(android.R.attr.textColorPrimary)
+    open var enabledFunctionButtonColor: Int = ResourcesCompat.getColor(context.resources, R.color.calc_default_function_button, context.theme)
+    open var enabledOperatorButtonColor: Int = ResourcesCompat.getColor(context.resources, R.color.calc_default_operation_button, context.theme)
 
-    open var disabledButtonColor: Int = ResourcesCompat.getColor(context.resources, R.color.grey, context.theme)
+    open var disabledButtonColor: Int = ResourcesCompat.getColor(context.resources, R.color.calc_button_pressed, context.theme)
 
     abstract var oldString: String
 
@@ -48,8 +52,24 @@ abstract class Clickable(
     protected val newStart: Int get() = Algorithms.findStartingPosOfPattern(viewModel.formattedInput[index], viewModel.inputAsTokens[index].toString()) + oldStart
     protected val newEnd: Int get() = viewModel.inputAsTokens[index].length + newStart
 
+    @ColorInt
+    private fun Context.resolveColorAttr(@AttrRes colorAttr: Int): Int {
+        val resolvedAttr = resolveThemeAttr(colorAttr)
+        // resourceId is used if it's a ColorStateList, and data if it's a color reference or a hex color
+        val colorRes = if (resolvedAttr.resourceId != 0) resolvedAttr.resourceId else resolvedAttr.data
+        return ContextCompat.getColor(this, colorRes)
+    }
+
+    private fun Context.resolveThemeAttr(@AttrRes attrRes: Int): TypedValue {
+        val typedValue = TypedValue()
+        theme.resolveAttribute(attrRes, typedValue, true)
+        return typedValue
+    }
+
     override fun onClick(view: View) {
         resetSpannableFocus()
+
+        setButtonState(buttons.changeLayout, disabledButtonColor, false)
         bindToEditableToken()
 
         applyColorToSpan(highlightedColor, newStart, newEnd)
@@ -101,6 +121,8 @@ abstract class Clickable(
     }
 
     private fun setButtonsAsClickable() {
+        setButtonState(buttons.changeLayout, enabledButtonColor)
+
         buttons.functions.forEach { (button, _) -> setButtonState(button, enabledFunctionButtonColor) }
         buttons.operators.forEach { (button, _) -> setButtonState(button, enabledOperatorButtonColor) }
         buttons.numbers.forEach { (button, _) -> setButtonState(button, enabledNumberButtonColor) }

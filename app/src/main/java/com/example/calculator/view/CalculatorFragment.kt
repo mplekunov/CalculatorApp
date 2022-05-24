@@ -97,6 +97,8 @@ class CalculatorFragment : Fragment() {
     }
 
     private fun initExpandedBindings() {
+        buttons.changeLayout = expandedCalculatorBinding?.changeLayout!!
+
         buttons.functions = mutableMapOf(
             expandedCalculatorBinding?.percent!! to FunctionKind.PERCENTAGE,
             expandedCalculatorBinding?.ln!! to FunctionKind.NATURAL_LOG
@@ -136,6 +138,8 @@ class CalculatorFragment : Fragment() {
     }
 
     private fun initDefaultBindings() {
+        buttons.changeLayout = defaultCalculatorBinding?.changeLayout!!
+
         buttons.functions = mutableMapOf(
             defaultCalculatorBinding?.percent!! to FunctionKind.PERCENTAGE
         )

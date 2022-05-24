@@ -64,7 +64,7 @@ open class InputAdapter(
         buttons.equal.setOnClickListener {
             viewModel.saveResult()
             resetSpannableInput()
-            replaceSpan()
+            setSpan()
         }
 
         buttons.clear.setOnClickListener {
@@ -72,7 +72,7 @@ open class InputAdapter(
                 if (viewModel.formattedInput.lastIndex < 0)
                     resetSpannableInput()
                 else
-                    replaceSpan()
+                    setSpan()
             }
         }
 
@@ -84,26 +84,26 @@ open class InputAdapter(
         buttons.numbers.forEach { (button, number) ->
             button.setOnClickListener {
                 if (viewModel.add(number))
-                    replaceSpan()
+                    setSpan()
             }
         }
 
         buttons.operators.forEach { (button, operator) ->
             button.setOnClickListener {
                 if (viewModel.add(operator))
-                    replaceSpan()
+                    setSpan()
             }
         }
 
         buttons.functions.forEach { (button, function) ->
             button.setOnClickListener {
                 if (viewModel.add(function))
-                    replaceSpan()
+                    setSpan()
             }
         }
     }
 
-    protected open fun replaceSpan() {
+    protected open fun setSpan() {
         for (i in viewModel.inputAsTokens.indices) {
             index = i
 

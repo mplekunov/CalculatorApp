@@ -273,11 +273,11 @@ class Expression {
                     tokenToEdit = tokenToEdit.slice(0 until tokenToEdit.lastIndex)
             }
             TokenTypes.Operator -> {
+                _expression.removeAt(index)
+
                 val lastIndex = index - 1
                 if (lastIndex >= 0 && _expression[lastIndex].type == TokenTypes.Function && tokenToEdit == OperatorParser.parse(OperatorKind.LEFT_BRACKET))
                     _expression.removeLast()
-
-                _expression.removeAt(index)
 
                 return true
             }
