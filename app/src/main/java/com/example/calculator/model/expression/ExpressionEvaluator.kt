@@ -1,5 +1,6 @@
 package com.example.calculator.model.expression
 
+import com.example.calculator.datastructure.BigNumber
 import com.example.calculator.model.postfix.PostfixEvaluator
 import com.example.calculator.model.token.TokenTypes
 
@@ -56,25 +57,37 @@ class ExpressionEvaluator(private val postfixEvaluator: PostfixEvaluator) {
 
                 // All operators require 2 operands, therefore if we don't have two operands in our stack
                 // We can't calculate the result of an expression
-                var left = BigDecimal.ZERO
-                val right = BigDecimal(s.pop().toString())
+                var left = BigNumber.ZERO
+                val right = BigNumber(s.pop().toString())
 
                 if (s.isNotEmpty())
-                    left = BigDecimal(s.pop().toString())
+                    left = BigNumber(s.pop().toString())
 
-                val result = when(OperatorParser.parse(token) as Operator) {
-                    OperatorParser.parse(OperatorKind.ADDITION) -> addition(left, right)
-                    OperatorParser.parse(OperatorKind.SUBTRACTION) -> subtraction(left, right)
-                    OperatorParser.parse(OperatorKind.MULTIPLICATION) -> multiplication(left, right)
-                    OperatorParser.parse(OperatorKind.DIVISION) -> {
-                        if (right.toDouble() == 0.0)
-                            return NumberParser.parse(NumberKind.NAN)
 
-                        division(left, right)
+                var result: BigNumber
+
+                try {
+                     result = when (OperatorParser.parse(token) as Operator) {
+                        OperatorParser.parse(OperatorKind.ADDITION) -> addition(left, right)
+                        OperatorParser.parse(OperatorKind.SUBTRACTION) -> subtraction(left, right)
+                        OperatorParser.parse(OperatorKind.MULTIPLICATION) -> multiplication(
+                            left,
+                            right
+                        )
+                        OperatorParser.parse(OperatorKind.DIVISION) -> {
+                            if (right == BigNumber.ZERO)
+                                return NumberParser.parse(NumberKind.NAN)
+
+                            division(left, right)
+                        }
+
+                        OperatorParser.parse(OperatorKind.POWER) -> power(left, right)
+                        else -> TODO("Not Implemented Yet")
                     }
-                    OperatorParser.parse(OperatorKind.POWER) -> power(left, right)
-                    else -> TODO("Not Implemented Yet")
+                } catch (e: NumberFormatException) {
+                    return NumberParser.parse(NumberKind.NAN)
                 }
+
 
                 s.push(numberToToken(result))
             }
@@ -86,11 +99,11 @@ class ExpressionEvaluator(private val postfixEvaluator: PostfixEvaluator) {
             s.pop()
     }
 
-    private fun numberToToken(number: BigDecimal) : Token = Token(number.toPlainString(), TokenTypes.Number)
+    private fun numberToToken(number: BigNumber) : Token = Token(number.toString(), TokenTypes.Number)
 
-    private fun addition(left: BigDecimal, right: BigDecimal): BigDecimal = left.plus(right).stripTrailingZeros()
-    private fun subtraction(left: BigDecimal, right: BigDecimal): BigDecimal = left.minus(right).stripTrailingZeros()
-    private fun multiplication(left: BigDecimal, right: BigDecimal): BigDecimal = left.times(right).stripTrailingZeros()
-    private fun division(left: BigDecimal, right: BigDecimal): BigDecimal = left.div(right).stripTrailingZeros()
-    private fun power(left: BigDecimal, right: BigDecimal): BigDecimal = BigDecimal(left.toDouble().pow(right.toDouble()).toString()).stripTrailingZeros()
+    private fun addition(left: BigNumber, right: BigNumber): BigNumber = left.plus(right)
+    private fun subtraction(left: BigNumber, right: BigNumber): BigNumber = left.minus(right)
+    private fun multiplication(left: BigNumber, right: BigNumber): BigNumber = left.times(right)
+    private fun division(left: BigNumber, right: BigNumber): BigNumber = left.div(right)
+    private fun power(left: BigNumber, right: BigNumber): BigNumber = left.pow(right)
 }

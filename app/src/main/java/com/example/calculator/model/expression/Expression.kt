@@ -144,10 +144,8 @@ class Expression {
         @Suppress("NAME_SHADOWING")
         val index = if (index > _expression.lastIndex) _expression.lastIndex else index
 
-
         val tokenToEdit = _expression[index]
 
-        val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
         val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
 
         // If last token is a number, we add new "token" to the previous number
