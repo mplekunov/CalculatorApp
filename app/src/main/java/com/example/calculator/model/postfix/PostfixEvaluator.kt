@@ -1,5 +1,6 @@
 package com.example.calculator.model.postfix
 
+import com.example.calculator.datastructure.BigNumber
 import com.example.calculator.model.expression.ExpressionEvaluator
 import com.example.calculator.model.function.FunctionKind
 import com.example.calculator.model.number.NumberKind
@@ -12,6 +13,7 @@ import com.example.calculator.parser.FunctionParser
 import com.example.calculator.parser.NumberParser
 import com.example.calculator.parser.OperatorParser
 import java.math.BigDecimal
+import java.math.BigInteger
 import java.math.RoundingMode
 import java.util.*
 import kotlin.math.log
@@ -118,16 +120,11 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
 
         val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
 
-        val prevToken = _infix[index - 1]
-
         // Adds 0 if - or + sign is found in the beginning of a "new" expression
         // "new" expression is an expression defined by two rules:
         // 1. Beginning of the complete expression (e.g. "- 2", "+ 2")
         // 2. Beginning of an expression defined by parentheses (e.g. "(- 2)", "(+ 2)")
-        if ((index == 0 || prevToken == leftParenthesis) && index + 1 < _infix.size && !isParenthesis(
-                token
-            )
-        ) {
+        if ((index == 0 || _infix[index - 1] == leftParenthesis) && index + 1 < _infix.size && !isParenthesis(token)) {
             if (operatorKind == OperatorKind.SUBTRACTION || operatorKind == OperatorKind.ADDITION)
                 _postfix.add(NumberParser.parse(NumberKind.ZERO))
             else
@@ -170,8 +167,57 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
             FunctionParser.parse(FunctionKind.NATURAL_LOG) -> processLogarithm(index, Math.E)
             FunctionParser.parse(FunctionKind.LOG) -> processLogarithm(index, 10.0)
             FunctionParser.parse(FunctionKind.SQUARE_ROOT) -> processSquareRoot(index)
+            FunctionParser.parse(FunctionKind.FACTORIAL) -> processFactorial(index)
+//            FunctionParser.parse(FunctionKind.SQUARED) -> processSquared(index)
             else -> processError()
         }
+    }
+
+    private fun processFactorial(index: Int): Int {
+        var factorial = BigNumber.ONE
+
+        var i = _postfix.lastIndex
+        while (i >= 0 && _postfix[i].type != TokenTypes.Number)
+            i--
+
+        val lastKnownNumber = BigNumber(_postfix[i].toString()).toInt()
+
+        for (j in 2..lastKnownNumber)
+            factorial = factorial.times(BigNumber(j))
+
+
+        infix.removeLast()
+        _infix.removeAt(index)
+
+        _infix[index - 1] = Token(factorial.toString(), TokenTypes.Number)
+        infix[infix.lastIndex] = _infix[index - 1]
+
+        _postfix.add(infix.last())
+
+            return index
+    }
+
+
+    // In Development
+    private fun processSquared(index: Int): Int {
+        var i = _postfix.lastIndex
+        while (i >= 0 && _postfix[i].type != TokenTypes.Number)
+            i--
+
+        val lastKnownNumber = BigNumber(_postfix[i].toString())
+
+        infix.removeLast()
+        _infix.removeAt(index)
+
+        val squared = lastKnownNumber.times(lastKnownNumber)
+
+        _infix[index - 1] = Token(squared.toString(), TokenTypes.Number)
+
+        infix[infix.lastIndex] = _infix[index - 1]
+
+        _postfix.add(Token(squared.toString(), TokenTypes.Number))
+
+        return index
     }
 
     /**
@@ -197,10 +243,10 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
         val result = expression.result
 
         // Natural logarithm can't evaluate NaN and can't be <= 0
-        if (result == NumberParser.parse(NumberKind.NAN) ||  result.toString().toDouble() < 0)
+        if (result == NumberParser.parse(NumberKind.NAN) ||  BigNumber(result.toString()) < BigNumber.ZERO)
             return processError()
 
-        _postfix.add(Token(sqrt(result.toString().toDouble()).toString(), TokenTypes.Number))
+        _postfix.add(Token(BigNumber.sqrt(BigNumber(result.toString())).toString(), TokenTypes.Number))
 
         // We need to know the "end" of the function body with respect of _infix
         end = getEndOfFunctionBody(start, _infix)
@@ -220,6 +266,7 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
         // When start > lastIndex it means we have an empty body... Therefore we return NaN
         if (start > infix.lastIndex)
             return processError()
+
         // Calculates postfix of the "body" of the function
         val postfixEvaluator = PostfixEvaluator(infix.subList(start, end))
         val expression = ExpressionEvaluator(postfixEvaluator)
@@ -230,10 +277,10 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
         val result = expression.result
 
         // Natural logarithm can't evaluate NaN and can't be <= 0
-        if (result == NumberParser.parse(NumberKind.NAN) || result.toString().toDouble() <= 0)
+        if (result == NumberParser.parse(NumberKind.NAN) || BigNumber(result.toString()) <= BigNumber.ZERO)
             return processError()
 
-        _postfix.add(Token(log(result.toString().toDouble(), base).toString(), TokenTypes.Number))
+        _postfix.add(Token(BigNumber.log(BigNumber(result.toString()), BigNumber(base)).toString(), TokenTypes.Number))
 
         // We need to know the "end" of the function body with respect of _infix
         end = getEndOfFunctionBody(start, _infix)
@@ -247,10 +294,10 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
      * @return [index] of the next element in [_infix]
      */
     private fun processPercent(index: Int): Int {
-        val first = BigDecimal(_postfix.removeLast().toString())
-        val second = BigDecimal(100.0)
+        val first = BigNumber(_postfix.removeLast().toString())
+        val second = BigNumber(100.0)
 
-        var percentage = first.divide(second)
+        var percentage = first.div(second)
 
         // If _postfix is not empty... then there was a percent expression in the format:
         // parent_number +or-or*or/ percent_number %
@@ -279,14 +326,14 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
                 NumberParser.parse(NumberKind.ZERO)
 
             // Transforms last token into BigDecimal
-            var lastKnownNumber = BigDecimal(last.toString())
+            var lastKnownNumber = BigNumber(last.toString())
 
             percentage =
                 if (lastKnownOperator == OperatorParser.parse(OperatorKind.SUBTRACTION) ||
                     lastKnownOperator == OperatorParser.parse(OperatorKind.ADDITION)
                 ) {
 
-                    if (lastKnownNumber.toDouble() == 0.0) {
+                    if (lastKnownNumber == BigNumber.ZERO) {
                         lastKnownNumber =
                             if (lastKnownOperator == OperatorParser.parse(OperatorKind.SUBTRACTION))
                                 lastKnownNumber.minus(first)
@@ -294,27 +341,25 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
                                 lastKnownNumber.plus(first)
                     }
 
-                    lastKnownNumber.multiply(percentage)
+                    lastKnownNumber.times(percentage)
                 } else
                     percentage
         }
-
-        percentage = percentage.stripTrailingZeros()
 
         // We have to remove percent sign from both, infix and _infix
         infix.removeLast()
         _infix.removeAt(index)
 
         // We have to make an in-place replacement of the "percent_number %" part for the calculated result
-        if (percentage < BigDecimal.ZERO)
+        if (percentage < BigNumber.ZERO)
             _infix[index - 1] =
-                Token(percentage.times(BigDecimal("-1")).toPlainString(), TokenTypes.Number)
+                Token(percentage.times(BigNumber("-1")).toString(), TokenTypes.Number)
         else
-            _infix[index - 1] = Token(percentage.toPlainString(), TokenTypes.Number)
+            _infix[index - 1] = Token(percentage.toString(), TokenTypes.Number)
 
         infix[infix.lastIndex] = _infix[index - 1]
 
-        _postfix.add(Token(percentage.toPlainString(), TokenTypes.Number))
+        _postfix.add(infix.last())
 
         return index
     }

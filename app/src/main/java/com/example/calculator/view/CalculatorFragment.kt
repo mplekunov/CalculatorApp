@@ -107,7 +107,9 @@ class CalculatorFragment : Fragment() {
                     expandedCalculatorBinding?.percent!! to FunctionKind.PERCENTAGE,
                     expandedCalculatorBinding?.ln!! to FunctionKind.NATURAL_LOG,
                     expandedCalculatorBinding?.log!! to FunctionKind.LOG,
-                    expandedCalculatorBinding?.squareRoot!! to FunctionKind.SQUARE_ROOT
+                    expandedCalculatorBinding?.squareRoot!! to FunctionKind.SQUARE_ROOT,
+//                    expandedCalculatorBinding?.squared!! to FunctionKind.SQUARED,
+                    expandedCalculatorBinding?.factorial!! to FunctionKind.FACTORIAL
                 )
             )
         }
@@ -120,7 +122,8 @@ class CalculatorFragment : Fragment() {
                     expandedCalculatorBinding?.multiply!! to OperatorKind.MULTIPLICATION,
                     expandedCalculatorBinding?.divide!! to OperatorKind.DIVISION,
                     expandedCalculatorBinding?.leftParenthesis!! to OperatorKind.LEFT_BRACKET,
-                    expandedCalculatorBinding?.rightParenthesis!! to OperatorKind.RIGHT_BRACKET
+                    expandedCalculatorBinding?.rightParenthesis!! to OperatorKind.RIGHT_BRACKET,
+                    expandedCalculatorBinding?.power!! to OperatorKind.POWER
                 )
             )
         }

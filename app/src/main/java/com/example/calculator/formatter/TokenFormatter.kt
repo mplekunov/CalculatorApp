@@ -1,5 +1,6 @@
 package com.example.calculator.formatter
 
+import com.example.calculator.datastructure.BigNumber
 import com.example.calculator.model.number.NumberKind
 import com.example.calculator.model.token.TokenTypes
 
@@ -58,7 +59,7 @@ object TokenFormatter {
                     var formatted: String = token.toString()
 
                     if (removeTrailingZeroes)
-                        formatted = BigDecimal(formatted).setScale(5, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
+                        formatted = BigNumber(formatted).stripTrailingZeros()
 
                     return " $formatted"
                 }

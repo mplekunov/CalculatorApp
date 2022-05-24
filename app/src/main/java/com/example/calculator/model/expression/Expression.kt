@@ -144,10 +144,8 @@ class Expression {
         @Suppress("NAME_SHADOWING")
         val index = if (index > _expression.lastIndex) _expression.lastIndex else index
 
-
         val tokenToEdit = _expression[index]
 
-        val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
         val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
 
         // If last token is a number, we add new "token" to the previous number
@@ -220,8 +218,35 @@ class Expression {
             FunctionParser.parse(FunctionKind.NATURAL_LOG) -> addRightSidedFunction(token, index)
             FunctionParser.parse(FunctionKind.LOG) -> addRightSidedFunction(token, index)
             FunctionParser.parse(FunctionKind.SQUARE_ROOT) -> addRightSidedFunction(token, index)
+            FunctionParser.parse(FunctionKind.SQUARED) -> addSquared(token, index)
+            FunctionParser.parse(FunctionKind.FACTORIAL) -> addFactorial(token, index)
             else -> false
         }
+    }
+
+    private fun addFactorial(token: Token, index: Int): Boolean {
+        if (_expression.isEmpty())
+            return false
+
+        val prevToken = _expression[index - 1]
+
+        if (prevToken.type != TokenTypes.Number || (prevToken.type == TokenTypes.Number && prevToken.contains(NumberParser.parse(NumberKind.DOT))))
+            return false
+
+        if (prevToken.toString().toInt() > 50)
+            return false
+
+        return _expression.add(token)
+    }
+
+    private fun addSquared(token: Token, index: Int): Boolean {
+        if (_expression.isEmpty())
+            return false
+
+        if (index - 1 >= 0 && _expression[index - 1].type == TokenTypes.Operator && !isParenthesis(_expression[index - 1]))
+            return false
+
+        return _expression.add(token)
     }
 
     private fun addRightSidedFunction(token: Token, index: Int): Boolean {
