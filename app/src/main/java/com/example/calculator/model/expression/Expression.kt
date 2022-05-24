@@ -217,9 +217,27 @@ class Expression {
     private fun addFunction(token: Token, index: Int) : Boolean {
         return when(token) {
             FunctionParser.parse(FunctionKind.PERCENTAGE) -> addPercent(token, index)
-            FunctionParser.parse(FunctionKind.NATURAL_LOG) -> addNaturalLogarithm(token, index)
+            FunctionParser.parse(FunctionKind.NATURAL_LOG) -> addRightSidedFunction(token, index)
+            FunctionParser.parse(FunctionKind.LOG) -> addRightSidedFunction(token, index)
+            FunctionParser.parse(FunctionKind.SQUARE_ROOT) -> addRightSidedFunction(token, index)
             else -> false
         }
+    }
+
+    private fun addRightSidedFunction(token: Token, index: Int): Boolean {
+        if (_expression.isNotEmpty()) {
+            val last = _expression.last()
+
+            val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
+
+            if (last.type == TokenTypes.Number || last == rightParenthesis)
+                return false
+        }
+
+        _expression.add(token)
+        _expression.add(OperatorParser.parse(OperatorKind.LEFT_BRACKET))
+
+        return true
     }
 
     private fun addPercent(token: Token, index: Int): Boolean {
@@ -238,25 +256,6 @@ class Expression {
         }
 
         return false
-    }
-
-
-    // I need to fix it later on... it works now but I have to make it universal
-    // Not only for the "last" token
-    private fun addNaturalLogarithm(token: Token, index: Int): Boolean {
-        if (_expression.isNotEmpty()) {
-            val last = _expression.last()
-
-            val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
-
-            if (last.type == TokenTypes.Number || last == rightParenthesis)
-                return false
-        }
-
-        _expression.add(token)
-        _expression.add(OperatorParser.parse(OperatorKind.LEFT_BRACKET))
-
-        return true
     }
 
     private fun parseDot(index: Int): Boolean {
