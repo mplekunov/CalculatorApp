@@ -7,5 +7,6 @@ enum class OperatorKind {
     MULTIPLICATION,
     POWER,
     LEFT_BRACKET,
-    RIGHT_BRACKET
+    RIGHT_BRACKET,
+    SQUARED
 }

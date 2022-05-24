@@ -113,10 +113,10 @@ class ExpandedInputAdapter(
 
         drawable.setTint(ContextCompat.getColor(context, R.color.white))
         val size: Int = (context as Activity).findViewById<TextView>(R.id.input).textSize.toInt()
-        drawable.setBounds(0, 0,  size - 15, size - 15)
+        drawable.setBounds(0, 0,  size - 15, size - 20)
 
         if (FunctionParser.parse<FunctionKind>(token) == FunctionKind.LOG)
-            drawable.setBounds(0, 0, size + 45, size + 12)
+            drawable.setBounds(0, 0, size + 45, size)
 
 
         spannable.setSpan(

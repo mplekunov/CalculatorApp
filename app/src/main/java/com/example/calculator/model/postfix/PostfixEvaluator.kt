@@ -12,6 +12,7 @@ import com.example.calculator.parser.FunctionParser
 import com.example.calculator.parser.NumberParser
 import com.example.calculator.parser.OperatorParser
 import java.math.BigDecimal
+import java.math.BigInteger
 import java.math.RoundingMode
 import java.util.*
 import kotlin.math.log
@@ -118,16 +119,11 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
 
         val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
 
-        val prevToken = _infix[index - 1]
-
         // Adds 0 if - or + sign is found in the beginning of a "new" expression
         // "new" expression is an expression defined by two rules:
         // 1. Beginning of the complete expression (e.g. "- 2", "+ 2")
         // 2. Beginning of an expression defined by parentheses (e.g. "(- 2)", "(+ 2)")
-        if ((index == 0 || prevToken == leftParenthesis) && index + 1 < _infix.size && !isParenthesis(
-                token
-            )
-        ) {
+        if ((index == 0 || _infix[index - 1] == leftParenthesis) && index + 1 < _infix.size && !isParenthesis(token)) {
             if (operatorKind == OperatorKind.SUBTRACTION || operatorKind == OperatorKind.ADDITION)
                 _postfix.add(NumberParser.parse(NumberKind.ZERO))
             else
@@ -170,8 +166,57 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
             FunctionParser.parse(FunctionKind.NATURAL_LOG) -> processLogarithm(index, Math.E)
             FunctionParser.parse(FunctionKind.LOG) -> processLogarithm(index, 10.0)
             FunctionParser.parse(FunctionKind.SQUARE_ROOT) -> processSquareRoot(index)
+            FunctionParser.parse(FunctionKind.FACTORIAL) -> processFactorial(index)
+//            FunctionParser.parse(FunctionKind.SQUARED) -> processSquared(index)
             else -> processError()
         }
+    }
+
+    private fun processFactorial(index: Int): Int {
+        var factorial = BigInteger.ONE
+
+        var i = _postfix.lastIndex
+        while (i >= 0 && _postfix[i].type != TokenTypes.Number)
+            i--
+
+        val lastKnownNumber = BigInteger(_postfix[i].toString()).toInt()
+
+        for (j in 2..lastKnownNumber)
+            factorial = factorial.times(j.toBigInteger())
+
+
+        infix.removeLast()
+        _infix.removeAt(index)
+
+        _infix[index - 1] = Token(factorial.toString(), TokenTypes.Number)
+        infix[infix.lastIndex] = _infix[index - 1]
+
+        _postfix.add(infix.last())
+
+            return index
+    }
+
+
+    // In Development
+    private fun processSquared(index: Int): Int {
+        var i = _postfix.lastIndex
+        while (i >= 0 && _postfix[i].type != TokenTypes.Number)
+            i--
+
+        val lastKnownNumber = BigDecimal(_postfix[i].toString())
+
+        infix.removeLast()
+        _infix.removeAt(index)
+
+        val squared = lastKnownNumber.times(lastKnownNumber)
+
+        _infix[index - 1] = Token(squared.toPlainString(), TokenTypes.Number)
+
+        infix[infix.lastIndex] = _infix[index - 1]
+
+        _postfix.add(Token(squared.toPlainString(), TokenTypes.Number))
+
+        return index
     }
 
     /**
@@ -220,6 +265,7 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
         // When start > lastIndex it means we have an empty body... Therefore we return NaN
         if (start > infix.lastIndex)
             return processError()
+
         // Calculates postfix of the "body" of the function
         val postfixEvaluator = PostfixEvaluator(infix.subList(start, end))
         val expression = ExpressionEvaluator(postfixEvaluator)
@@ -314,7 +360,7 @@ class PostfixEvaluator(var infix: MutableList<Token>) {
 
         infix[infix.lastIndex] = _infix[index - 1]
 
-        _postfix.add(Token(percentage.toPlainString(), TokenTypes.Number))
+        _postfix.add(infix.last())
 
         return index
     }

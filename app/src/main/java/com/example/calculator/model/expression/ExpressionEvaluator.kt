@@ -12,6 +12,7 @@ import com.example.calculator.parser.OperatorParser
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
+import kotlin.math.pow
 
 /**
  * Helper class that evaluates [Expression].
@@ -91,5 +92,5 @@ class ExpressionEvaluator(private val postfixEvaluator: PostfixEvaluator) {
     private fun subtraction(left: BigDecimal, right: BigDecimal): BigDecimal = left.minus(right).stripTrailingZeros()
     private fun multiplication(left: BigDecimal, right: BigDecimal): BigDecimal = left.times(right).stripTrailingZeros()
     private fun division(left: BigDecimal, right: BigDecimal): BigDecimal = left.div(right).stripTrailingZeros()
-    private fun power(left: BigDecimal, right: BigDecimal): BigDecimal = left.pow(right.toInt()).stripTrailingZeros()
+    private fun power(left: BigDecimal, right: BigDecimal): BigDecimal = BigDecimal(left.toDouble().pow(right.toDouble()).toString()).stripTrailingZeros()
 }
