@@ -17,6 +17,7 @@ import com.example.calculator.R
 import com.example.calculator.databinding.CalculatorExpandedBinding
 import com.example.calculator.databinding.CalculatorNormalBinding
 import com.example.calculator.databinding.FragmentCalculatorBinding
+import com.example.calculator.datastructure.BiMap
 import com.example.calculator.model.function.FunctionKind
 import com.example.calculator.model.input.defaultEditing.InputAdapter
 import com.example.calculator.model.input.expandedEditing.ExpandedInputAdapter
@@ -99,35 +100,40 @@ class CalculatorFragment : Fragment() {
     private fun initExpandedBindings() {
         buttons.changeLayout = expandedCalculatorBinding?.changeLayout!!
 
-        buttons.functions = mutableMapOf(
+        buttons.functions = BiMap<ImageButton, FunctionKind>().apply { putAll(
+            mutableMapOf(
             expandedCalculatorBinding?.percent!! to FunctionKind.PERCENTAGE,
             expandedCalculatorBinding?.ln!! to FunctionKind.NATURAL_LOG
-        )
+            )
+        ) }
 
-        buttons.operators = mutableMapOf(
+        buttons.operators = BiMap<ImageButton, OperatorKind>().apply {  putAll(
+            mutableMapOf(
             expandedCalculatorBinding?.add!! to OperatorKind.ADDITION,
             expandedCalculatorBinding?.subtract!! to OperatorKind.SUBTRACTION,
             expandedCalculatorBinding?.multiply!! to OperatorKind.MULTIPLICATION,
             expandedCalculatorBinding?.divide!! to OperatorKind.DIVISION,
             expandedCalculatorBinding?.leftParenthesis!! to OperatorKind.LEFT_BRACKET,
             expandedCalculatorBinding?.rightParenthesis!! to OperatorKind.RIGHT_BRACKET
-        )
+        ))  }
 
-        buttons.numbers = mutableMapOf(
-            expandedCalculatorBinding?.number0!! to NumberKind.ZERO,
-            expandedCalculatorBinding?.number1!! to NumberKind.ONE,
-            expandedCalculatorBinding?.number2!! to NumberKind.TWO,
-            expandedCalculatorBinding?.number3!! to NumberKind.THREE,
-            expandedCalculatorBinding?.number4!! to NumberKind.FOUR,
-            expandedCalculatorBinding?.number5!! to NumberKind.FIVE,
-            expandedCalculatorBinding?.number6!! to NumberKind.SIX,
-            expandedCalculatorBinding?.number7!! to NumberKind.SEVEN,
-            expandedCalculatorBinding?.number8!! to NumberKind.EIGHT,
-            expandedCalculatorBinding?.number9!! to NumberKind.NINE,
-            expandedCalculatorBinding?.dot!! to NumberKind.DOT,
-            expandedCalculatorBinding?.pi!! to NumberKind.PI,
-            expandedCalculatorBinding?.epsilon!! to NumberKind.EPSILON
-        )
+        buttons.numbers = BiMap<ImageButton, NumberKind>().apply { putAll(
+            mutableMapOf(
+                expandedCalculatorBinding?.number0!! to NumberKind.ZERO,
+                expandedCalculatorBinding?.number1!! to NumberKind.ONE,
+                expandedCalculatorBinding?.number2!! to NumberKind.TWO,
+                expandedCalculatorBinding?.number3!! to NumberKind.THREE,
+                expandedCalculatorBinding?.number4!! to NumberKind.FOUR,
+                expandedCalculatorBinding?.number5!! to NumberKind.FIVE,
+                expandedCalculatorBinding?.number6!! to NumberKind.SIX,
+                expandedCalculatorBinding?.number7!! to NumberKind.SEVEN,
+                expandedCalculatorBinding?.number8!! to NumberKind.EIGHT,
+                expandedCalculatorBinding?.number9!! to NumberKind.NINE,
+                expandedCalculatorBinding?.dot!! to NumberKind.DOT,
+                expandedCalculatorBinding?.pi!! to NumberKind.PI,
+                expandedCalculatorBinding?.epsilon!! to NumberKind.EPSILON
+            )
+        ) }
 
         buttons.clear = expandedCalculatorBinding?.clear!!
         buttons.clearAll = expandedCalculatorBinding?.clearAll!!
@@ -140,30 +146,36 @@ class CalculatorFragment : Fragment() {
     private fun initDefaultBindings() {
         buttons.changeLayout = defaultCalculatorBinding?.changeLayout!!
 
-        buttons.functions = mutableMapOf(
-            defaultCalculatorBinding?.percent!! to FunctionKind.PERCENTAGE
-        )
+        buttons.functions = BiMap<ImageButton, FunctionKind>().apply { putAll(
+            mutableMapOf(
+                defaultCalculatorBinding?.percent!! to FunctionKind.PERCENTAGE
+            )
+        ) }
 
-        buttons.operators = mutableMapOf(
-            defaultCalculatorBinding?.add!! to OperatorKind.ADDITION,
-            defaultCalculatorBinding?.subtract!! to OperatorKind.SUBTRACTION,
-            defaultCalculatorBinding?.multiply!! to OperatorKind.MULTIPLICATION,
-            defaultCalculatorBinding?.divide!! to OperatorKind.DIVISION
-        )
+        buttons.operators = BiMap<ImageButton, OperatorKind>().apply { putAll(
+            mutableMapOf(
+                defaultCalculatorBinding?.add!! to OperatorKind.ADDITION,
+                defaultCalculatorBinding?.subtract!! to OperatorKind.SUBTRACTION,
+                defaultCalculatorBinding?.multiply!! to OperatorKind.MULTIPLICATION,
+                defaultCalculatorBinding?.divide!! to OperatorKind.DIVISION
+            )
+        ) }
 
-        buttons.numbers = mutableMapOf(
-            defaultCalculatorBinding?.number0!! to NumberKind.ZERO,
-            defaultCalculatorBinding?.number1!! to NumberKind.ONE,
-            defaultCalculatorBinding?.number2!! to NumberKind.TWO,
-            defaultCalculatorBinding?.number3!! to NumberKind.THREE,
-            defaultCalculatorBinding?.number4!! to NumberKind.FOUR,
-            defaultCalculatorBinding?.number5!! to NumberKind.FIVE,
-            defaultCalculatorBinding?.number6!! to NumberKind.SIX,
-            defaultCalculatorBinding?.number7!! to NumberKind.SEVEN,
-            defaultCalculatorBinding?.number8!! to NumberKind.EIGHT,
-            defaultCalculatorBinding?.number9!! to NumberKind.NINE,
-            defaultCalculatorBinding?.dot!! to NumberKind.DOT
-        )
+        buttons.numbers = BiMap<ImageButton, NumberKind>().apply { putAll(
+            mutableMapOf(
+                defaultCalculatorBinding?.number0!! to NumberKind.ZERO,
+                defaultCalculatorBinding?.number1!! to NumberKind.ONE,
+                defaultCalculatorBinding?.number2!! to NumberKind.TWO,
+                defaultCalculatorBinding?.number3!! to NumberKind.THREE,
+                defaultCalculatorBinding?.number4!! to NumberKind.FOUR,
+                defaultCalculatorBinding?.number5!! to NumberKind.FIVE,
+                defaultCalculatorBinding?.number6!! to NumberKind.SIX,
+                defaultCalculatorBinding?.number7!! to NumberKind.SEVEN,
+                defaultCalculatorBinding?.number8!! to NumberKind.EIGHT,
+                defaultCalculatorBinding?.number9!! to NumberKind.NINE,
+                defaultCalculatorBinding?.dot!! to NumberKind.DOT
+            )
+        ) }
 
         buttons.clear = defaultCalculatorBinding?.clear!!
         buttons.clearAll = defaultCalculatorBinding?.clearAll!!

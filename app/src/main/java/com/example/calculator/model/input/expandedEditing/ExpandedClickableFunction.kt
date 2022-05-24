@@ -4,11 +4,8 @@ import android.content.Context
 import android.text.SpannableStringBuilder
 import android.view.View
 import androidx.lifecycle.MutableLiveData
-import com.example.calculator.model.function.Function
-import com.example.calculator.model.function.FunctionBody
-import com.example.calculator.model.input.defaultEditing.ClickableFunction
+import com.example.calculator.model.input.defaultEditing.Clickable
 import com.example.calculator.model.wrapper.Buttons
-import com.example.calculator.parser.FunctionParser
 import com.example.calculator.viewmodel.CalculatorViewModel
 
 class ExpandedClickableFunction(
@@ -17,7 +14,10 @@ class ExpandedClickableFunction(
     viewModel: CalculatorViewModel,
     liveInput: MutableLiveData<SpannableStringBuilder>,
     index: Int
-) : ClickableFunction(context, buttons, viewModel, liveInput, index) {
+) : Clickable(context, buttons, viewModel, liveInput, index) {
+
+    override lateinit var oldString: String
+
     override val what
         get() = ExpandedClickableFunction(context, buttons, viewModel, liveInput, index)
 
@@ -26,6 +26,9 @@ class ExpandedClickableFunction(
     }
 
     override fun bindToEditableToken() {
+        buttons.operators.forEach { (button, _) -> setButtonState(button, disabledButtonColor, false) }
+        buttons.numbers.forEach { (button, _) -> setButtonState(button, disabledButtonColor, false) }
+
 //        super.bindToEditableToken()
 //
 //        buttons.functions.forEach { (button, function) ->

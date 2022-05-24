@@ -33,7 +33,7 @@ open class InputAdapter(
 
     val spannable = spannableInput.value ?: SpannableStringBuilder()
 
-    protected open val what: Clickable
+    protected open val what: Clickable?
         get() {
             return when (token.type) {
                 TokenTypes.Number -> ClickableNumber(
@@ -43,13 +43,13 @@ open class InputAdapter(
                     spannableInput,
                     index
                 )
-                TokenTypes.Function -> ClickableFunction(
-                    context,
-                    buttons,
-                    viewModel,
-                    spannableInput,
-                    index
-                )
+//                TokenTypes.Function -> ClickableFunction(
+//                    context,
+//                    buttons,
+//                    viewModel,
+//                    spannableInput,
+//                    index
+//                )
                 TokenTypes.Operator -> ClickableOperator(
                     context,
                     buttons,
@@ -57,10 +57,14 @@ open class InputAdapter(
                     spannableInput,
                     index
                 )
+                else -> null
             }
         }
 
     open fun setBindings() {
+//        resetSpannableInput()
+//        setSpan()
+
         buttons.equal.setOnClickListener {
             viewModel.saveResult()
             resetSpannableInput()
@@ -104,11 +108,23 @@ open class InputAdapter(
     }
 
     protected open fun setSpan() {
-        for (i in viewModel.inputAsTokens.indices) {
-            index = i
+        if (spannable.isEmpty()) {
+            for (i in viewModel.inputAsTokens.indices) {
+                index = i
+
+                spannable.replace(oldStart, oldEnd, string)
+
+                if (what != null)
+                    spannable.setSpan(newStart, newEnd)
+            }
+        }
+        else {
+            index = viewModel.inputAsTokens.lastIndex
 
             spannable.replace(oldStart, oldEnd, string)
-            spannable.setSpan(newStart, newEnd)
+
+            if (what != null)
+                spannable.setSpan(newStart, newEnd)
         }
     }
 
