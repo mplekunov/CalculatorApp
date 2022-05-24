@@ -5,8 +5,10 @@
 - Can evaluate expressions containing positive/negative integers/floats using infix and postfix algorithms
 - Has responsive UI (colors and input/output formats will be customizable in the feature)
 - Supports standard calculator operations (support of functions (e.g. log, ln, cos, sin) are in progress)
+- Supports some advanced calculator operations (still in the development but parentheses and ln work as intended)
 - Supports removal of operators and operands anywhere in the expression
 - Supports editing of operators and operands anywhere in the expression
+- (In development) support for function editing in support mode
 - Dynamically evaluates expression, saves expression result on the Equal button press
 
 This program allows user to calculate standard mathematical expressions (as any other basic calculator)
@@ -16,26 +18,37 @@ This program allows user to calculate standard mathematical expressions (as any 
 #### Editing Feature
 User can edit their expression at anytime by entering "Edit Mode". To enter Edit Mode, press on any operator or operand of the expression. The editable operator/operand will be highlighted for convenience:
 
-![Edit Mode 480x](https://user-images.githubusercontent.com/38502074/168490142-7a79b457-643f-422e-b40d-80a688ae7c1d.gif)
+![EditingMode 480x](https://user-images.githubusercontent.com/38502074/169933781-c7b0ec76-8dd4-4f4f-98d7-fa296d11ee24.gif)
 
 
 To exit Edit Mode, press "equal button" (which will be displayed as "check mark" in Edit Mode):
 
-![Check Mark 480x](https://user-images.githubusercontent.com/38502074/168490139-551bea81-c349-415b-ae77-df1787858f77.gif)
+![CheckButton 480x](https://user-images.githubusercontent.com/38502074/169933795-b84bf958-6e8d-45fd-ae1d-858f04c77564.gif)
 
 
 While in Edit Mode, user can freely choose any other operand/operator and change them accordingly:
 
-![Different Tokens 480x](https://user-images.githubusercontent.com/38502074/168490135-135269b0-f173-4652-8ffe-ac0dd3c0d7e9.gif)
+![FreeEditing 480x](https://user-images.githubusercontent.com/38502074/169933811-23961f46-3853-43e6-ad05-fceddc2aadfc.gif)
+
 
 Edit Mode has type safety, which means operators can only be replaced by other operators, and numbers can only be replaced by other numbers. All other buttons, are turned off for safety. 
 
 
 #### Negative Numbers
-Currently only "first-in-line" negative numbers are supported. That means, user can only enter negative number if it's the first number in an expression:
+Negative numbers are fully supported:
 
-![Negative Numbers 480x](https://user-images.githubusercontent.com/38502074/168862259-b1a9d4e6-6234-4569-9231-7f384d60f1a4.gif)
+![NegativeNumbers 480x](https://user-images.githubusercontent.com/38502074/169934057-3e9d4bf8-4c54-4c77-82b0-c58576918b67.gif)
+
 
 There also exist typesafety... Changing "number" sign on anything other than "-" will result in "NaN" result:
 
-![Negative Numbers TypeSafety 480x](https://user-images.githubusercontent.com/38502074/168896802-56977ba3-c7b0-416b-8dc9-e690dc4fbfc4.gif)
+![TypeSafety 480x](https://user-images.githubusercontent.com/38502074/169934111-9cb4a0dc-1f3a-4d06-93d5-56aa736b8f60.gif)
+
+
+#### Advanced Mode
+Calculator also supports "advanced mode". It can be accessed by pressing "change layout" button. In advanced mode, user can use additional mathematical functions, as well as parentheses.
+
+![AdvancedMode 480x](https://user-images.githubusercontent.com/38502074/169934294-56440a03-ead7-4876-a32a-a1dfc441bceb.gif)
+
+
+
