@@ -42,6 +42,8 @@ object NumberParser : TokenParser<NumberKind> {
                     return Number(Double.POSITIVE_INFINITY.toString()) as T
                 else if (map[token] == NumberKind.NAN)
                     return Number(map[token].toString()) as T
+                else if (map[token] == NumberKind.PI || map[token] == NumberKind.EPSILON)
+                    return Number(map[token].toString(), true) as T
 
                 return Number(token.toString()) as T
             }

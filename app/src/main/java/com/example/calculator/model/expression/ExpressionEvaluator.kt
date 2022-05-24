@@ -53,10 +53,10 @@ class ExpressionEvaluator(private val postfixEvaluator: PostfixEvaluator) {
                     break
 
                 var left = BigDecimal.ZERO
-                val right = BigDecimal(NumberParser.parse<Number>(s.pop()).toString()).setScale(10, RoundingMode.HALF_UP)
+                val right = BigDecimal(s.pop().toString()).setScale(10, RoundingMode.HALF_UP)
 
                 if (s.isNotEmpty())
-                    left = BigDecimal(NumberParser.parse<Number>(s.pop()).toString()).setScale(10, RoundingMode.HALF_UP)
+                    left = BigDecimal(s.pop().toString()).setScale(10, RoundingMode.HALF_UP)
 
                 val result = when(OperatorParser.parse(token) as Operator) {
                     OperatorParser.parse(OperatorKind.ADDITION) -> addition(left, right)
