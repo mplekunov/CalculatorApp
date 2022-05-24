@@ -60,23 +60,6 @@ class ExpandedInputAdapter(
     override fun setBindings() {
         super.setBindings()
 
-//        buttons.numbers.forEach { (button, number) ->
-//            button.setOnClickListener {
-//                if (viewModel.add(number)) {
-//                    if (number == NumberKind.EPSILON || number == NumberKind.PI) {
-//                        val drawable = button.drawable.constantState!!.newDrawable().mutate()
-//
-//                        drawable.setTint(ContextCompat.getColor(context, R.color.white))
-//                        drawable.setBounds(0, 0, 80, 80)
-//
-//                        setSpan(drawable)
-//                    }
-//                    else
-//                        setSpan()
-//                }
-//            }
-//        }
-
         buttons.functions.forEach { (button, function) ->
             button.setOnClickListener {
                 if (viewModel.add(function)) {

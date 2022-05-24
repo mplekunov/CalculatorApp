@@ -7,6 +7,7 @@ import com.example.calculator.model.token.Token
 import com.example.calculator.parser.NumberParser
 
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 import java.text.NumberFormat
 
@@ -17,7 +18,7 @@ object TokenFormatter {
     private val nf = NumberFormat.getNumberInstance()
 
     init {
-        nf.maximumFractionDigits = 10
+        nf.maximumFractionDigits = 5
     }
 
     /**
@@ -50,14 +51,14 @@ object TokenFormatter {
         if (token == null || token.isEmpty())
             return " 0 "
         return if (token.type == TokenTypes.Number) {
-            return when {
-                token == NumberParser.parse(NumberKind.INFINITY) -> " $token"
-                token == NumberParser.parse(NumberKind.NAN) -> " $token"
+            return when (token) {
+                NumberParser.parse(NumberKind.INFINITY) -> " $token"
+                NumberParser.parse(NumberKind.NAN) -> " $token"
                 else -> {
                     var formatted: String = token.toString()
 
                     if (removeTrailingZeroes)
-                        formatted = BigDecimal(formatted).stripTrailingZeros().toPlainString()
+                        formatted = BigDecimal(formatted).setScale(5, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
 
                     return " $formatted"
                 }

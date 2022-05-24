@@ -1,17 +1,14 @@
 package com.example.calculator
 
-import com.example.calculator.model.expression.Expression
 import com.example.calculator.model.expression.ExpressionEvaluator
-import com.example.calculator.model.expression.PostfixEvaluator
+import com.example.calculator.model.postfix.PostfixEvaluator
 import com.example.calculator.model.function.FunctionKind
 import com.example.calculator.model.operator.OperatorKind
 import com.example.calculator.model.token.Token
 import com.example.calculator.model.token.TokenTypes
 import com.example.calculator.parser.FunctionParser
-import com.example.calculator.parser.NumberParser
 import com.example.calculator.parser.OperatorParser
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
 import java.math.RoundingMode

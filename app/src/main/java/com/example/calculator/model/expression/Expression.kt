@@ -1,7 +1,5 @@
 package com.example.calculator.model.expression
 
-import com.example.calculator.model.function.Function
-import com.example.calculator.model.function.FunctionBody
 import com.example.calculator.model.function.FunctionKind
 import com.example.calculator.model.number.Number
 import com.example.calculator.model.number.NumberKind
@@ -20,24 +18,24 @@ import kotlinx.coroutines.*
  * Provides interface for performing different manipulations on the [Expression] data structure.
  */
 class Expression {
-    protected val _tokenLengthLimit = 18
+    private val _tokenLengthLimit = 18
 
     private var _expression = mutableListOf<Token>()
 
     val expression: List<Token> get() = _expression
 
     /**
-     * Adds specified object to [Expression] at [index]
+     * Adds [token] to [Expression] at [index]
      *
-     * @param  [number] [Number] object that stores representation of a number
-     * @param [index] position of [number] in [Expression]
+     * @param  [token] token to be added
+     * @param [index] position of [token] in [Expression]
      * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
     fun add(token: Token, index: Int = _expression.size) : Boolean {
         if (token.type == TokenTypes.Operator && OperatorParser.parse(token) as OperatorKind == OperatorKind.SUBTRACTION)
             return processMinusSign(token, index)
 
-        if (token.type == TokenTypes.Operator && (token == OperatorParser.parse(OperatorKind.LEFT_BRACKET) || token == OperatorParser.parse(OperatorKind.RIGHT_BRACKET)))
+        if (token.type == TokenTypes.Operator && isParenthesis(token))
             return processParentheses(token)
 
         return when(token.type) {
@@ -47,10 +45,26 @@ class Expression {
         }
     }
 
+    /**
+     * Checks if [token] is a parenthesis.
+     * @return [TRUE] upon successful check, otherwise [FALSE]
+     */
+    private fun isParenthesis(token: Token): Boolean {
+        val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
+        val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
+
+        return token == leftParenthesis || token == rightParenthesis
+    }
+
+    /**
+     * Processes parenthesis as the [token]
+     * @return [TRUE] upon successful operation, otherwise [FALSE]
+     */
     private fun processParentheses(token: Token): Boolean {
         val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
         val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
 
+        // If expression is empty... only left parenthesis is allowed
         if (_expression.isEmpty()) {
             return if (token == leftParenthesis)
                 _expression.add(token)
@@ -60,9 +74,11 @@ class Expression {
 
         val prevToken = _expression.last()
 
+        // left parenthesis can be used after operators or another left parenthesis
         if (token == leftParenthesis && (prevToken != rightParenthesis && prevToken.type == TokenTypes.Operator))
             return _expression.add(token)
 
+        // right parenthesis can be used only as closing parenthesis or after number
         if (token == rightParenthesis) {
             var parentheses = 0
 
@@ -87,21 +103,31 @@ class Expression {
         return false
     }
 
+    /**
+     * Processes minus sign as the [token] at specified [index]
+     * @return [TRUE] upon successful operation, otherwise [FALSE]
+     */
     private fun processMinusSign(token: Token, index: Int) : Boolean {
-        // " - 5"
-        // "( - 5 )"
-
         val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
 
+        // Minus sign can be in the beginning of an expression
         if (_expression.isEmpty())
             return _expression.add(OperatorParser.parse(OperatorKind.SUBTRACTION))
 
+        // Minus sign can be after left parenthesis
         if (_expression.last().type == TokenTypes.Operator && _expression.last() == leftParenthesis)
             return _expression.add(OperatorParser.parse(OperatorKind.SUBTRACTION))
 
         return addOperator(token, index)
     }
 
+    /**
+     * Adds number to [Expression] at [index]
+     *
+     * @param  [token] token to be added
+     * @param [index] position of [token] in [Expression]
+     * @return [TRUE] upon successful operation, otherwise [FALSE]
+     */
     private fun addNumber(token: Token, index: Int) : Boolean {
         if (token == NumberParser.parse(NumberKind.DOT))
             return parseDot(index)
@@ -149,10 +175,10 @@ class Expression {
     }
 
     /**
-     * Adds specified object to [Expression] at [index]
+     * Adds operator to [Expression] at [index]
      *
-     * @param  [operator] [Operator] object that stores representation of an operator
-     * @param [index] position of [operator] in [Expression]
+     * @param  [token] token to be added
+     * @param [index] position of [token] in [Expression]
      * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
     private fun addOperator(token: Token, index: Int) : Boolean {
@@ -182,13 +208,21 @@ class Expression {
     }
 
     /**
-     * Adds specified object to [Expression] at [index]
+     * Adds function to [Expression] at [index]
      *
-     * @param  [function] [Function] object that stores representation of a function or function expression
-     * @param [index] position of [function] in [Expression]
+     * @param  [token] token to be added
+     * @param [index] position of [token] in [Expression]
      * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
     private fun addFunction(token: Token, index: Int) : Boolean {
+        return when(token) {
+            FunctionParser.parse(FunctionKind.PERCENTAGE) -> addPercent(token, index)
+            FunctionParser.parse(FunctionKind.NATURAL_LOG) -> addNaturalLogarithm(token, index)
+            else -> false
+        }
+    }
+
+    private fun addPercent(token: Token, index: Int): Boolean {
         if (token == FunctionParser.parse(FunctionKind.PERCENTAGE) && _expression.isEmpty())
             return false
 
@@ -203,26 +237,26 @@ class Expression {
             return true
         }
 
-        if (token == FunctionParser.parse(FunctionKind.NATURAL_LOG)) {
-            if (_expression.isNotEmpty()) {
-                val last = _expression.last()
+        return false
+    }
 
-                val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
 
-                if (last.type == TokenTypes.Number || last == rightParenthesis)
-                    return false
-            }
+    // I need to fix it later on... it works now but I have to make it universal
+    // Not only for the "last" token
+    private fun addNaturalLogarithm(token: Token, index: Int): Boolean {
+        if (_expression.isNotEmpty()) {
+            val last = _expression.last()
 
-            _expression.add(token)
-            _expression.add(OperatorParser.parse(OperatorKind.LEFT_BRACKET))
+            val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
 
-            return true
+            if (last.type == TokenTypes.Number || last == rightParenthesis)
+                return false
         }
 
+        _expression.add(token)
+        _expression.add(OperatorParser.parse(OperatorKind.LEFT_BRACKET))
 
-        // Logic for fun ( expr ) format
-
-        return false
+        return true
     }
 
     private fun parseDot(index: Int): Boolean {

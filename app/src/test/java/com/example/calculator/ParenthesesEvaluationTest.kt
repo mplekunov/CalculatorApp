@@ -1,7 +1,7 @@
 package com.example.calculator
 
 import com.example.calculator.model.expression.ExpressionEvaluator
-import com.example.calculator.model.expression.PostfixEvaluator
+import com.example.calculator.model.postfix.PostfixEvaluator
 import com.example.calculator.model.token.Token
 import com.example.calculator.model.token.TokenTypes
 
