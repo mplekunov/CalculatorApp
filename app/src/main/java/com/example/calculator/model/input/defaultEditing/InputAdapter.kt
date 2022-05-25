@@ -5,8 +5,10 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import androidx.lifecycle.MutableLiveData
 import com.example.calculator.algorithm.Algorithms
+import com.example.calculator.model.operator.OperatorKind
 import com.example.calculator.model.token.TokenTypes
 import com.example.calculator.model.wrapper.Buttons
+import com.example.calculator.parser.OperatorParser
 import com.example.calculator.viewmodel.CalculatorViewModel
 
 open class InputAdapter(
@@ -110,6 +112,17 @@ open class InputAdapter(
         }
         else {
             index = viewModel.inputAsTokens.lastIndex
+
+            if (token == OperatorParser.parse(OperatorKind.SUBTRACTION)) {
+                if (index - 2 >= 0 && viewModel.inputAsTokens[index - 2].type == TokenTypes.Operator) {
+                    for(i in (index - 1)..viewModel.inputAsTokens.lastIndex) {
+                        index = i
+
+                        spannable.replace(oldStart, oldEnd, string)
+                        spannable.setSpan(newStart, newEnd)
+                    }
+                }
+            }
 
             spannable.replace(oldStart, oldEnd, string)
 

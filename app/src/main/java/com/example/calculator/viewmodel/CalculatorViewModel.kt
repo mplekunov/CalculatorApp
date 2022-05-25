@@ -25,7 +25,7 @@ class CalculatorViewModel : ViewModel() {
 
     val inputAsTokens: List<Token> get() = postfixEvaluator.infix
 
-    val outputAsToken: Token get() = ExpressionEvaluator(postfixEvaluator).result
+    val outputAsToken: Token get() = ExpressionEvaluator(postfixEvaluator.postfix).result
 
     val formattedInput: List<String>
         get() = TokenFormatter.convertTokensToStrings(inputAsTokens)
@@ -88,7 +88,7 @@ class CalculatorViewModel : ViewModel() {
      * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
     fun set(function: FunctionKind, index: Int = inputSize) : Boolean {
-        TODO("Not yet implemented")
+        return expression.setFunction(FunctionParser.parse(function), index)
     }
 
     /**

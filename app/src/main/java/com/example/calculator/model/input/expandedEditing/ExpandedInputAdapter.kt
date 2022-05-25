@@ -97,6 +97,17 @@ class ExpandedInputAdapter(
             } else
                 viewModel.inputAsTokens.lastIndex
 
+            if (token == OperatorParser.parse(OperatorKind.SUBTRACTION)) {
+                if (index - 2 >= 0 && viewModel.inputAsTokens[index - 2].type == TokenTypes.Operator) {
+                    for(i in (index - 1)..viewModel.inputAsTokens.lastIndex) {
+                        index = i
+
+                        spannable.replace(oldStart, oldEnd, string)
+                        spannable.setSpan(newStart, newEnd)
+                    }
+                }
+            }
+
             spannable.replace(oldStart, oldEnd, string)
             spannable.setSpan(newStart, newEnd)
         }

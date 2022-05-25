@@ -1,5 +1,6 @@
 package com.example.calculator.model.expression
 
+import com.example.calculator.model.function.Function
 import com.example.calculator.model.function.FunctionKind
 import com.example.calculator.model.number.Number
 import com.example.calculator.model.number.NumberKind
@@ -115,10 +116,15 @@ class Expression {
             return _expression.add(OperatorParser.parse(OperatorKind.SUBTRACTION))
 
         // Minus sign can be after left parenthesis
-        if (_expression.last().type == TokenTypes.Operator && _expression.last() == leftParenthesis)
-            return _expression.add(OperatorParser.parse(OperatorKind.SUBTRACTION))
-
-        return addOperator(token, index)
+        return if (_expression.last().type == TokenTypes.Operator) {
+            if (_expression.last() == leftParenthesis)
+                _expression.add(OperatorParser.parse(OperatorKind.SUBTRACTION))
+            else {
+                _expression.add(OperatorParser.parse(OperatorKind.LEFT_BRACKET)) &&
+                        _expression.add(OperatorParser.parse(OperatorKind.SUBTRACTION))
+            }
+        } else
+            addOperator(token, index)
     }
 
     /**
@@ -393,14 +399,36 @@ class Expression {
     }
 
     /**
-     * Replaces old object in [Expression] at specified [index] to [operator]
+     * Replaces old object in [Expression] at specified [index] to [Operator]
      *
-     * @param  [operator] [Operator] object that stores representation of an operator
-     * @param [index] position of [operator] in [Expression]
+     * @param  [token] [Operator] object that stores representation of an operator
+     * @param [index] position of [token] in [Expression]
      * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
     fun setOperator(token: Token, index: Int): Boolean {
         if (index < 0 || index > _expression.lastIndex)
+            return false
+
+        _expression[index] = token
+
+        return true
+    }
+
+    /**
+     * Replaces old object in [Expression] at specified [index] to [Function]
+     *
+     * @param  [token] [Function] object that stores representation of an operator
+     * @param [index] position of [token] in [Expression]
+     * @return [TRUE] upon successful operation, otherwise [FALSE]
+     */
+    fun setFunction(token: Token, index: Int): Boolean {
+        if (index < 0 || index > _expression.lastIndex)
+            return false
+
+        val prevFunction = FunctionParser.parse<Function>(_expression[index])
+        val newFunction = FunctionParser.parse<Function>(token)
+
+        if (prevFunction.functionBody != newFunction.functionBody)
             return false
 
         _expression[index] = token
