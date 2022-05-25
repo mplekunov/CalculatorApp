@@ -96,12 +96,12 @@ abstract class Clickable(
         spannable.highlight(color, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
 
-    private fun SpannableStringBuilder.setSpan(start: Int, end: Int, flags: Int) {
+    protected fun SpannableStringBuilder.setSpan(start: Int, end: Int, flags: Int) {
         this@setSpan.setSpan(what, start, end, flags)
         liveInput.value = this@setSpan
     }
 
-    private fun SpannableStringBuilder.highlight(color: Int, start: Int, end: Int, flags: Int) {
+    protected fun SpannableStringBuilder.highlight(color: Int, start: Int, end: Int, flags: Int) {
         this@highlight.setSpan(ForegroundColorSpan(color), start, end, flags)
         liveInput.value = this@highlight
     }
@@ -138,7 +138,7 @@ abstract class Clickable(
         return startingIndex
     }
 
-    protected fun replaceSpan(newString: String) {
+    protected open fun replaceSpan(newString: String) {
         spannable.replace(oldStart, oldEnd, newString)
         spannable.setSpan(newStart, newEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
     }

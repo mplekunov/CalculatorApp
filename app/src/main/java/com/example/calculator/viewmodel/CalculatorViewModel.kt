@@ -88,7 +88,7 @@ class CalculatorViewModel : ViewModel() {
      * @return [TRUE] upon successful operation, otherwise [FALSE]
      */
     fun set(function: FunctionKind, index: Int = inputSize) : Boolean {
-        TODO("Not yet implemented")
+        return expression.setFunction(FunctionParser.parse(function), index)
     }
 
     /**

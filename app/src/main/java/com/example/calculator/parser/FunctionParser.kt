@@ -17,13 +17,10 @@ object FunctionParser : TokenParser<FunctionKind> {
             Token("!", TokenTypes.Function) to FunctionKind.FACTORIAL,
             Token("^2", TokenTypes.Function) to FunctionKind.SQUARED,
             Token("v", TokenTypes.Function) to FunctionKind.SQUARE_ROOT,
-            Token("(", TokenTypes.Function) to FunctionKind.LEFT_PARENTHESIS,
-            Token(")", TokenTypes.Function) to FunctionKind.RIGHT_PARENTHESIS
         )) }
 
     @PublishedApi
     internal val functionMap = mutableMapOf(
-        FunctionKind.PERCENTAGE to Function(map[FunctionKind.PERCENTAGE].toString(), FunctionBody.LEFT_SIDE),
         FunctionKind.NATURAL_LOG to Function(map[FunctionKind.NATURAL_LOG].toString(), FunctionBody.RIGHT_SIDE),
         FunctionKind.LOG to Function(map[FunctionKind.LOG].toString(), FunctionBody.RIGHT_SIDE),
         FunctionKind.SQUARE_ROOT to Function(map[FunctionKind.SQUARE_ROOT].toString(), FunctionBody.RIGHT_SIDE)
