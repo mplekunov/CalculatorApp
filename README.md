@@ -4,11 +4,11 @@
 ## Features
 - Can evaluate expressions containing positive/negative integers/floats using infix and postfix algorithms
 - Has responsive UI (colors and input/output formats will be customizable in the feature)
-- Supports standard calculator operations (support of functions (e.g. log, ln, cos, sin) are in progress)
-- Supports some advanced calculator operations (still in the development but parentheses and ln work as intended)
+- Supports standard calculator operations
+- Supports advanced calculator operations (squared, square root, natural logarith, logarithm base 10, factorial (max number is limited to 50))
 - Supports removal of operators and operands anywhere in the expression
 - Supports editing of operators and operands anywhere in the expression
-- (In development) support for function editing in support mode
+- Supports editing of similar functions (lg, log, square root)
 - Dynamically evaluates expression, saves expression result on the Equal button press
 
 This program allows user to calculate standard mathematical expressions (as any other basic calculator)
