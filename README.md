@@ -37,7 +37,7 @@ Edit Mode has type safety, which means operators can only be replaced by other o
 #### Negative Numbers
 Negative numbers are fully supported:
 
-![NegativeNumbers 480x](https://user-images.githubusercontent.com/38502074/169934057-3e9d4bf8-4c54-4c77-82b0-c58576918b67.gif)
+![NegativeNumbers 480x](https://user-images.githubusercontent.com/38502074/170172132-c252b956-3263-4182-956a-601c91a1f12f.gif)
 
 
 There also exist typesafety... Changing "number" sign on anything other than "-" will result in "NaN" result:
