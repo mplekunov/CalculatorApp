@@ -39,6 +39,14 @@ android {
         jvmTarget = '1.8'
     }
     buildToolsVersion '32.1.0 rc1'
+    flavorDimensions 'CalculatorApp'
+    productFlavors {
+        CalculatorApp {
+            dimension 'CalculatorApp'
+            versionCode 2
+            versionName '2.1'
+        }
+    }
 }
 
 dependencies {
