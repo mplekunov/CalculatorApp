@@ -108,7 +108,7 @@ class CalculatorFragment : Fragment() {
                     expandedCalculatorBinding?.ln!! to FunctionKind.NATURAL_LOG,
                     expandedCalculatorBinding?.log!! to FunctionKind.LOG,
                     expandedCalculatorBinding?.squareRoot!! to FunctionKind.SQUARE_ROOT,
-//                    expandedCalculatorBinding?.squared!! to FunctionKind.SQUARED,
+                    expandedCalculatorBinding?.squared!! to FunctionKind.SQUARED,
                     expandedCalculatorBinding?.factorial!! to FunctionKind.FACTORIAL
                 )
             )

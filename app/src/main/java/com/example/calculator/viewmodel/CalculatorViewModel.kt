@@ -25,7 +25,7 @@ class CalculatorViewModel : ViewModel() {
 
     val inputAsTokens: List<Token> get() = postfixEvaluator.infix
 
-    val outputAsToken: Token get() = ExpressionEvaluator(postfixEvaluator).result
+    val outputAsToken: Token get() = ExpressionEvaluator(postfixEvaluator.postfix).result
 
     val formattedInput: List<String>
         get() = TokenFormatter.convertTokensToStrings(inputAsTokens)

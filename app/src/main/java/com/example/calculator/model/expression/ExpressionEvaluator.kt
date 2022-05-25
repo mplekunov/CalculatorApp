@@ -18,7 +18,7 @@ import kotlin.math.pow
 /**
  * Helper class that evaluates [Expression].
  */
-class ExpressionEvaluator(private val postfixEvaluator: PostfixEvaluator) {
+class ExpressionEvaluator(private val postfix: MutableList<Token>) {
     var result: Token
 
     init {
@@ -38,8 +38,6 @@ class ExpressionEvaluator(private val postfixEvaluator: PostfixEvaluator) {
      * @return [Token] containing result of computation.
      */
     private fun calculateResult() : Token {
-        val postfix = postfixEvaluator.postfix
-
         val s = Stack<Token>()
 
         for (i in postfix.indices) {

@@ -115,10 +115,15 @@ class Expression {
             return _expression.add(OperatorParser.parse(OperatorKind.SUBTRACTION))
 
         // Minus sign can be after left parenthesis
-        if (_expression.last().type == TokenTypes.Operator && _expression.last() == leftParenthesis)
-            return _expression.add(OperatorParser.parse(OperatorKind.SUBTRACTION))
-
-        return addOperator(token, index)
+        return if (_expression.last().type == TokenTypes.Operator) {
+            if (_expression.last() == leftParenthesis)
+                _expression.add(OperatorParser.parse(OperatorKind.SUBTRACTION))
+            else {
+                _expression.add(OperatorParser.parse(OperatorKind.LEFT_BRACKET)) &&
+                        _expression.add(OperatorParser.parse(OperatorKind.SUBTRACTION))
+            }
+        } else
+            addOperator(token, index)
     }
 
     /**
