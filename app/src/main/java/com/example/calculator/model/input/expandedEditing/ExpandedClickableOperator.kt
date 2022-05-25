@@ -16,7 +16,9 @@ class ExpandedClickableOperator(
     viewModel: CalculatorViewModel,
     liveInput: MutableLiveData<SpannableStringBuilder>,
     index: Int
-) : ClickableOperator(context, buttons, viewModel, liveInput, index) {
+) : ExpandedClickable(context, buttons, viewModel, liveInput, index) {
+    override lateinit var oldString: String
+
     override val what
         get() = ExpandedClickableOperator(context, buttons, viewModel, liveInput, index)
 
@@ -29,7 +31,11 @@ class ExpandedClickableOperator(
     }
 
     override fun bindToEditableToken() {
-        super.bindToEditableToken()
+        buttons.functions.forEach { (button, _) -> setButtonState(button, disabledButtonColor, false) }
+        buttons.numbers.forEach { (button, _) -> setButtonState(button, disabledButtonColor, false) }
+
+        setButtonState(buttons.clear, disabledButtonColor, false)
+        setButtonState(buttons.clearAll, disabledButtonColor, false)
 
         buttons.operators.forEach { (button, operator) ->
             if (operator == OperatorKind.LEFT_BRACKET || operator == OperatorKind.RIGHT_BRACKET)

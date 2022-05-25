@@ -28,10 +28,9 @@ abstract class Clickable(
     protected val buttons: Buttons,
     protected val viewModel: CalculatorViewModel,
     protected val liveInput: MutableLiveData<SpannableStringBuilder>,
-    protected val index: Int
+    protected var index: Int
 ) : ClickableSpan() {
     protected val spannable get() = liveInput.value ?: SpannableStringBuilder()
-
 
     open var highlightedColor: Int = ResourcesCompat.getColor(context.resources, R.color.highlighted_text, context.theme)
     open var defaultTextColor: Int = ResourcesCompat.getColor(context.resources, R.color.default_text, context.theme)
@@ -92,7 +91,7 @@ abstract class Clickable(
 
     protected abstract fun bindToEditableToken()
 
-    protected fun applyColorToSpan(@ColorInt color: Int, start: Int = 0, end: Int = liveInput.value?.length!!) {
+    protected open fun applyColorToSpan(@ColorInt color: Int, start: Int = 0, end: Int = liveInput.value?.length!!) {
         spannable.highlight(color, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
 
@@ -115,7 +114,7 @@ abstract class Clickable(
         btn.isClickable = isClickable
     }
 
-    private fun resetSpannableFocus() {
+    protected open fun resetSpannableFocus() {
         applyColorToSpan(defaultTextColor)
         setButtonsAsClickable()
     }

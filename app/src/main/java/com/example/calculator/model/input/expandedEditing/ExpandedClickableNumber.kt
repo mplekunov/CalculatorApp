@@ -14,12 +14,33 @@ class ExpandedClickableNumber(
     viewModel: CalculatorViewModel,
     liveInput: MutableLiveData<SpannableStringBuilder>,
     index: Int
-) : ClickableNumber(context, buttons, viewModel, liveInput, index) {
+) : ExpandedClickable(context, buttons, viewModel, liveInput, index) {
+    override lateinit var oldString: String
+
     override val what
         get() = ExpandedClickableNumber(context, buttons, viewModel, liveInput, index)
 
     override fun bindToEditableToken() {
-        super.bindToEditableToken()
+        buttons.operators.forEach { (button, _) -> setButtonState(button, disabledButtonColor, false)}
+        buttons.functions.forEach { (button, _) -> setButtonState(button, disabledButtonColor, false) }
+
+        buttons.clear.setOnClickListener {
+            oldString = viewModel.formattedInput[index]
+
+            if (viewModel.delete(index)) {
+                replaceSpan(viewModel.formattedInput[index])
+                applyColorToSpan(highlightedColor, newStart, newEnd)
+            }
+        }
+
+        buttons.clearAll.setOnClickListener {
+            oldString = viewModel.formattedInput[index]
+
+            if (viewModel.deleteAll(index)) {
+                replaceSpan(viewModel.formattedInput[index])
+                applyColorToSpan(highlightedColor, newStart, newEnd)
+            }
+        }
 
         buttons.numbers.forEach { (button, number) ->
             button.setOnClickListener {
