@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <PreferenceCategory
+        android:title="Input Formatting">
+
+        <EditTextPreference
+            android:key="@string/saved_input_font_size_key"
+            android:title="Size"
+            app:useSimpleSummaryProvider="true"
+
+            android:dialogTitle="Choose Font Size"
+            tools:defaultValue="@string/default_input_size" />
+
+<!--        <ListPreference-->
+<!--            android:key="@string/saved_input_formatting_key"-->
+<!--            android:title="Format"-->
+<!--            app:useSimpleSummaryProvider="true"-->
+
+<!--            android:dialogTitle="Choose Font"-->
+<!--            tools:entries="@array/entries"-->
+<!--            tools:entryValues="@array/values"-->
+<!--            tools:defaultValue="Test 1" />-->
+
+        <Preference
+            android:key="@string/saved_input_font_color_key"
+            android:title="Text Color" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Output Formatting">
+
+        <EditTextPreference
+            android:key="@string/saved_output_font_size_key"
+            android:title="Size"
+            app:useSimpleSummaryProvider="true"
+
+            android:dialogTitle="Choose Font Size"
+            tools:defaultValue="@string/default_output_size" />
+
+<!--        <ListPreference-->
+<!--            android:key="@string/saved_output_formatting_key"-->
+<!--            android:title="Format"-->
+<!--            app:useSimpleSummaryProvider="true"-->
+
+<!--            android:dialogTitle="Choose Font"-->
+<!--            tools:entries="@array/entries"-->
+<!--            tools:entryValues="@array/values"-->
+<!--            tools:defaultValue="Test 1" />-->
+
+        <Preference
+            android:key="@string/saved_output_font_color_key"
+            android:title="Text Color"
+            android:summary="" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Buttons Color">
+
+        <Preference
+            android:key="@string/saved_function_button_color_key"
+            android:title="Function Buttons"
+            android:summary="" />
+
+        <Preference
+            android:key="@string/saved_number_button_color_key"
+            android:title="Number Buttons"
+            android:summary="" />
+
+        <Preference
+            android:key="@string/saved_operator_button_color_key"
+            android:title="Operator Buttons"
+            android:summary="" />
+
+        <Preference
+            android:key="@string/saved_clear_button_color_key"
+            android:title="Clear Button"
+            android:summary="" />
+
+        <Preference
+            android:key="@string/saved_clear_all_button_color_key"
+            android:title="Clear All Button"
+            android:summary="" />
+
+        <Preference
+            android:key="@string/saved_disabled_button_color_key"
+            android:title="Disabled Button"
+            android:summary="" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Editing Mode">
+
+        <Preference
+            android:key="@string/saved_highlighting_color_key"
+            android:title="Highlighting Color"
+            android:summary="" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

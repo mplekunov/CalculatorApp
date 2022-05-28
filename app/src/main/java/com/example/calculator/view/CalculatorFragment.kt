@@ -1,17 +1,22 @@
 package com.example.calculator.view
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 
 import android.text.method.LinkMovementMethod
+import android.util.Log
 
 import android.view.*
-import android.widget.Button
 import android.widget.ImageButton
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.*
+import androidx.core.widget.ImageViewCompat
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
+import androidx.preference.PreferenceManager
 
 import com.example.calculator.R
 import com.example.calculator.databinding.CalculatorExpandedBinding
@@ -42,6 +47,13 @@ class CalculatorFragment : Fragment() {
 
     private var liveInput = MutableLiveData<SpannableStringBuilder>()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Log.d("ColorPicker", "CalculatorFragment onCreate")
+
+        loadDefaultSettings()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -52,11 +64,17 @@ class CalculatorFragment : Fragment() {
         defaultCalculatorBinding = CalculatorNormalBinding.inflate(inflater, null, false)
         expandedCalculatorBinding = CalculatorExpandedBinding.inflate(inflater, null, false)
 
+        Log.d("ColorPicker", "CalculatorFragment onCreateView")
+
         return binding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        Log.d("ColorPicker", "CalculatorFragment onViewCreated")
+
+        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayShowTitleEnabled(false)
 
         binding?.apply {
             lifecycleOwner = viewLifecycleOwner
@@ -71,6 +89,7 @@ class CalculatorFragment : Fragment() {
 
         // Binds an observer to liveInput...
         // On liveData object modification, updates both input and output textview
+
         liveInput.observe(viewLifecycleOwner) {
             binding?.input?.text = it
             binding?.output?.text = viewModel.formattedOutput
@@ -95,6 +114,134 @@ class CalculatorFragment : Fragment() {
 
             binding?.calculatorLayout?.removeAllViews()
             binding?.calculatorLayout?.addView(defaultCalculatorBinding!!.root)
+        }
+    }
+
+    private fun applyCalculatorSettings() {
+        val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
+
+        ImageViewCompat.setImageTintList(buttons.clear, ColorStateList.valueOf(
+            pref.getString(
+                getString(R.string.saved_clear_button_color_key),
+                ""
+            )!!.toColorInt()
+        ))
+
+        buttons.clearAll.setTextColor(ColorStateList.valueOf(pref.getString(
+            getString(R.string.saved_clear_all_button_color_key),
+            ""
+        )!!.toColorInt())
+        )
+
+        buttons.functions.forEach { (button, _) ->
+            ImageViewCompat.setImageTintList(button, ColorStateList.valueOf(
+                pref.getString(
+                    getString(R.string.saved_function_button_color_key),
+                    ""
+                )!!.toColorInt()))
+        }
+        buttons.operators.forEach { (button, _) ->
+            ImageViewCompat.setImageTintList(button, ColorStateList.valueOf(
+                pref.getString(
+                    getString(R.string.saved_operator_button_color_key),
+                    ""
+                )!!.toColorInt())
+            )
+        }
+        buttons.numbers.forEach { (button, _) ->
+            ImageViewCompat.setImageTintList(button, ColorStateList.valueOf(
+                pref.getString(
+                    getString(R.string.saved_number_button_color_key),
+                    ""
+                )!!.toColorInt())
+            )
+        }
+
+        binding!!.input.setTextColor(
+            pref.getString(getString(R.string.saved_input_font_color_key), "")!!.toColorInt())
+
+        binding!!.output.setTextColor(
+            pref.getString(getString(R.string.saved_output_font_color_key), "")!!.toColorInt())
+
+
+        binding!!.input.textSize = pref.getString(getString(R.string.saved_input_font_size_key), "0").toString().toFloat()
+        binding!!.output.textSize = pref.getString(getString(R.string.saved_output_font_size_key), "0").toString().toFloat()
+    }
+
+    private fun getHexColor(color: Int): String {
+        var alpha = color.alpha.toString(16)
+        if (alpha.length == 1)
+            alpha = "0$alpha"
+
+        var red = color.red.toString(16)
+        if (red.length == 1)
+            red = "0$red"
+
+        var green = color.green.toString(16)
+        if (green.length == 1)
+            green = "0$green"
+
+        var blue = color.blue.toString(16)
+        if (blue.length == 1)
+            blue = "0$blue"
+
+        return "#$alpha$red$green$blue"
+    }
+
+    // Default Settings
+    private fun loadDefaultSettings() {
+        val sp = PreferenceManager.getDefaultSharedPreferences(requireContext())
+
+        with(sp.edit()) {
+            putString(
+                getString(R.string.saved_input_font_color_key),
+                getHexColor(resources.getColor(R.color.default_text, context?.theme))
+            )
+            putString(
+                getString(R.string.saved_output_font_color_key),
+                getHexColor(resources.getColor(R.color.default_text, context?.theme))
+            )
+
+            putString(
+                getString(R.string.saved_number_button_color_key),
+                getHexColor(resources.getColor(R.color.calc_number_button, context?.theme))
+            )
+            putString(
+                getString(R.string.saved_function_button_color_key),
+                getHexColor(resources.getColor(R.color.calc_function_button, context?.theme))
+            )
+            putString(
+                getString(R.string.saved_operator_button_color_key),
+                getHexColor(resources.getColor(R.color.calc_operation_button, context?.theme))
+            )
+
+            putString(
+                getString(R.string.saved_clear_button_color_key),
+                getHexColor(resources.getColor(R.color.calc_clear_button, context?.theme))
+            )
+            putString(
+                getString(R.string.saved_clear_all_button_color_key),
+                getHexColor(resources.getColor(R.color.calc_clear_all_button, context?.theme))
+            )
+
+            putString(
+                getString(R.string.saved_disabled_button_color_key),
+                getHexColor(resources.getColor(R.color.calc_disabled_button, context?.theme))
+            )
+            putString(
+                getString(R.string.saved_highlighting_color_key),
+                getHexColor(resources.getColor(R.color.highlighted_text, context?.theme))
+            )
+
+            putString(
+                getString(R.string.saved_input_font_size_key), "14"
+            )
+
+            putString(
+                getString(R.string.saved_output_font_size_key), "10"
+            )
+
+            apply()
         }
     }
 
@@ -152,8 +299,11 @@ class CalculatorFragment : Fragment() {
         buttons.clearAll = expandedCalculatorBinding?.clearAll!!
         buttons.equal = expandedCalculatorBinding?.equal!!
 
-        expandedInputAdapter = ExpandedInputAdapter(requireContext(), buttons, viewModel, liveInput)
+        expandedInputAdapter =
+            ExpandedInputAdapter(requireActivity(), buttons, viewModel, liveInput)
         expandedInputAdapter.setBindings()
+
+        applyCalculatorSettings()
     }
 
     private fun initDefaultBindings() {
@@ -200,8 +350,10 @@ class CalculatorFragment : Fragment() {
         buttons.clearAll = defaultCalculatorBinding?.clearAll!!
         buttons.equal = defaultCalculatorBinding?.equal!!
 
-        defaultInputAdapter = InputAdapter(requireContext(), buttons, viewModel, liveInput)
+        defaultInputAdapter = InputAdapter(requireActivity(), buttons, viewModel, liveInput)
         defaultInputAdapter.setBindings()
+
+        applyCalculatorSettings()
     }
 
     fun onInputChange() {

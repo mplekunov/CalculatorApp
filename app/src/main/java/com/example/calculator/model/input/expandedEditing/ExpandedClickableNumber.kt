@@ -2,6 +2,8 @@ package com.example.calculator.model.input.expandedEditing
 
 import android.content.Context
 import android.text.SpannableStringBuilder
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import com.example.calculator.model.input.defaultEditing.ClickableNumber
 import com.example.calculator.model.number.NumberKind
@@ -9,16 +11,16 @@ import com.example.calculator.model.wrapper.Buttons
 import com.example.calculator.viewmodel.CalculatorViewModel
 
 class ExpandedClickableNumber(
-    context: Context,
+    activity: FragmentActivity,
     buttons: Buttons,
     viewModel: CalculatorViewModel,
     liveInput: MutableLiveData<SpannableStringBuilder>,
     index: Int
-) : ExpandedClickable(context, buttons, viewModel, liveInput, index) {
+) : ExpandedClickable(activity, buttons, viewModel, liveInput, index) {
     override lateinit var oldString: String
 
     override val what
-        get() = ExpandedClickableNumber(context, buttons, viewModel, liveInput, index)
+        get() = ExpandedClickableNumber(activity, buttons, viewModel, liveInput, index)
 
     override fun bindToEditableToken() {
         buttons.operators.forEach { (button, _) -> setButtonState(button, disabledButtonColor, false)}

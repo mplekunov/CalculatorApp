@@ -8,6 +8,8 @@ import android.text.style.DynamicDrawableSpan
 import android.text.style.ImageSpan
 import android.widget.TextView
 import androidx.annotation.ColorInt
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import com.example.calculator.R
 import com.example.calculator.model.function.FunctionKind
@@ -23,12 +25,12 @@ import com.example.calculator.parser.OperatorParser
 import com.example.calculator.viewmodel.CalculatorViewModel
 
 abstract class ExpandedClickable(
-    context: Context,
+    activity: FragmentActivity,
     buttons: Buttons,
     viewModel: CalculatorViewModel,
     liveInput: MutableLiveData<SpannableStringBuilder>,
     index: Int
-) : Clickable(context, buttons, viewModel, liveInput, index) {
+) : Clickable(activity, buttons, viewModel, liveInput, index) {
     private val token get() = viewModel.inputAsTokens[index]
 
     override fun resetSpannableFocus() {
@@ -62,7 +64,7 @@ abstract class ExpandedClickable(
         }
 
         drawable.setTint(color)
-        val size: Int = (context as Activity).findViewById<TextView>(R.id.input).textSize.toInt()
+        val size: Int = activity.findViewById<TextView>(R.id.input).textSize.toInt()
         drawable.setBounds(0, 0,  size - 15, size - 20)
 
         if (FunctionParser.parse<FunctionKind>(token) == FunctionKind.LOG)

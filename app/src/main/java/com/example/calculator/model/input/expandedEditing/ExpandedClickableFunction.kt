@@ -9,7 +9,9 @@ import android.text.style.ImageSpan
 import android.view.View
 import android.widget.TextView
 import androidx.annotation.ColorInt
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import com.example.calculator.R
 import com.example.calculator.model.function.Function
@@ -26,17 +28,17 @@ import com.example.calculator.parser.OperatorParser
 import com.example.calculator.viewmodel.CalculatorViewModel
 
 class ExpandedClickableFunction(
-    context: Context,
+    activity: FragmentActivity,
     buttons: Buttons,
     viewModel: CalculatorViewModel,
     liveInput: MutableLiveData<SpannableStringBuilder>,
     index: Int
-) : ExpandedClickable(context, buttons, viewModel, liveInput, index) {
+) : ExpandedClickable(activity, buttons, viewModel, liveInput, index) {
 
     override lateinit var oldString: String
 
     override val what
-        get() = ExpandedClickableFunction(context, buttons, viewModel, liveInput, index)
+        get() = ExpandedClickableFunction(activity, buttons, viewModel, liveInput, index)
 
     override fun bindToEditableToken() {
         buttons.operators.forEach { (button, _) -> setButtonState(button, disabledButtonColor, false) }

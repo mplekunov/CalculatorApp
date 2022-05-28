@@ -3,6 +3,8 @@ package com.example.calculator.model.input.defaultEditing
 import android.content.Context
 import android.text.Spannable
 import android.text.SpannableStringBuilder
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import com.example.calculator.algorithm.Algorithms
 import com.example.calculator.model.operator.OperatorKind
@@ -12,7 +14,7 @@ import com.example.calculator.parser.OperatorParser
 import com.example.calculator.viewmodel.CalculatorViewModel
 
 open class InputAdapter(
-    val context: Context,
+    val activity: FragmentActivity,
     val buttons: Buttons,
     val viewModel: CalculatorViewModel,
     val spannableInput: MutableLiveData<SpannableStringBuilder>,
@@ -39,14 +41,14 @@ open class InputAdapter(
         get() {
             return when (token.type) {
                 TokenTypes.Number -> ClickableNumber(
-                    context,
+                    activity,
                     buttons,
                     viewModel,
                     spannableInput,
                     index
                 )
                 TokenTypes.Operator -> ClickableOperator(
-                    context,
+                    activity,
                     buttons,
                     viewModel,
                     spannableInput,

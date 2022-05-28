@@ -7,24 +7,24 @@ import android.text.SpannableStringBuilder
 import android.text.TextPaint
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
-import android.util.TypedValue
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
-import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.toColorInt
 import androidx.core.widget.ImageViewCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
+import androidx.preference.PreferenceManager
 import com.example.calculator.R
 import com.example.calculator.algorithm.Algorithms
 import com.example.calculator.model.wrapper.Buttons
 import com.example.calculator.viewmodel.CalculatorViewModel
 
 abstract class Clickable(
-    protected val context: Context,
+    protected val activity: FragmentActivity,
     protected val buttons: Buttons,
     protected val viewModel: CalculatorViewModel,
     protected val liveInput: MutableLiveData<SpannableStringBuilder>,
@@ -32,16 +32,23 @@ abstract class Clickable(
 ) : ClickableSpan() {
     protected val spannable get() = liveInput.value ?: SpannableStringBuilder()
 
-    open var highlightedColor: Int = ResourcesCompat.getColor(context.resources, R.color.highlighted_text, context.theme)
-    open var defaultTextColor: Int = ResourcesCompat.getColor(context.resources, R.color.default_text, context.theme)
+    private fun getColor(preferenceKey: Int): Int {
+        val preference = PreferenceManager.getDefaultSharedPreferences(activity.baseContext)
 
-    private var enabledButtonColor: Int = ResourcesCompat.getColor(context.resources, R.color.calc_default_function_button, context.theme)
+        val str = preference.getString(activity.getString(preferenceKey), "")
+        return str!!.toColorInt()
+    }
 
-    open var enabledNumberButtonColor: Int = context.resolveColorAttr(android.R.attr.textColorPrimary)
-    open var enabledFunctionButtonColor: Int = ResourcesCompat.getColor(context.resources, R.color.calc_default_function_button, context.theme)
-    open var enabledOperatorButtonColor: Int = ResourcesCompat.getColor(context.resources, R.color.calc_default_operation_button, context.theme)
+    open val highlightedColor: Int get() = getColor(R.string.saved_highlighting_color_key)
+    open val defaultTextColor: Int get() = getColor(R.string.saved_input_font_color_key)
 
-    open var disabledButtonColor: Int = ResourcesCompat.getColor(context.resources, R.color.calc_button_pressed, context.theme)
+    protected val enabledButtonColor: Int get() = getColor(R.string.saved_highlighting_color_key)
+
+    protected val enabledNumberButtonColor: Int get() = getColor(R.string.saved_number_button_color_key)
+    protected val enabledFunctionButtonColor: Int get() = getColor(R.string.saved_function_button_color_key)
+    protected val enabledOperatorButtonColor: Int get() = getColor(R.string.saved_operator_button_color_key)
+
+    protected val disabledButtonColor: Int get() = getColor(R.string.saved_disabled_button_color_key)
 
     abstract var oldString: String
 
@@ -51,20 +58,6 @@ abstract class Clickable(
     protected val newStart: Int get() = Algorithms.findStartingPosOfPattern(viewModel.formattedInput[index], viewModel.inputAsTokens[index].toString()) + oldStart
     protected val newEnd: Int get() = viewModel.inputAsTokens[index].length + newStart
 
-    @ColorInt
-    private fun Context.resolveColorAttr(@AttrRes colorAttr: Int): Int {
-        val resolvedAttr = resolveThemeAttr(colorAttr)
-        // resourceId is used if it's a ColorStateList, and data if it's a color reference or a hex color
-        val colorRes = if (resolvedAttr.resourceId != 0) resolvedAttr.resourceId else resolvedAttr.data
-        return ContextCompat.getColor(this, colorRes)
-    }
-
-    private fun Context.resolveThemeAttr(@AttrRes attrRes: Int): TypedValue {
-        val typedValue = TypedValue()
-        theme.resolveAttribute(attrRes, typedValue, true)
-        return typedValue
-    }
-
     override fun onClick(view: View) {
         resetSpannableFocus()
 
@@ -73,13 +66,13 @@ abstract class Clickable(
 
         applyColorToSpan(highlightedColor, newStart, newEnd)
 
-        buttons.equal.setImageDrawable(ResourcesCompat.getDrawable(context.resources, R.drawable.check_mark_ic, context.theme))
+        buttons.equal.setImageDrawable(ResourcesCompat.getDrawable(activity.resources, R.drawable.check_mark_ic, activity.theme))
 
         buttons.equal.setOnClickListener {
-            InputAdapter(context, buttons, viewModel, liveInput).setBindings()
+            InputAdapter(activity, buttons, viewModel, liveInput).setBindings()
 
             resetSpannableFocus()
-            buttons.equal.setImageDrawable(ResourcesCompat.getDrawable(context.resources, R.drawable.equal_ic, context.theme))
+            buttons.equal.setImageDrawable(ResourcesCompat.getDrawable(activity.resources, R.drawable.equal_ic, activity.theme))
         }
     }
 

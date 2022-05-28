@@ -71,7 +71,7 @@
 
             android:text="@string/all_cleared"
             android:fontFamily="sans-serif-condensed"
-            android:textColor="@color/calc_default_function_button"
+            android:textColor="@color/calc_function_button"
             android:textSize="@dimen/button_ac_text_size" />
 
 

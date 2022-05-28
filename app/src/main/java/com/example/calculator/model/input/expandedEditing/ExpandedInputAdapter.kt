@@ -1,14 +1,12 @@
 package com.example.calculator.model.input.expandedEditing
 
-import android.app.Activity
-import android.content.Context
-import android.graphics.drawable.Drawable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.DynamicDrawableSpan
 import android.text.style.ImageSpan
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import com.example.calculator.R
 import com.example.calculator.model.function.Function
@@ -18,41 +16,39 @@ import com.example.calculator.model.input.defaultEditing.Clickable
 import com.example.calculator.model.input.defaultEditing.InputAdapter
 import com.example.calculator.model.number.NumberKind
 import com.example.calculator.model.operator.OperatorKind
-import com.example.calculator.model.token.Token
 import com.example.calculator.model.token.TokenTypes
 import com.example.calculator.model.wrapper.Buttons
 import com.example.calculator.parser.FunctionParser
 import com.example.calculator.parser.NumberParser
 import com.example.calculator.parser.OperatorParser
-import com.example.calculator.view.CalculatorFragment
 import com.example.calculator.viewmodel.CalculatorViewModel
 
 class ExpandedInputAdapter(
-    context: Context,
+    activity: FragmentActivity,
     buttons: Buttons,
     viewModel: CalculatorViewModel,
     spannableInput: MutableLiveData<SpannableStringBuilder>
-) : InputAdapter(context, buttons, viewModel, spannableInput) {
+) : InputAdapter(activity, buttons, viewModel, spannableInput) {
 
     override val what: Clickable
         get() {
             return when (token.type) {
                 TokenTypes.Number -> ExpandedClickableNumber(
-                    context,
+                    activity,
                     buttons,
                     viewModel,
                     spannableInput,
                     index
                 )
                 TokenTypes.Operator -> ExpandedClickableOperator(
-                    context,
+                    activity,
                     buttons,
                     viewModel,
                     spannableInput,
                     index
                 )
                 TokenTypes.Function -> ExpandedClickableFunction(
-                    context,
+                    activity,
                     buttons,
                     viewModel,
                     spannableInput,
@@ -122,8 +118,8 @@ class ExpandedInputAdapter(
             TokenTypes.Operator -> buttons.operators[OperatorParser.parse<OperatorKind>(token)]!!.drawable.constantState!!.newDrawable().mutate()
         }
 
-        drawable.setTint(ContextCompat.getColor(context, R.color.white))
-        val size: Int = (context as Activity).findViewById<TextView>(R.id.input).textSize.toInt()
+        drawable.setTint(ContextCompat.getColor(activity, R.color.white))
+        val size: Int = activity.findViewById<TextView>(R.id.input).textSize.toInt()
         drawable.setBounds(0, 0,  size - 15, size - 20)
 
         if (FunctionParser.parse<FunctionKind>(token) == FunctionKind.LOG)

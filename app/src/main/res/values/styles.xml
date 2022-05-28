@@ -8,7 +8,6 @@
         <item name="android:paddingBottom">8dp</item>
         <item name="android:paddingStart">24dp</item>
         <item name="android:paddingEnd">24dp</item>
-        <item name="android:colorAccent"></item>
     </style>
 
     <!-- Divider style -->
@@ -18,6 +17,13 @@
         <item name="android:layout_marginEnd">24dp</item>
         <item name="android:layout_marginTop">4dp</item>
         <item name="android:layout_marginBottom">4dp</item>
+    </style>
+
+
+    <style name="Widget.Calculator.Button" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/button_pressed</item>
+        <item name="android:backgroundTint">@color/calc_function_button</item>
+        <item name="android:color">@color/calc_function_button</item>
     </style>
 
     <!-- Calculator Button style -->
@@ -33,7 +39,7 @@
         <item name="android:adjustViewBounds">true</item>
         <item name="android:scaleType">fitCenter</item>
         <item name="android:layout_columnWeight">1</item>
-        <item name="android:tint">@color/calc_default_function_button</item>
+        <item name="android:tint">@color/calc_function_button</item>
         <item name="backgroundTint">@color/calc_button_pressed</item>
     </style>
 </resources>
