@@ -20,6 +20,7 @@ import com.example.calculator.model.function.FunctionKind
 import com.example.calculator.model.input.defaultEditing.Clickable
 import com.example.calculator.model.number.NumberKind
 import com.example.calculator.model.operator.OperatorKind
+import com.example.calculator.model.settings.SettingsManager
 import com.example.calculator.model.token.TokenTypes
 import com.example.calculator.model.wrapper.Buttons
 import com.example.calculator.parser.FunctionParser
@@ -33,7 +34,7 @@ class ExpandedClickableFunction(
     viewModel: CalculatorViewModel,
     liveInput: MutableLiveData<SpannableStringBuilder>,
     index: Int
-) : ExpandedClickable(activity, buttons, viewModel, liveInput, index) {
+) : ExpandedClickable(activity,  buttons, viewModel, liveInput, index) {
 
     override lateinit var oldString: String
 

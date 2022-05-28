@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import com.example.calculator.model.input.defaultEditing.ClickableOperator
 import com.example.calculator.model.operator.OperatorKind
+import com.example.calculator.model.settings.SettingsManager
 import com.example.calculator.model.wrapper.Buttons
 import com.example.calculator.parser.OperatorParser
 import com.example.calculator.viewmodel.CalculatorViewModel
@@ -22,7 +23,7 @@ class ExpandedClickableOperator(
     override lateinit var oldString: String
 
     override val what
-        get() = ExpandedClickableOperator(activity, buttons, viewModel, liveInput, index)
+        get() = ExpandedClickableOperator(activity,buttons, viewModel, liveInput, index)
 
     override fun onClick(view: View) {
         val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)

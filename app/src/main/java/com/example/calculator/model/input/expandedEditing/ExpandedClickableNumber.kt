@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import com.example.calculator.model.input.defaultEditing.ClickableNumber
 import com.example.calculator.model.number.NumberKind
+import com.example.calculator.model.settings.SettingsManager
 import com.example.calculator.model.wrapper.Buttons
 import com.example.calculator.viewmodel.CalculatorViewModel
 

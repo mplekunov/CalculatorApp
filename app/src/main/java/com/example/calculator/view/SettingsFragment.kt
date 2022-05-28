@@ -17,6 +17,7 @@ import androidx.core.graphics.*
 import androidx.preference.*
 import com.example.calculator.R
 import com.example.calculator.databinding.FragmentColorPickerBinding
+import com.example.calculator.model.settings.SettingsManager
 import java.util.*
 
 class SettingsFragment : PreferenceFragmentCompat() {
@@ -69,13 +70,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             initColorSpectrumSeekBars(preferenceKey)
 
             colorPickerBiding?.colorApplyButton?.setOnClickListener {
-                val preferenceManager =
-                    PreferenceManager.getDefaultSharedPreferences(requireContext())
-
-                with(preferenceManager.edit()) {
-                    putString(getString(preferenceKey), getHexColor())
-                    apply()
-                }
+                SettingsManager(requireContext()).setColor(preferenceKey, getHexColor().toColorInt())
 
                 colorPickerBiding?.colorCancelButton?.performClick()
             }

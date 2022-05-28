@@ -19,6 +19,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 
 import com.example.calculator.R
+import com.example.calculator.converter.ColorConverter
 import com.example.calculator.databinding.CalculatorExpandedBinding
 import com.example.calculator.databinding.CalculatorNormalBinding
 import com.example.calculator.databinding.FragmentCalculatorBinding
@@ -28,6 +29,7 @@ import com.example.calculator.model.input.defaultEditing.InputAdapter
 import com.example.calculator.model.input.expandedEditing.ExpandedInputAdapter
 import com.example.calculator.model.number.NumberKind
 import com.example.calculator.model.operator.OperatorKind
+import com.example.calculator.model.settings.SettingsManager
 import com.example.calculator.model.wrapper.Buttons
 
 import com.example.calculator.viewmodel.CalculatorViewModel
@@ -40,7 +42,7 @@ class CalculatorFragment : Fragment() {
 
     private val viewModel: CalculatorViewModel by viewModels()
 
-    private var buttons: Buttons = Buttons()
+    private var buttons = Buttons()
 
     private lateinit var defaultInputAdapter: InputAdapter
     private lateinit var expandedInputAdapter: ExpandedInputAdapter
@@ -118,131 +120,64 @@ class CalculatorFragment : Fragment() {
     }
 
     private fun applyCalculatorSettings() {
-        val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        val settingsManager = SettingsManager(requireContext())
 
         ImageViewCompat.setImageTintList(buttons.clear, ColorStateList.valueOf(
-            pref.getString(
-                getString(R.string.saved_clear_button_color_key),
-                ""
-            )!!.toColorInt()
+            settingsManager.getColor(R.string.saved_clear_button_color_key)
         ))
 
-        buttons.clearAll.setTextColor(ColorStateList.valueOf(pref.getString(
-            getString(R.string.saved_clear_all_button_color_key),
-            ""
-        )!!.toColorInt())
-        )
+        buttons.clearAll.setTextColor(ColorStateList.valueOf(
+            settingsManager.getColor(R.string.saved_clear_all_button_color_key)
+        ))
 
         buttons.functions.forEach { (button, _) ->
             ImageViewCompat.setImageTintList(button, ColorStateList.valueOf(
-                pref.getString(
-                    getString(R.string.saved_function_button_color_key),
-                    ""
-                )!!.toColorInt()))
+                settingsManager.getColor(R.string.saved_function_button_color_key)
+            ))
         }
+
         buttons.operators.forEach { (button, _) ->
             ImageViewCompat.setImageTintList(button, ColorStateList.valueOf(
-                pref.getString(
-                    getString(R.string.saved_operator_button_color_key),
-                    ""
-                )!!.toColorInt())
-            )
+                settingsManager.getColor(R.string.saved_operator_button_color_key)
+            ))
         }
+
         buttons.numbers.forEach { (button, _) ->
             ImageViewCompat.setImageTintList(button, ColorStateList.valueOf(
-                pref.getString(
-                    getString(R.string.saved_number_button_color_key),
-                    ""
-                )!!.toColorInt())
-            )
+                settingsManager.getColor(R.string.saved_number_button_color_key)
+            ))
         }
 
         binding!!.input.setTextColor(
-            pref.getString(getString(R.string.saved_input_font_color_key), "")!!.toColorInt())
+            settingsManager.getColor(R.string.saved_input_font_color_key))
 
         binding!!.output.setTextColor(
-            pref.getString(getString(R.string.saved_output_font_color_key), "")!!.toColorInt())
+            settingsManager.getColor(R.string.saved_output_font_color_key))
 
 
-        binding!!.input.textSize = pref.getString(getString(R.string.saved_input_font_size_key), "0").toString().toFloat()
-        binding!!.output.textSize = pref.getString(getString(R.string.saved_output_font_size_key), "0").toString().toFloat()
-    }
-
-    private fun getHexColor(color: Int): String {
-        var alpha = color.alpha.toString(16)
-        if (alpha.length == 1)
-            alpha = "0$alpha"
-
-        var red = color.red.toString(16)
-        if (red.length == 1)
-            red = "0$red"
-
-        var green = color.green.toString(16)
-        if (green.length == 1)
-            green = "0$green"
-
-        var blue = color.blue.toString(16)
-        if (blue.length == 1)
-            blue = "0$blue"
-
-        return "#$alpha$red$green$blue"
+        binding!!.input.textSize = settingsManager.getString(R.string.saved_input_font_size_key).toFloat()
+        binding!!.output.textSize = settingsManager.getString(R.string.saved_output_font_size_key).toFloat()
     }
 
     // Default Settings
     private fun loadDefaultSettings() {
-        val sp = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        val settingsManager = SettingsManager(requireContext())
 
-        with(sp.edit()) {
-            putString(
-                getString(R.string.saved_input_font_color_key),
-                getHexColor(resources.getColor(R.color.default_text, context?.theme))
-            )
-            putString(
-                getString(R.string.saved_output_font_color_key),
-                getHexColor(resources.getColor(R.color.default_text, context?.theme))
-            )
+        settingsManager.setColor(R.string.saved_input_font_color_key, resources.getColor(R.color.default_text, context?.theme))
+        settingsManager.setColor(R.string.saved_output_font_color_key, resources.getColor(R.color.default_text, context?.theme))
 
-            putString(
-                getString(R.string.saved_number_button_color_key),
-                getHexColor(resources.getColor(R.color.calc_number_button, context?.theme))
-            )
-            putString(
-                getString(R.string.saved_function_button_color_key),
-                getHexColor(resources.getColor(R.color.calc_function_button, context?.theme))
-            )
-            putString(
-                getString(R.string.saved_operator_button_color_key),
-                getHexColor(resources.getColor(R.color.calc_operation_button, context?.theme))
-            )
+        settingsManager.setColor(R.string.saved_number_button_color_key, resources.getColor(R.color.calc_number_button, context?.theme))
+        settingsManager.setColor(R.string.saved_function_button_color_key, resources.getColor(R.color.calc_function_button, context?.theme))
+        settingsManager.setColor(R.string.saved_operator_button_color_key, resources.getColor(R.color.calc_operation_button, context?.theme))
 
-            putString(
-                getString(R.string.saved_clear_button_color_key),
-                getHexColor(resources.getColor(R.color.calc_clear_button, context?.theme))
-            )
-            putString(
-                getString(R.string.saved_clear_all_button_color_key),
-                getHexColor(resources.getColor(R.color.calc_clear_all_button, context?.theme))
-            )
+        settingsManager.setColor(R.string.saved_clear_button_color_key, resources.getColor(R.color.calc_clear_button, context?.theme))
+        settingsManager.setColor(R.string.saved_clear_all_button_color_key, resources.getColor(R.color.calc_clear_all_button, context?.theme))
 
-            putString(
-                getString(R.string.saved_disabled_button_color_key),
-                getHexColor(resources.getColor(R.color.calc_disabled_button, context?.theme))
-            )
-            putString(
-                getString(R.string.saved_highlighting_color_key),
-                getHexColor(resources.getColor(R.color.highlighted_text, context?.theme))
-            )
+        settingsManager.setColor(R.string.saved_disabled_button_color_key, resources.getColor(R.color.calc_disabled_button, context?.theme))
+        settingsManager.setColor(R.string.saved_highlighting_color_key, resources.getColor(R.color.highlighted_text, context?.theme))
 
-            putString(
-                getString(R.string.saved_input_font_size_key), "14"
-            )
-
-            putString(
-                getString(R.string.saved_output_font_size_key), "10"
-            )
-
-            apply()
-        }
+        settingsManager.setString(R.string.saved_input_font_size_key, "35")
+        settingsManager.setString(R.string.saved_output_font_size_key, "20")
     }
 
     private fun initExpandedBindings() {

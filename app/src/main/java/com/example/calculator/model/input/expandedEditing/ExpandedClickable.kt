@@ -16,6 +16,7 @@ import com.example.calculator.model.function.FunctionKind
 import com.example.calculator.model.input.defaultEditing.Clickable
 import com.example.calculator.model.number.NumberKind
 import com.example.calculator.model.operator.OperatorKind
+import com.example.calculator.model.settings.SettingsManager
 import com.example.calculator.model.token.Token
 import com.example.calculator.model.token.TokenTypes
 import com.example.calculator.model.wrapper.Buttons
