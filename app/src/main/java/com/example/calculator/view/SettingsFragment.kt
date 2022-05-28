@@ -161,8 +161,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         preferenceMap.forEach { (key, _) -> setOnPreferenceClickColorPicker(key) }
 
-        setOnPreferenceClickTextSize(R.string.saved_input_font_size_key)
-        setOnPreferenceClickTextSize(R.string.saved_output_font_size_key)
+//        setOnPreferenceClickTextSize(R.string.saved_input_font_size_key)
+//        setOnPreferenceClickTextSize(R.string.saved_output_font_size_key)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

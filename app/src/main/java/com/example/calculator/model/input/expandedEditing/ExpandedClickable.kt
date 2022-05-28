@@ -1,29 +1,27 @@
 package com.example.calculator.model.input.expandedEditing
 
-import android.app.Activity
-import android.content.Context
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.DynamicDrawableSpan
 import android.text.style.ImageSpan
+import android.view.View
 import android.widget.TextView
-import androidx.annotation.ColorInt
-import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import com.example.calculator.R
 import com.example.calculator.model.function.FunctionKind
 import com.example.calculator.model.input.defaultEditing.Clickable
+import com.example.calculator.model.input.defaultEditing.InputAdapter
 import com.example.calculator.model.number.NumberKind
 import com.example.calculator.model.operator.OperatorKind
-import com.example.calculator.model.settings.SettingsManager
-import com.example.calculator.model.token.Token
 import com.example.calculator.model.token.TokenTypes
 import com.example.calculator.model.wrapper.Buttons
 import com.example.calculator.parser.FunctionParser
 import com.example.calculator.parser.NumberParser
 import com.example.calculator.parser.OperatorParser
 import com.example.calculator.viewmodel.CalculatorViewModel
+import kotlin.math.roundToInt
 
 abstract class ExpandedClickable(
     activity: FragmentActivity,
@@ -33,6 +31,25 @@ abstract class ExpandedClickable(
     index: Int
 ) : Clickable(activity, buttons, viewModel, liveInput, index) {
     private val token get() = viewModel.inputAsTokens[index]
+
+    override fun onClick(view: View) {
+        resetSpannableFocus()
+
+        setButtonState(buttons.changeLayout, disabledButtonColor, false)
+        bindToEditableToken()
+
+        applyColorToSpan(highlightedColor, newStart, newEnd)
+
+        buttons.equal.setImageDrawable(ResourcesCompat.getDrawable(activity.resources, R.drawable.check_mark_ic, activity.theme))
+
+        buttons.equal.setOnClickListener {
+            ExpandedInputAdapter(activity, buttons, viewModel, liveInput).setBindings()
+
+            resetSpannableFocus()
+            buttons.equal.setImageDrawable(ResourcesCompat.getDrawable(activity.resources, R.drawable.equal_ic, activity.theme))
+        }
+    }
+
 
     override fun resetSpannableFocus() {
         super.resetSpannableFocus()
@@ -66,10 +83,10 @@ abstract class ExpandedClickable(
 
         drawable.setTint(color)
         val size: Int = activity.findViewById<TextView>(R.id.input).textSize.toInt()
-        drawable.setBounds(0, 0,  size - 15, size - 20)
+        drawable.setBounds(0, 0,  (size / 1.2).roundToInt(), (size / 1.2).roundToInt())
 
         if (FunctionParser.parse<FunctionKind>(token) == FunctionKind.LOG)
-            drawable.setBounds(0, 0, size + 45, size)
+            drawable.setBounds(0, 0, (size * 1.5).roundToInt(), size)
 
         spannable.setSpan(
             ImageSpan(

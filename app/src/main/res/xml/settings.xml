@@ -7,13 +7,13 @@
     <PreferenceCategory
         android:title="Input Formatting">
 
-        <EditTextPreference
-            android:key="@string/saved_input_font_size_key"
-            android:title="Size"
-            app:useSimpleSummaryProvider="true"
+<!--        <EditTextPreference-->
+<!--            android:key="@string/saved_input_font_size_key"-->
+<!--            android:title="Size"-->
+<!--            app:useSimpleSummaryProvider="true"-->
 
-            android:dialogTitle="Choose Font Size"
-            tools:defaultValue="@string/default_input_size" />
+<!--            android:dialogTitle="Choose Font Size"-->
+<!--            tools:defaultValue="@string/default_input_size" />-->
 
 <!--        <ListPreference-->
 <!--            android:key="@string/saved_input_formatting_key"-->
@@ -33,13 +33,13 @@
     <PreferenceCategory
         android:title="Output Formatting">
 
-        <EditTextPreference
-            android:key="@string/saved_output_font_size_key"
-            android:title="Size"
-            app:useSimpleSummaryProvider="true"
+<!--        <EditTextPreference-->
+<!--            android:key="@string/saved_output_font_size_key"-->
+<!--            android:title="Size"-->
+<!--            app:useSimpleSummaryProvider="true"-->
 
-            android:dialogTitle="Choose Font Size"
-            tools:defaultValue="@string/default_output_size" />
+<!--            android:dialogTitle="Choose Font Size"-->
+<!--            tools:defaultValue="@string/default_output_size" />-->
 
 <!--        <ListPreference-->
 <!--            android:key="@string/saved_output_formatting_key"-->

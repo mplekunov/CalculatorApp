@@ -23,6 +23,7 @@ import com.example.calculator.parser.FunctionParser
 import com.example.calculator.parser.NumberParser
 import com.example.calculator.parser.OperatorParser
 import com.example.calculator.viewmodel.CalculatorViewModel
+import kotlin.math.roundToInt
 
 class ExpandedInputAdapter(
     activity: FragmentActivity,
@@ -121,10 +122,10 @@ class ExpandedInputAdapter(
 
         drawable.setTint(ContextCompat.getColor(activity, R.color.white))
         val size: Int = activity.findViewById<TextView>(R.id.input).textSize.toInt()
-        drawable.setBounds(0, 0,  size - 15, size - 20)
+        drawable.setBounds(0, 0,  (size / 1.2).roundToInt(), (size / 1.2).roundToInt())
 
         if (FunctionParser.parse<FunctionKind>(token) == FunctionKind.LOG)
-            drawable.setBounds(0, 0, size + 45, size)
+            drawable.setBounds(0, 0, (size * 1.5).roundToInt(), size)
 
 
         spannable.setSpan(

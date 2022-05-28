@@ -155,8 +155,8 @@ class CalculatorFragment : Fragment() {
             settingsManager.getColor(R.string.saved_output_font_color_key))
 
 
-        binding!!.input.textSize = settingsManager.getString(R.string.saved_input_font_size_key).toFloat()
-        binding!!.output.textSize = settingsManager.getString(R.string.saved_output_font_size_key).toFloat()
+//        binding!!.input.textSize = settingsManager.getString(R.string.saved_input_font_size_key).toFloat()
+//        binding!!.output.textSize = settingsManager.getString(R.string.saved_output_font_size_key).toFloat()
     }
 
     // Default Settings
@@ -176,8 +176,8 @@ class CalculatorFragment : Fragment() {
         settingsManager.setColor(R.string.saved_disabled_button_color_key, resources.getColor(R.color.calc_disabled_button, context?.theme))
         settingsManager.setColor(R.string.saved_highlighting_color_key, resources.getColor(R.color.highlighted_text, context?.theme))
 
-        settingsManager.setString(R.string.saved_input_font_size_key, "35")
-        settingsManager.setString(R.string.saved_output_font_size_key, "20")
+//        settingsManager.setString(R.string.saved_input_font_size_key, "35")
+//        settingsManager.setString(R.string.saved_output_font_size_key, "20")
     }
 
     private fun initExpandedBindings() {

@@ -1,14 +1,11 @@
 package com.example.calculator.model.input.defaultEditing
 
-import android.content.Context
 import android.text.Spannable
 import android.text.SpannableStringBuilder
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import com.example.calculator.algorithm.Algorithms
 import com.example.calculator.model.operator.OperatorKind
-import com.example.calculator.model.settings.SettingsManager
 import com.example.calculator.model.token.TokenTypes
 import com.example.calculator.model.wrapper.Buttons
 import com.example.calculator.parser.OperatorParser
