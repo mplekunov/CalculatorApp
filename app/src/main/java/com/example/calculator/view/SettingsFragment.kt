@@ -13,6 +13,7 @@ import android.widget.EditText
 import android.widget.PopupWindow
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.*
 import androidx.preference.*
 import com.example.calculator.R
@@ -63,6 +64,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
             popupWindow.contentView = colorPickerBiding!!.root
             popupWindow.isOutsideTouchable = true
             popupWindow.isFocusable = true
+
+            val background = ContextCompat.getDrawable(requireContext(), R.drawable.round_corners)
+            background!!.setTint(requireContext().getColor(R.color.highlighted_text))
+
+            popupWindow.setBackgroundDrawable(background)
+
 
             popupWindow.showAtLocation(this.view, Gravity.CENTER, 0, 0)
 

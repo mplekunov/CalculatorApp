@@ -12,6 +12,8 @@
         android:columnCount="5"
         android:rowCount="6"
 
+        android:background="?android:attr/colorPrimary"
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

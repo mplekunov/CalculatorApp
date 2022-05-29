@@ -11,8 +11,9 @@
         <action
             android:id="@+id/action_calculatorFragment_to_settingsFragment"
             app:destination="@id/settingsFragment"
-            app:popUpTo="@id/action_calculatorFragment_to_settingsFragment"
-             />
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popUpTo="@id/action_calculatorFragment_to_settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
@@ -21,6 +22,8 @@
         <action
             android:id="@+id/action_settingsFragment_to_calculatorFragment"
             app:destination="@id/calculatorFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
             app:popUpTo="@id/action_settingsFragment_to_calculatorFragment" />
     </fragment>
 </navigation>

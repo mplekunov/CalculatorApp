@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
-    xmlns:android="http://schemas.android.com/apk/res/android" >
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
         <variable
@@ -13,6 +13,7 @@
         android:layout_height="wrap_content"
         android:background="?android:attr/colorPrimary"
         android:orientation="vertical"
+
 
         android:paddingTop="30dp"
         android:paddingBottom="30dp"
