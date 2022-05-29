@@ -51,9 +51,6 @@ class CalculatorFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("ColorPicker", "CalculatorFragment onCreate")
-
-        loadDefaultSettings()
     }
 
     override fun onCreateView(
@@ -66,15 +63,11 @@ class CalculatorFragment : Fragment() {
         defaultCalculatorBinding = CalculatorNormalBinding.inflate(inflater, null, false)
         expandedCalculatorBinding = CalculatorExpandedBinding.inflate(inflater, null, false)
 
-        Log.d("ColorPicker", "CalculatorFragment onCreateView")
-
         return binding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        Log.d("ColorPicker", "CalculatorFragment onViewCreated")
 
         (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayShowTitleEnabled(false)
 
@@ -122,6 +115,12 @@ class CalculatorFragment : Fragment() {
     private fun applyCalculatorSettings() {
         val settingsManager = SettingsManager(requireContext())
 
+//        binding!!.input.setTextColor(
+//            settingsManager.getColor(R.string.saved_input_font_color_key))
+
+        binding!!.output.setTextColor(
+            settingsManager.getColor(R.string.saved_output_font_color_key))
+
         ImageViewCompat.setImageTintList(buttons.clear, ColorStateList.valueOf(
             settingsManager.getColor(R.string.saved_clear_button_color_key)
         ))
@@ -148,36 +147,8 @@ class CalculatorFragment : Fragment() {
             ))
         }
 
-        binding!!.input.setTextColor(
-            settingsManager.getColor(R.string.saved_input_font_color_key))
-
-        binding!!.output.setTextColor(
-            settingsManager.getColor(R.string.saved_output_font_color_key))
-
-
 //        binding!!.input.textSize = settingsManager.getString(R.string.saved_input_font_size_key).toFloat()
 //        binding!!.output.textSize = settingsManager.getString(R.string.saved_output_font_size_key).toFloat()
-    }
-
-    // Default Settings
-    private fun loadDefaultSettings() {
-        val settingsManager = SettingsManager(requireContext())
-
-        settingsManager.setColor(R.string.saved_input_font_color_key, resources.getColor(R.color.default_text, context?.theme))
-        settingsManager.setColor(R.string.saved_output_font_color_key, resources.getColor(R.color.default_text, context?.theme))
-
-        settingsManager.setColor(R.string.saved_number_button_color_key, resources.getColor(R.color.calc_number_button, context?.theme))
-        settingsManager.setColor(R.string.saved_function_button_color_key, resources.getColor(R.color.calc_function_button, context?.theme))
-        settingsManager.setColor(R.string.saved_operator_button_color_key, resources.getColor(R.color.calc_operation_button, context?.theme))
-
-        settingsManager.setColor(R.string.saved_clear_button_color_key, resources.getColor(R.color.calc_clear_button, context?.theme))
-        settingsManager.setColor(R.string.saved_clear_all_button_color_key, resources.getColor(R.color.calc_clear_all_button, context?.theme))
-
-        settingsManager.setColor(R.string.saved_disabled_button_color_key, resources.getColor(R.color.calc_disabled_button, context?.theme))
-        settingsManager.setColor(R.string.saved_highlighting_color_key, resources.getColor(R.color.highlighted_text, context?.theme))
-
-//        settingsManager.setString(R.string.saved_input_font_size_key, "35")
-//        settingsManager.setString(R.string.saved_output_font_size_key, "20")
     }
 
     private fun initExpandedBindings() {

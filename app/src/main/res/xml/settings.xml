@@ -4,31 +4,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <PreferenceCategory
-        android:title="Input Formatting">
+<!--    <PreferenceCategory-->
+<!--        android:title="Input Formatting">-->
 
-<!--        <EditTextPreference-->
-<!--            android:key="@string/saved_input_font_size_key"-->
-<!--            android:title="Size"-->
-<!--            app:useSimpleSummaryProvider="true"-->
+<!--&lt;!&ndash;        <EditTextPreference&ndash;&gt;-->
+<!--&lt;!&ndash;            android:key="@string/saved_input_font_size_key"&ndash;&gt;-->
+<!--&lt;!&ndash;            android:title="Size"&ndash;&gt;-->
+<!--&lt;!&ndash;            app:useSimpleSummaryProvider="true"&ndash;&gt;-->
 
-<!--            android:dialogTitle="Choose Font Size"-->
-<!--            tools:defaultValue="@string/default_input_size" />-->
+<!--&lt;!&ndash;            android:dialogTitle="Choose Font Size"&ndash;&gt;-->
+<!--&lt;!&ndash;            tools:defaultValue="@string/default_input_size" />&ndash;&gt;-->
 
-<!--        <ListPreference-->
-<!--            android:key="@string/saved_input_formatting_key"-->
-<!--            android:title="Format"-->
-<!--            app:useSimpleSummaryProvider="true"-->
+<!--&lt;!&ndash;        <ListPreference&ndash;&gt;-->
+<!--&lt;!&ndash;            android:key="@string/saved_input_formatting_key"&ndash;&gt;-->
+<!--&lt;!&ndash;            android:title="Format"&ndash;&gt;-->
+<!--&lt;!&ndash;            app:useSimpleSummaryProvider="true"&ndash;&gt;-->
 
-<!--            android:dialogTitle="Choose Font"-->
-<!--            tools:entries="@array/entries"-->
-<!--            tools:entryValues="@array/values"-->
-<!--            tools:defaultValue="Test 1" />-->
+<!--&lt;!&ndash;            android:dialogTitle="Choose Font"&ndash;&gt;-->
+<!--&lt;!&ndash;            tools:entries="@array/entries"&ndash;&gt;-->
+<!--&lt;!&ndash;            tools:entryValues="@array/values"&ndash;&gt;-->
+<!--&lt;!&ndash;            tools:defaultValue="Test 1" />&ndash;&gt;-->
 
-        <Preference
-            android:key="@string/saved_input_font_color_key"
-            android:title="Text Color" />
-    </PreferenceCategory>
+<!--        <Preference-->
+<!--            android:key="@string/saved_input_font_color_key"-->
+<!--            android:title="Text Color"-->
+<!--            android:defaultValue="@string/saved_input_font_color_key"/>-->
+<!--    </PreferenceCategory>-->
 
     <PreferenceCategory
         android:title="Output Formatting">
@@ -54,7 +55,8 @@
         <Preference
             android:key="@string/saved_output_font_color_key"
             android:title="Text Color"
-            android:summary="" />
+            android:summary=""
+            android:defaultValue="@string/saved_input_font_color_key"/>
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -63,32 +65,38 @@
         <Preference
             android:key="@string/saved_function_button_color_key"
             android:title="Function Buttons"
-            android:summary="" />
+            android:summary=""
+            android:defaultValue="@string/saved_input_font_color_key"/>
 
         <Preference
             android:key="@string/saved_number_button_color_key"
             android:title="Number Buttons"
-            android:summary="" />
+            android:summary=""
+            android:defaultValue="@string/saved_input_font_color_key"/>
 
         <Preference
             android:key="@string/saved_operator_button_color_key"
             android:title="Operator Buttons"
-            android:summary="" />
+            android:summary=""
+            android:defaultValue="@string/saved_input_font_color_key"/>
 
         <Preference
             android:key="@string/saved_clear_button_color_key"
             android:title="Clear Button"
-            android:summary="" />
+            android:summary=""
+            android:defaultValue="@string/saved_input_font_color_key"/>
 
         <Preference
             android:key="@string/saved_clear_all_button_color_key"
             android:title="Clear All Button"
-            android:summary="" />
+            android:summary=""
+            android:defaultValue="@string/saved_input_font_color_key"/>
 
         <Preference
             android:key="@string/saved_disabled_button_color_key"
             android:title="Disabled Button"
-            android:summary="" />
+            android:summary=""
+            android:defaultValue="@string/saved_input_font_color_key"/>
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -97,7 +105,8 @@
         <Preference
             android:key="@string/saved_highlighting_color_key"
             android:title="Highlighting Color"
-            android:summary="" />
+            android:summary=""
+            android:defaultValue="@string/saved_input_font_color_key"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

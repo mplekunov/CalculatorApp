@@ -4,6 +4,7 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.DynamicDrawableSpan
 import android.text.style.ImageSpan
+import android.util.TypedValue
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
@@ -120,7 +121,10 @@ class ExpandedInputAdapter(
             TokenTypes.Operator -> buttons.operators[OperatorParser.parse<OperatorKind>(token)]!!.drawable.constantState!!.newDrawable().mutate()
         }
 
-        drawable.setTint(ContextCompat.getColor(activity, R.color.white))
+        val typedValue = TypedValue()
+        activity.theme.resolveAttribute(com.google.android.material.R.attr.colorOnPrimary, typedValue, true)
+
+        drawable.setTint(activity.getColor(typedValue.resourceId))
         val size: Int = activity.findViewById<TextView>(R.id.input).textSize.toInt()
         drawable.setBounds(0, 0,  (size / 1.2).roundToInt(), (size / 1.2).roundToInt())
 

@@ -50,7 +50,6 @@ abstract class ExpandedClickable(
         }
     }
 
-
     override fun resetSpannableFocus() {
         super.resetSpannableFocus()
 

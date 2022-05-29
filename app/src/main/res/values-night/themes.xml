@@ -3,19 +3,19 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
     <!-- Base application theme. -->
-    <style name="Theme.Calculator" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.Calculator.DayNight" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/black</item>
-        <item name="colorPrimaryVariant">@color/black</item>
-        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorPrimary">@color/NightPrimary</item>
+        <item name="colorPrimaryVariant">@color/NightPrimaryLight</item>
+        <item name="colorOnPrimary">@color/NightTextOnPrimary</item>
+
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/yellow_800</item>
-        <item name="colorSecondaryVariant">@color/yellow_light</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorSecondary">@color/NightSecondary</item>
+        <item name="colorSecondaryVariant">@color/NightSecondaryLight</item>
+        <item name="colorOnSecondary">@color/NightTextOnSecondary</item>
+
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
         <!-- Customize your theme here. -->
-        <item name="android:textColorPrimary">@color/white</item>
-        <item name="android:textColorSecondary">@color/black</item>
     </style>
 </resources>

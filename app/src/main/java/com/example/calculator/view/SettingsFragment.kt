@@ -66,10 +66,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
             popupWindow.isFocusable = true
 
             val background = ContextCompat.getDrawable(requireContext(), R.drawable.round_corners)
-            background!!.setTint(requireContext().getColor(R.color.highlighted_text))
 
             popupWindow.setBackgroundDrawable(background)
-
 
             popupWindow.showAtLocation(this.view, Gravity.CENTER, 0, 0)
 

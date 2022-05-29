@@ -9,14 +9,12 @@
 
     app:title="Main Page"
 
-    android:background="?android:attr/colorPrimary"
+    android:background="?attr/colorPrimary"
 
     android:layout_width="match_parent"
     android:layout_height="?actionBarSize"
 
     android:gravity="center"
 
-    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-    android:theme="@style/ThemeOverlay.AppCompat.DayNight.ActionBar"/>
-
-
+    app:popupTheme="@style/Widget.Calculator.PopupMenu"
+    android:theme="@style/ThemeOverlay.Calculator.DayNight"/>

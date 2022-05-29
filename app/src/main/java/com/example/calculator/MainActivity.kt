@@ -4,46 +4,52 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.PersistableBundle
-import android.util.Log
+import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.navigation.NavController
+import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.preference.PreferenceManager
+import com.example.calculator.model.settings.SettingsManager
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var navController: NavController
-    private lateinit var appBarConfiguration: AppBarConfiguration
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        loadDefaultSettings()
         setSupportActionBar(findViewById(R.id.toolbar))
-
-        Log.d("MainActivityDebug", "onCreate")
-
     }
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    private fun loadDefaultSettings() {
+        val settingsManager = SettingsManager(this)
+
+        val typedValue = TypedValue()
+        theme.resolveAttribute(com.google.android.material.R.attr.colorOnPrimary, typedValue, true)
+
+//        settingsManager.setColor(R.string.saved_input_font_color_key, ContextCompat.getColor(this, typedValue.resourceId))
+        settingsManager.setColor(R.string.saved_output_font_color_key, ContextCompat.getColor(this, typedValue.resourceId))
+
+        settingsManager.setColor(R.string.saved_number_button_color_key, ContextCompat.getColor(this, typedValue.resourceId))
+        settingsManager.setColor(R.string.saved_function_button_color_key, resources.getColor(R.color.calc_function_button, theme))
+        settingsManager.setColor(R.string.saved_operator_button_color_key, resources.getColor(R.color.calc_operation_button, theme))
+
+        settingsManager.setColor(R.string.saved_clear_button_color_key, resources.getColor(R.color.calc_clear_button, theme))
+        settingsManager.setColor(R.string.saved_clear_all_button_color_key, resources.getColor(R.color.calc_clear_all_button, theme))
+
+        settingsManager.setColor(R.string.saved_disabled_button_color_key, resources.getColor(R.color.calc_disabled_button, theme))
+        settingsManager.setColor(R.string.saved_highlighting_color_key, resources.getColor(R.color.highlighted_text, theme))
+
+//        settingsManager.setString(R.string.saved_input_font_size_key, "35")
+//        settingsManager.setString(R.string.saved_output_font_size_key, "20")
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        Log.d("MainActivityDebug", "onSupportNavigateUp")
-        return navController.navigateUp() || super.onSupportNavigateUp()
-    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        Log.d("Test", "?")
         menuInflater.inflate(R.menu.menu, menu)
         return true
     }
-
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId) {
