@@ -58,10 +58,42 @@ class CalculatorFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentCalculatorBinding.inflate(inflater, container, false)
+        if (binding == null) {
+            binding = FragmentCalculatorBinding.inflate(inflater, container, false)
 
-        defaultCalculatorBinding = CalculatorNormalBinding.inflate(inflater, null, false)
-        expandedCalculatorBinding = CalculatorExpandedBinding.inflate(inflater, null, false)
+            defaultCalculatorBinding = CalculatorNormalBinding.inflate(inflater, null, false)
+            expandedCalculatorBinding = CalculatorExpandedBinding.inflate(inflater, null, false)
+
+            // initializes default InputAdapter
+            initDefaultBindings()
+
+            // Adds Default layout and assigns binding to default DataViewBinding object
+            binding?.calculatorLayout?.addView(defaultCalculatorBinding!!.root)
+
+
+            // Init for spannable string support
+            binding?.input?.movementMethod = LinkMovementMethod.getInstance()
+            binding?.input?.highlightColor =
+                requireContext().getColor(com.google.android.material.R.color.mtrl_btn_transparent_bg_color)
+
+
+            // Change Layout Button
+            defaultCalculatorBinding?.changeLayout?.setOnClickListener {
+                initExpandedBindings()
+                applyCalculatorSettings()
+
+                binding?.calculatorLayout?.removeAllViews()
+                binding?.calculatorLayout?.addView(expandedCalculatorBinding!!.root)
+            }
+
+            expandedCalculatorBinding?.changeLayout?.setOnClickListener {
+                initDefaultBindings()
+                applyCalculatorSettings()
+
+                binding?.calculatorLayout?.removeAllViews()
+                binding?.calculatorLayout?.addView(defaultCalculatorBinding!!.root)
+            }
+        }
 
         return binding!!.root
     }
@@ -76,40 +108,14 @@ class CalculatorFragment : Fragment() {
             calculatorFragment = this@CalculatorFragment
         }
 
-        // Adds Default layout and assigns binding to default DataViewBinding object
-        binding?.calculatorLayout?.addView(defaultCalculatorBinding!!.root)
-
-        // initializes default InputAdapter
-        initDefaultBindings()
-
         // Binds an observer to liveInput...
         // On liveData object modification, updates both input and output textview
-
         liveInput.observe(viewLifecycleOwner) {
             binding?.input?.text = it
             binding?.output?.text = viewModel.formattedOutput
         }
 
-        // Init for spannable string support
-        binding?.input?.movementMethod = LinkMovementMethod.getInstance()
-        binding?.input?.highlightColor =
-            requireContext().getColor(com.google.android.material.R.color.mtrl_btn_transparent_bg_color)
-
-
-        // Change Layout Button
-        defaultCalculatorBinding?.changeLayout?.setOnClickListener {
-            initExpandedBindings()
-
-            binding?.calculatorLayout?.removeAllViews()
-            binding?.calculatorLayout?.addView(expandedCalculatorBinding!!.root)
-        }
-
-        expandedCalculatorBinding?.changeLayout?.setOnClickListener {
-            initDefaultBindings()
-
-            binding?.calculatorLayout?.removeAllViews()
-            binding?.calculatorLayout?.addView(defaultCalculatorBinding!!.root)
-        }
+        applyCalculatorSettings()
     }
 
     private fun applyCalculatorSettings() {
@@ -208,8 +214,6 @@ class CalculatorFragment : Fragment() {
         expandedInputAdapter =
             ExpandedInputAdapter(requireActivity(), buttons, viewModel, liveInput)
         expandedInputAdapter.setBindings()
-
-        applyCalculatorSettings()
     }
 
     private fun initDefaultBindings() {
@@ -258,8 +262,6 @@ class CalculatorFragment : Fragment() {
 
         defaultInputAdapter = InputAdapter(requireActivity(), buttons, viewModel, liveInput)
         defaultInputAdapter.setBindings()
-
-        applyCalculatorSettings()
     }
 
     fun onInputChange() {
