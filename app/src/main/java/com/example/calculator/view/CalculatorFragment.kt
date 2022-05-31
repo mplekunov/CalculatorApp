@@ -26,7 +26,7 @@ import com.example.calculator.databinding.FragmentCalculatorBinding
 import com.example.calculator.datastructure.BiMap
 import com.example.calculator.model.function.FunctionKind
 import com.example.calculator.model.input.defaultEditing.InputAdapter
-import com.example.calculator.model.input.expandedEditing.ExpandedInputAdapter
+
 import com.example.calculator.model.number.NumberKind
 import com.example.calculator.model.operator.OperatorKind
 import com.example.calculator.model.settings.SettingsManager
@@ -45,7 +45,7 @@ class CalculatorFragment : Fragment() {
     private var buttons = Buttons()
 
     private lateinit var defaultInputAdapter: InputAdapter
-    private lateinit var expandedInputAdapter: ExpandedInputAdapter
+//    private lateinit var expandedInputAdapter: ExpandedInputAdapter
 
     private var liveInput = MutableLiveData<SpannableStringBuilder>()
 
@@ -78,21 +78,25 @@ class CalculatorFragment : Fragment() {
 
 
             // Change Layout Button
-            defaultCalculatorBinding?.changeLayout?.setOnClickListener {
-                initExpandedBindings()
-                applyCalculatorSettings()
+//            defaultCalculatorBinding?.changeLayout?.setOnClickListener {
+//                binding?.calculatorLayout?.removeAllViews()
+//                defaultInputAdapter.removeBindings()
+//
+////                initExpandedBindings()
+//                applyCalculatorSettings()
+//
+//                binding?.calculatorLayout?.addView(expandedCalculatorBinding!!.root)
+//            }
 
-                binding?.calculatorLayout?.removeAllViews()
-                binding?.calculatorLayout?.addView(expandedCalculatorBinding!!.root)
-            }
-
-            expandedCalculatorBinding?.changeLayout?.setOnClickListener {
-                initDefaultBindings()
-                applyCalculatorSettings()
-
-                binding?.calculatorLayout?.removeAllViews()
-                binding?.calculatorLayout?.addView(defaultCalculatorBinding!!.root)
-            }
+//            expandedCalculatorBinding?.changeLayout?.setOnClickListener {
+//                binding?.calculatorLayout?.removeAllViews()
+//                expandedInputAdapter.removeBindings()
+//
+//                initDefaultBindings()
+//                applyCalculatorSettings()
+//
+//                binding?.calculatorLayout?.addView(defaultCalculatorBinding!!.root)
+//            }
         }
 
         return binding!!.root
@@ -157,64 +161,64 @@ class CalculatorFragment : Fragment() {
 //        binding!!.output.textSize = settingsManager.getString(R.string.saved_output_font_size_key).toFloat()
     }
 
-    private fun initExpandedBindings() {
-        buttons.changeLayout = expandedCalculatorBinding?.changeLayout!!
-
-        buttons.functions = BiMap<ImageButton, FunctionKind>().apply {
-            putAll(
-                mutableMapOf(
-                    expandedCalculatorBinding?.percent!! to FunctionKind.PERCENTAGE,
-                    expandedCalculatorBinding?.ln!! to FunctionKind.NATURAL_LOG,
-                    expandedCalculatorBinding?.log!! to FunctionKind.LOG,
-                    expandedCalculatorBinding?.squareRoot!! to FunctionKind.SQUARE_ROOT,
-                    expandedCalculatorBinding?.squared!! to FunctionKind.SQUARED,
-                    expandedCalculatorBinding?.factorial!! to FunctionKind.FACTORIAL
-                )
-            )
-        }
-
-        buttons.operators = BiMap<ImageButton, OperatorKind>().apply {
-            putAll(
-                mutableMapOf(
-                    expandedCalculatorBinding?.add!! to OperatorKind.ADDITION,
-                    expandedCalculatorBinding?.subtract!! to OperatorKind.SUBTRACTION,
-                    expandedCalculatorBinding?.multiply!! to OperatorKind.MULTIPLICATION,
-                    expandedCalculatorBinding?.divide!! to OperatorKind.DIVISION,
-                    expandedCalculatorBinding?.leftParenthesis!! to OperatorKind.LEFT_BRACKET,
-                    expandedCalculatorBinding?.rightParenthesis!! to OperatorKind.RIGHT_BRACKET,
-                    expandedCalculatorBinding?.power!! to OperatorKind.POWER
-                )
-            )
-        }
-
-        buttons.numbers = BiMap<ImageButton, NumberKind>().apply {
-            putAll(
-                mutableMapOf(
-                    expandedCalculatorBinding?.number0!! to NumberKind.ZERO,
-                    expandedCalculatorBinding?.number1!! to NumberKind.ONE,
-                    expandedCalculatorBinding?.number2!! to NumberKind.TWO,
-                    expandedCalculatorBinding?.number3!! to NumberKind.THREE,
-                    expandedCalculatorBinding?.number4!! to NumberKind.FOUR,
-                    expandedCalculatorBinding?.number5!! to NumberKind.FIVE,
-                    expandedCalculatorBinding?.number6!! to NumberKind.SIX,
-                    expandedCalculatorBinding?.number7!! to NumberKind.SEVEN,
-                    expandedCalculatorBinding?.number8!! to NumberKind.EIGHT,
-                    expandedCalculatorBinding?.number9!! to NumberKind.NINE,
-                    expandedCalculatorBinding?.dot!! to NumberKind.DOT,
-                    expandedCalculatorBinding?.pi!! to NumberKind.PI,
-                    expandedCalculatorBinding?.epsilon!! to NumberKind.EPSILON
-                )
-            )
-        }
-
-        buttons.clear = expandedCalculatorBinding?.clear!!
-        buttons.clearAll = expandedCalculatorBinding?.clearAll!!
-        buttons.equal = expandedCalculatorBinding?.equal!!
-
-        expandedInputAdapter =
-            ExpandedInputAdapter(requireActivity(), buttons, viewModel, liveInput)
-        expandedInputAdapter.setBindings()
-    }
+//    private fun initExpandedBindings() {
+//        buttons.changeLayout = expandedCalculatorBinding?.changeLayout!!
+//
+//        buttons.functions = BiMap<ImageButton, FunctionKind>().apply {
+//            putAll(
+//                mutableMapOf(
+//                    expandedCalculatorBinding?.percent!! to FunctionKind.PERCENTAGE,
+//                    expandedCalculatorBinding?.ln!! to FunctionKind.NATURAL_LOG,
+//                    expandedCalculatorBinding?.log!! to FunctionKind.LOG,
+//                    expandedCalculatorBinding?.squareRoot!! to FunctionKind.SQUARE_ROOT,
+//                    expandedCalculatorBinding?.squared!! to FunctionKind.SQUARED,
+//                    expandedCalculatorBinding?.factorial!! to FunctionKind.FACTORIAL
+//                )
+//            )
+//        }
+//
+//        buttons.operators = BiMap<ImageButton, OperatorKind>().apply {
+//            putAll(
+//                mutableMapOf(
+//                    expandedCalculatorBinding?.add!! to OperatorKind.ADDITION,
+//                    expandedCalculatorBinding?.subtract!! to OperatorKind.SUBTRACTION,
+//                    expandedCalculatorBinding?.multiply!! to OperatorKind.MULTIPLICATION,
+//                    expandedCalculatorBinding?.divide!! to OperatorKind.DIVISION,
+//                    expandedCalculatorBinding?.leftParenthesis!! to OperatorKind.LEFT_BRACKET,
+//                    expandedCalculatorBinding?.rightParenthesis!! to OperatorKind.RIGHT_BRACKET,
+//                    expandedCalculatorBinding?.power!! to OperatorKind.POWER
+//                )
+//            )
+//        }
+//
+//        buttons.numbers = BiMap<ImageButton, NumberKind>().apply {
+//            putAll(
+//                mutableMapOf(
+//                    expandedCalculatorBinding?.number0!! to NumberKind.ZERO,
+//                    expandedCalculatorBinding?.number1!! to NumberKind.ONE,
+//                    expandedCalculatorBinding?.number2!! to NumberKind.TWO,
+//                    expandedCalculatorBinding?.number3!! to NumberKind.THREE,
+//                    expandedCalculatorBinding?.number4!! to NumberKind.FOUR,
+//                    expandedCalculatorBinding?.number5!! to NumberKind.FIVE,
+//                    expandedCalculatorBinding?.number6!! to NumberKind.SIX,
+//                    expandedCalculatorBinding?.number7!! to NumberKind.SEVEN,
+//                    expandedCalculatorBinding?.number8!! to NumberKind.EIGHT,
+//                    expandedCalculatorBinding?.number9!! to NumberKind.NINE,
+//                    expandedCalculatorBinding?.dot!! to NumberKind.DOT,
+//                    expandedCalculatorBinding?.pi!! to NumberKind.PI,
+//                    expandedCalculatorBinding?.epsilon!! to NumberKind.EPSILON
+//                )
+//            )
+//        }
+//
+//        buttons.clear = expandedCalculatorBinding?.clear!!
+//        buttons.clearAll = expandedCalculatorBinding?.clearAll!!
+//        buttons.equal = expandedCalculatorBinding?.equal!!
+//
+//        expandedInputAdapter =
+//            ExpandedInputAdapter(requireActivity(), buttons, viewModel, liveInput)
+//        expandedInputAdapter.setBindings()
+//    }
 
     private fun initDefaultBindings() {
         buttons.changeLayout = defaultCalculatorBinding?.changeLayout!!

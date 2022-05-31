@@ -50,7 +50,7 @@ object TokenFormatter {
      */
     fun convertTokenToString(token: Token?, removeTrailingZeroes: Boolean): String {
         if (token == null || token.isEmpty())
-            return " 0 "
+            return "0"
         return if (token.type == TokenTypes.Number) {
             return when (token) {
                 NumberParser.parse(NumberKind.INFINITY) -> " $token"

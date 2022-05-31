@@ -5,11 +5,12 @@ import android.text.SpannableStringBuilder
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import com.example.calculator.algorithm.Algorithms
-import com.example.calculator.model.operator.OperatorKind
+import com.example.calculator.formatter.TokenFormatter
+import com.example.calculator.model.token.Token
 import com.example.calculator.model.token.TokenTypes
 import com.example.calculator.model.wrapper.Buttons
-import com.example.calculator.parser.OperatorParser
 import com.example.calculator.viewmodel.CalculatorViewModel
+import java.lang.reflect.TypeVariable
 
 open class InputAdapter(
     val activity: FragmentActivity,
@@ -17,58 +18,60 @@ open class InputAdapter(
     val viewModel: CalculatorViewModel,
     val spannableInput: MutableLiveData<SpannableStringBuilder>,
 ) {
-    var index = 0
+    protected val lastIndex get() = viewModel.inputAsTokens.lastIndex
 
-    protected val string get() = viewModel.formattedInput[index]
-    protected val token get() = viewModel.inputAsTokens[index]
-
-    protected val oldStart get() = getStartingPos()
-    protected val oldEnd get() = spannableInput.value?.length ?: 0
-
-    protected val newStart
-        get() = Algorithms.findStartingPosOfPattern(
-            string,
-            token.toString()
-        ) + oldStart
-
-    protected val newEnd get() = token.length + newStart
-
+    companion object {
+        protected val spanMap = HashMap<Int, Clickable>()
+    }
     val spannable = spannableInput.value ?: SpannableStringBuilder()
 
-    protected open val what: Clickable?
-        get() {
-            return when (token.type) {
-                TokenTypes.Number -> ClickableNumber(
-                    activity,
-                    buttons,
-                    viewModel,
-                    spannableInput,
-                    index
-                )
-                TokenTypes.Operator -> ClickableOperator(
-                    activity,
-                    buttons,
-                    viewModel,
-                    spannableInput,
-                    index
-                )
-                else -> null
-            }
+    protected fun getWhat(type: TokenTypes, index: Int): Clickable? {
+        return when (type) {
+            TokenTypes.Number -> ClickableNumber(
+                activity,
+                buttons,
+                viewModel,
+                spannableInput,
+                index
+            )
+            TokenTypes.Operator -> ClickableOperator(
+                activity,
+                buttons,
+                viewModel,
+                spannableInput,
+                index
+            )
+            else -> null
         }
+    }
+
+    protected fun getLastToken(): Token? {
+        return if (viewModel.inputAsTokens.isNotEmpty()) viewModel.inputAsTokens.last()
+        else null
+    }
 
     open fun setBindings() {
         buttons.equal.setOnClickListener {
             viewModel.saveResult()
             resetSpannableInput()
-            setSpan()
+
+            for (i in viewModel.inputAsTokens.indices)
+                appendSpan(i)
         }
 
         buttons.clear.setOnClickListener {
+            val prevIndex = lastIndex
+            val oldToken = getLastToken()
+
             if (viewModel.delete()) {
                 if (viewModel.formattedInput.lastIndex < 0)
                     resetSpannableInput()
-                else
-                    setSpan()
+                else {
+                    if (prevIndex == lastIndex)
+                        replaceSpan(viewModel.inputAsTokens.last(), oldToken!!)
+                    else
+                        removeSpan(oldToken!!, prevIndex)
+                }
             }
         }
 
@@ -79,70 +82,132 @@ open class InputAdapter(
 
         buttons.numbers.forEach { (button, number) ->
             button.setOnClickListener {
+                val prevIndex = lastIndex
+                val oldToken = getLastToken()
+
                 if (viewModel.add(number))
-                    setSpan()
+                    if (prevIndex + 1 > lastIndex)
+                        replaceSpan(viewModel.inputAsTokens[lastIndex], oldToken!!)
+                    else
+                        appendSpan(prevIndex + 1)
             }
         }
 
         buttons.operators.forEach { (button, operator) ->
             button.setOnClickListener {
+                val prevIndex = lastIndex
+                val oldToken = getLastToken()
+
                 if (viewModel.add(operator))
-                    setSpan()
+                    if (prevIndex + 1 > lastIndex)
+                        replaceSpan(viewModel.inputAsTokens[lastIndex], oldToken!!)
+                    else
+                        appendSpan(prevIndex + 1)
             }
         }
 
         buttons.functions.forEach { (button, function) ->
             button.setOnClickListener {
+                val prevIndex = lastIndex
+                val oldToken = getLastToken()
+
                 if (viewModel.add(function))
-                    setSpan()
+                    if (prevIndex + 1 > lastIndex)
+                        replaceSpan(viewModel.inputAsTokens[lastIndex], oldToken!!)
+                    else
+                        appendSpan(prevIndex + 1)
             }
         }
     }
 
-    protected open fun setSpan() {
-        if (spannable.isEmpty()) {
-            for (i in viewModel.inputAsTokens.indices) {
-                index = i
+    protected open fun removeSpan(token: Token, index: Int = lastIndex) {
+        val last = spanMap[index]
 
-                spannable.replace(oldStart, oldEnd, string)
+        val formattedString = TokenFormatter.convertTokenToString(token, false)
 
-                if (what != null)
-                    spannable.setSpan(newStart, newEnd)
-            }
-        }
-        else {
-            index = viewModel.inputAsTokens.lastIndex
+        val frontOffset = Algorithms.findStartingPosOfPattern(formattedString, token.toString())
+        val start = spannable.getSpanStart(last) - frontOffset
 
-            if (token == OperatorParser.parse(OperatorKind.SUBTRACTION)) {
-                if (index - 2 >= 0 && viewModel.inputAsTokens[index - 2].type == TokenTypes.Operator) {
-                    for(i in (index - 1)..viewModel.inputAsTokens.lastIndex) {
-                        index = i
+        val backOffset = formattedString.length - (spannable.getSpanEnd(last) - start)
+        val end = spannable.getSpanEnd(last) + backOffset
 
-                        spannable.replace(oldStart, oldEnd, string)
-                        spannable.setSpan(newStart, newEnd)
-                    }
-                }
-            }
+        spannable.delete(start, end)
 
-            spannable.replace(oldStart, oldEnd, string)
+        spanMap.remove(index)
 
-            if (what != null)
-                spannable.setSpan(newStart, newEnd)
+        spannableInput.value = spannable
+    }
+
+
+    fun appendSpan(index: Int) {
+        for (i in index..lastIndex) {
+            val what = getWhat(viewModel.inputAsTokens[i].type, i)!!
+            spanMap[i] = what
+
+            spannable.append(what, viewModel.inputAsTokens[i])
         }
     }
 
-    private fun getStartingPos(): Int {
-        var startingIndex = 0
-        val list = viewModel.formattedInput.subList(0, index)
-        list.forEach { str -> startingIndex += str.length }
-        return startingIndex
+    fun replaceAllSpans() {
+        for (i in viewModel.inputAsTokens.indices) {
+            val what = spanMap[i]
+
+            if (viewModel.inputAsTokens[i].type == TokenTypes.Function) {
+                spannable.removeSpan(what)
+            } else
+                replaceSpan(viewModel.inputAsTokens[i], viewModel.inputAsTokens[i], i)
+        }
+    }
+
+    protected open fun replaceSpan(token: Token, oldToken: Token, index: Int = lastIndex) {
+        var what = spanMap[index]!!
+
+        val formattedString = TokenFormatter.convertTokenToString(oldToken, false)
+
+        var frontOffset = Algorithms.findStartingPosOfPattern(formattedString, oldToken.toString())
+        var backOffset = formattedString.length - (oldToken.toString().length + frontOffset)
+
+        val oldStart = spannable.getSpanStart(what) - frontOffset
+        val oldEnd = spannable.getSpanEnd(what) + backOffset
+
+        val newFormattedString = TokenFormatter.convertTokenToString(token, false)
+
+        spannable.replace(oldStart, oldEnd, newFormattedString)
+
+        frontOffset = Algorithms.findStartingPosOfPattern(newFormattedString, token.toString())
+        backOffset = newFormattedString.length - (token.toString().length + frontOffset)
+
+        val newStart = oldStart + frontOffset
+        val newEnd = oldStart + newFormattedString.length - backOffset
+
+        what = getWhat(token.type, lastIndex)!!
+        spanMap.replace(index, what)
+
+        spannable.setSpan(what, newStart, newEnd)
+
+        spannableInput.value = spannable
     }
 
     protected fun resetSpannableInput() {
         spannable.clearAll()
     }
 
-    fun SpannableStringBuilder.setSpan(start: Int, end: Int) {
+    protected open fun SpannableStringBuilder.append(what: Clickable, token: Token) {
+        val formattedString = TokenFormatter.convertTokenToString(token, false)
+
+        val frontOffset = Algorithms.findStartingPosOfPattern(formattedString, token.toString())
+        val start = spannable.length
+
+        val backOffset = formattedString.length - (token.length + frontOffset)
+        val end = formattedString.length + start
+
+        this@append.replace(spannable.length, spannable.length, formattedString)
+        this@append.setSpan(what, start + frontOffset, end - backOffset)
+
+        spannableInput.value = this@append
+    }
+
+    fun SpannableStringBuilder.setSpan(what: Clickable, start: Int, end: Int) {
         this@setSpan.setSpan(what, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
         spannableInput.value = this@setSpan
