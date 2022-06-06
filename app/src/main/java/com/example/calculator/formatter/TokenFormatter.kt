@@ -53,18 +53,18 @@ object TokenFormatter {
             return "0"
         return if (token.type == TokenTypes.Number) {
             return when (token) {
-                NumberParser.parse(NumberKind.INFINITY) -> " $token"
-                NumberParser.parse(NumberKind.NAN) -> " $token"
+                NumberParser.parse(NumberKind.INFINITY) -> "$token"
+                NumberParser.parse(NumberKind.NAN) -> "$token"
                 else -> {
                     var formatted: String = token.toString()
 
                     if (removeTrailingZeroes)
                         formatted = BigNumber(formatted).stripTrailingZeros()
 
-                    return " $formatted"
+                    return "$formatted"
                 }
             }
         } else
-            " $token"
+            "$token"
     }
 }
