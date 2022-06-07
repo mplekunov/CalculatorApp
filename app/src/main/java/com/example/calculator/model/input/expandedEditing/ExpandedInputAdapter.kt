@@ -67,7 +67,7 @@ class ExpandedInputAdapter(
                 if (viewModel.add(function)) {
                     when {
                         prevIndex == lastIndex -> updateSpan(prevIndex)
-                        prevIndex < lastIndex -> addSpan(prevIndex)
+                        prevIndex < lastIndex -> addSpan(prevIndex + 1)
                     }
 
                     val token = FunctionParser.parse(function)
@@ -107,7 +107,6 @@ class ExpandedInputAdapter(
 
         if (FunctionParser.parse<FunctionKind>(token) == FunctionKind.LOG)
             drawable.setBounds(0, 0, (size * 1.5).roundToInt(), size)
-
 
         spannable.setSpan(
             ImageSpan(

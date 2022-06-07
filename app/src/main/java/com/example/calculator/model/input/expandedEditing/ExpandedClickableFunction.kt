@@ -1,13 +1,16 @@
 package com.example.calculator.model.input.expandedEditing
 
 import android.text.SpannableStringBuilder
+import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
+import com.example.calculator.R
 import com.example.calculator.model.function.Function
 import com.example.calculator.model.function.FunctionKind
 import com.example.calculator.model.wrapper.Buttons
 import com.example.calculator.parser.FunctionParser
 import com.example.calculator.viewmodel.CalculatorViewModel
+import kotlin.math.roundToInt
 
 class ExpandedClickableFunction(
     activity: FragmentActivity,
@@ -49,7 +52,6 @@ class ExpandedClickableFunction(
                 if (viewModel.set(function, index)) {
                     replaceSpan(what, viewModel.inputAsTokens[index], oldToken)
                     applyColorToSpan(highlightedColor)
-                    applyColorToImageSpan(highlightedColor, index)
                 }
             }
         }

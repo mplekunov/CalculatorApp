@@ -1,6 +1,7 @@
 package com.example.calculator.model.input.expandedEditing
 
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.DynamicDrawableSpan
@@ -8,6 +9,8 @@ import android.text.style.ImageSpan
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.DrawableCompat.setTint
+import androidx.core.text.getSpans
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import com.example.calculator.R
@@ -54,33 +57,52 @@ abstract class ExpandedClickable(
     override fun resetSpannableFocus() {
         super.resetSpannableFocus()
 
-        for (i in viewModel.inputAsTokens.indices) {
-            if (viewModel.inputAsTokens[i].type == TokenTypes.Function)
-                applyColorToImageSpan(defaultTextColor, i)
+        val imageSpans = spannable.getSpans<ImageSpan>(0, spannable.length)
+        imageSpans.forEach { imageSpan ->
+            val drawable = imageSpan.drawable
+
+            drawable.setTint(defaultTextColor)
+
+            val start = spannable.getSpanStart(imageSpan)
+            val end = spannable.getSpanEnd(imageSpan)
+
+            spannable.removeSpan(imageSpan)
+
+            spannable.setSpan(
+                ImageSpan(
+                    drawable,
+                    DynamicDrawableSpan.ALIGN_CENTER
+                ), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        liveInput.value = spannable
+    }
+
+
+    override fun replaceSpan(what: Clickable, token: Token, oldToken: Token) {
+        super.replaceSpan(what, token, oldToken)
+
+        if (token.type == TokenTypes.Function && token != oldToken) {
+            val drawable = buttons.functions[FunctionParser.parse<FunctionKind>(token)]!!.drawable.constantState!!.newDrawable().mutate()
+
+            val size: Int = activity.findViewById<TextView>(R.id.input).textSize.toInt()
+            drawable.setBounds(0, 0,  (size / 1.2).roundToInt(), (size / 1.2).roundToInt())
+
+            if (FunctionParser.parse<FunctionKind>(token) == FunctionKind.LOG)
+                drawable.setBounds(0, 0, (size * 1.5).roundToInt(), size)
+
+            setDrawableSpan(drawable, highlightedColor)
         }
     }
 
-    override fun bindToEditableToken() {}
-
-    fun applyColorToImageSpan(color: Int, index: Int) {
-        setDrawableSpan(index, color)
-    }
-
-    protected fun setDrawableSpan(index: Int, color: Int = defaultTextColor) {
-        val token = viewModel.inputAsTokens[index]
-
-        val drawable = when(token.type) {
-            TokenTypes.Function -> buttons.functions[FunctionParser.parse<FunctionKind>(token)]!!.drawable.constantState!!.newDrawable().mutate()
-            TokenTypes.Number -> buttons.numbers[NumberParser.parse<NumberKind>(token)]!!.drawable.constantState?.newDrawable()!!.mutate()
-            TokenTypes.Operator -> buttons.operators[OperatorParser.parse<OperatorKind>(token)]!!.drawable.constantState!!.newDrawable().mutate()
-        }
-
+    protected fun setDrawableSpan(drawable: Drawable, color: Int) {
         drawable.setTint(color)
-        val size: Int = activity.findViewById<TextView>(R.id.input).textSize.toInt()
-        drawable.setBounds(0, 0,  (size / 1.2).roundToInt(), (size / 1.2).roundToInt())
 
-        if (FunctionParser.parse<FunctionKind>(token) == FunctionKind.LOG)
-            drawable.setBounds(0, 0, (size * 1.5).roundToInt(), size)
+        val spans = spannable.getSpans<ImageSpan>(start, end)
+
+        if (spans.isNotEmpty())
+            spannable.removeSpan(spans.first())
 
         spannable.setSpan(
             ImageSpan(
@@ -90,5 +112,18 @@ abstract class ExpandedClickable(
         )
 
         liveInput.value = spannable
+    }
+
+    override fun bindToEditableToken() {}
+
+    override fun applyColorToSpan(color: Int) {
+        super.applyColorToSpan(color)
+
+        val spans = spannable.getSpans<ImageSpan>(start, end)
+
+        if (spans.isNotEmpty()) {
+            val drawable = spans.first().drawable
+            setDrawableSpan(drawable, color)
+        }
     }
 }

@@ -82,7 +82,7 @@ class CalculatorFragment : Fragment() {
             // Change Layout Button
             defaultCalculatorBinding?.changeLayout?.setOnClickListener {
                 binding?.calculatorLayout?.removeAllViews()
-                defaultInputAdapter.replaceAllSpans()
+//                defaultInputAdapter.replaceAllSpans()
 
                 initExpandedBindings()
                 applyCalculatorSettings()
@@ -92,7 +92,7 @@ class CalculatorFragment : Fragment() {
 
             expandedCalculatorBinding?.changeLayout?.setOnClickListener {
                 binding?.calculatorLayout?.removeAllViews()
-                expandedInputAdapter.replaceAllSpans()
+//                expandedInputAdapter.replaceAllSpans()
 
                 initDefaultBindings()
                 applyCalculatorSettings()
