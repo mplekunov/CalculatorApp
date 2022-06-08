@@ -3,13 +3,15 @@
 ## General Information
 ## Features
 - Can evaluate expressions containing positive/negative integers/floats using infix and postfix algorithms
-- Has responsive UI (colors and input/output formats will be customizable in the feature)
+- Has responsive UI
+- Customizable Colors: Highlighting, Function/Operator/Number Buttons, as well as input and output font colors
 - Supports standard calculator operations
 - Supports advanced calculator operations (squared, square root, natural logarith, logarithm base 10, factorial (max number is limited to 50))
 - Supports removal of operators and operands anywhere in the expression
 - Supports editing of operators and operands anywhere in the expression
 - Supports editing of similar functions (lg, log, square root)
 - Dynamically evaluates expression, saves expression result on the Equal button press
+- Supports Day and Night Mode
 
 This program allows user to calculate standard mathematical expressions (as any other basic calculator)
 
