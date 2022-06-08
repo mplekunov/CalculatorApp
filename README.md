@@ -4,7 +4,7 @@
 ## Features
 - Can evaluate expressions containing positive/negative integers/floats using infix and postfix algorithms
 - Has responsive UI
-- Customizable Colors: Highlighting, Function/Operator/Number Buttons, as well as input and output font colors
+- Customizable Colors in Settings Menu: Highlighting, Function/Operator/Number Buttons, as well as input and output font colors
 - Supports standard calculator operations
 - Supports advanced calculator operations (squared, square root, natural logarith, logarithm base 10, factorial (max number is limited to 50))
 - Supports removal of operators and operands anywhere in the expression
