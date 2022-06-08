@@ -4,32 +4,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-<!--    <PreferenceCategory-->
-<!--        android:title="Input Formatting">-->
+    <PreferenceCategory
+        android:title="Input Formatting">
 
-<!--&lt;!&ndash;        <EditTextPreference&ndash;&gt;-->
-<!--&lt;!&ndash;            android:key="@string/saved_input_font_size_key"&ndash;&gt;-->
-<!--&lt;!&ndash;            android:title="Size"&ndash;&gt;-->
-<!--&lt;!&ndash;            app:useSimpleSummaryProvider="true"&ndash;&gt;-->
+<!--        <EditTextPreference-->
+<!--            android:key="@string/saved_input_font_size_key"-->
+<!--            android:title="Size"-->
+<!--            app:useSimpleSummaryProvider="true"-->
 
-<!--&lt;!&ndash;            android:dialogTitle="Choose Font Size"&ndash;&gt;-->
-<!--&lt;!&ndash;            tools:defaultValue="@string/default_input_size" />&ndash;&gt;-->
+<!--            android:dialogTitle="Choose Font Size"-->
+<!--            tools:defaultValue="@string/default_input_size" />-->
 
-<!--&lt;!&ndash;        <ListPreference&ndash;&gt;-->
-<!--&lt;!&ndash;            android:key="@string/saved_input_formatting_key"&ndash;&gt;-->
-<!--&lt;!&ndash;            android:title="Format"&ndash;&gt;-->
-<!--&lt;!&ndash;            app:useSimpleSummaryProvider="true"&ndash;&gt;-->
+<!--        <ListPreference-->
+<!--            android:key="@string/saved_input_formatting_key"-->
+<!--            android:title="Format"-->
+<!--            app:useSimpleSummaryProvider="true"-->
 
-<!--&lt;!&ndash;            android:dialogTitle="Choose Font"&ndash;&gt;-->
-<!--&lt;!&ndash;            tools:entries="@array/entries"&ndash;&gt;-->
-<!--&lt;!&ndash;            tools:entryValues="@array/values"&ndash;&gt;-->
-<!--&lt;!&ndash;            tools:defaultValue="Test 1" />&ndash;&gt;-->
+<!--            android:dialogTitle="Choose Font"-->
+<!--            tools:entries="@array/entries"-->
+<!--            tools:entryValues="@array/values"-->
+<!--            tools:defaultValue="Test 1" />-->
 
-<!--        <Preference-->
-<!--            android:key="@string/saved_input_font_color_key"-->
-<!--            android:title="Text Color"-->
-<!--            android:defaultValue="@string/saved_input_font_color_key"/>-->
-<!--    </PreferenceCategory>-->
+        <Preference
+            android:key="@string/saved_input_font_color_key"
+            android:title="Text Color"
+            android:defaultValue="@string/saved_input_font_color_key"/>
+    </PreferenceCategory>
 
     <PreferenceCategory
         android:title="Output Formatting">

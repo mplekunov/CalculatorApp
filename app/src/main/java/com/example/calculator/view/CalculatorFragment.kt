@@ -2,24 +2,24 @@ package com.example.calculator.view
 
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.text.Spannable
 import android.text.SpannableStringBuilder
 
 import android.text.method.LinkMovementMethod
-import android.util.Log
+import android.text.style.DynamicDrawableSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.ImageSpan
 
 import android.view.*
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.graphics.*
 import androidx.core.widget.ImageViewCompat
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
-import androidx.preference.PreferenceManager
 
 import com.example.calculator.R
-import com.example.calculator.converter.ColorConverter
 import com.example.calculator.databinding.CalculatorExpandedBinding
 import com.example.calculator.databinding.CalculatorNormalBinding
 import com.example.calculator.databinding.FragmentCalculatorBinding
@@ -112,6 +112,8 @@ class CalculatorFragment : Fragment() {
             calculatorFragment = this@CalculatorFragment
         }
 
+        colorLiveInput()
+
         // Binds an observer to liveInput...
         // On liveData object modification, updates both input and output textview
         liveInput.observe(viewLifecycleOwner) {
@@ -122,11 +124,30 @@ class CalculatorFragment : Fragment() {
         applyCalculatorSettings()
     }
 
+    private fun colorLiveInput() {
+        liveInput.value?.setSpan(ForegroundColorSpan(SettingsManager(requireContext()).getColor(R.string.saved_input_font_color_key)), 0, liveInput.value!!.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        val drawables = liveInput.value?.getSpans(0, liveInput.value!!.length, ImageSpan::class.java)
+
+        if (drawables != null) {
+            for (imageSpan in drawables) {
+                val drawable = imageSpan.drawable
+                drawable.setTint(SettingsManager(requireContext()).getColor(R.string.saved_input_font_color_key))
+
+                val start = liveInput.value!!.getSpanStart(imageSpan)
+                val end = liveInput.value!!.getSpanEnd(imageSpan)
+
+                liveInput.value?.removeSpan(imageSpan)
+
+                liveInput.value?.setSpan(ImageSpan(drawable, DynamicDrawableSpan.ALIGN_CENTER), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+        }
+    }
+
     private fun applyCalculatorSettings() {
         val settingsManager = SettingsManager(requireContext())
 
-//        binding!!.input.setTextColor(
-//            settingsManager.getColor(R.string.saved_input_font_color_key))
+        binding!!.input.setTextColor(
+            settingsManager.getColor(R.string.saved_input_font_color_key))
 
         binding!!.output.setTextColor(
             settingsManager.getColor(R.string.saved_output_font_color_key))

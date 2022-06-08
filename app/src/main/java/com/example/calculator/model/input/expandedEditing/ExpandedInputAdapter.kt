@@ -16,6 +16,7 @@ import com.example.calculator.model.input.defaultEditing.Clickable
 import com.example.calculator.model.input.defaultEditing.InputAdapter
 import com.example.calculator.model.number.NumberKind
 import com.example.calculator.model.operator.OperatorKind
+import com.example.calculator.model.settings.SettingsManager
 import com.example.calculator.model.token.TokenTypes
 import com.example.calculator.model.wrapper.Buttons
 import com.example.calculator.parser.FunctionParser
@@ -101,7 +102,8 @@ class ExpandedInputAdapter(
         val typedValue = TypedValue()
         activity.theme.resolveAttribute(com.google.android.material.R.attr.colorOnPrimary, typedValue, true)
 
-        drawable.setTint(activity.getColor(typedValue.resourceId))
+        drawable.setTint(SettingsManager(activity.applicationContext).getColor(R.string.saved_input_font_color_key))
+
         val size: Int = activity.findViewById<TextView>(R.id.input).textSize.toInt()
         drawable.setBounds(0, 0,  (size / 1.3).roundToInt(), (size / 1.3).roundToInt())
 
