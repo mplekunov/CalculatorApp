@@ -7,5 +7,18 @@
     <fragment
         android:id="@+id/calculatorFragment"
         android:name="com.example.calculator.view.CalculatorFragment"
-        android:label="CalculatorFragment" />
+        android:label="CalculatorFragment" >
+        <action
+            android:id="@+id/action_calculatorFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.calculator.view.SettingsFragment"
+        android:label="SettingsFragment" >
+        <action
+            android:id="@+id/action_settingsFragment_to_calculatorFragment"
+            app:destination="@id/calculatorFragment" />
+    </fragment>
 </navigation>

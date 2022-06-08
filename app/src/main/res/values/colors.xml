@@ -1,20 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="yellow_800">#f9a825</color>
-    <color name="yellow_light">#ffd95a</color>
-    <color name="yellow_dark">#c17900</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="grey">#757575</color>
+    <color name="NightPrimary">#000000</color>
+    <color name="NightPrimaryLight">#2c2c2c</color>
+    <color name="NightPrimaryDark">#000000</color>
+
+    <color name="NightSecondary">#ffb100</color>
+    <color name="NightSecondaryLight">#ffe34c</color>
+    <color name="NightSecondaryDark">#c68200</color>
+    
+    <color name="NightTextOnPrimary">#ffffff</color>
+    <color name="NightTextOnSecondary">#000000</color>
+
+    <color name="DayPrimary">#ffffff</color>
+    <color name="DayPrimaryLight">#ffffff</color>
+    <color name="DayPrimaryDark">#cccccc</color>
+
+    <color name="DaySecondary">#ffb100</color>
+    <color name="DaySecondaryLight">#ffe34c</color>
+    <color name="DaySecondaryDark">#c68200</color>
+
+    <color name="DayTextOnPrimary">#000000</color>
+    <color name="DayTextOnSecondary">#000000</color>
 
     <color name="calc_button_pressed">#bcbcbc</color>
-    <color name="calc_default_function_button">@android:color/holo_orange_dark</color>
-    <color name="calc_default_operation_button">@android:color/holo_orange_dark</color>
-    <color name="calc_default_number_button">@android:color/white</color>
 
-    <color name="highlighted_text">@android:color/holo_orange_dark </color>
-    <color name="default_text">@android:color/white</color>
+    <color name="calc_function_button">@android:color/holo_orange_dark</color>
+    <color name="calc_operation_button">@android:color/holo_orange_dark</color>
+    <color name="calc_number_button">?android:attr/textColorPrimary</color>
 
-    <color name="enabled_button"> </color>
-    <color name="disabled_button"> </color>
+    <color name="calc_clear_button">@android:color/holo_orange_dark</color>
+    <color name="calc_clear_all_button">@android:color/holo_orange_dark</color>
+
+    <color name="calc_disabled_button">@android:color/darker_gray</color>
+
+    <color name="highlighted_text">@android:color/holo_orange_dark</color>
+    <color name="default_text">?android:attr/textColorPrimary</color>
+
+
+    <color name="alpha_seekbar">@android:color/darker_gray</color>
+    <color name="red_seekbar">@android:color/holo_red_dark</color>
+    <color name="green_seekbar">@android:color/holo_green_dark</color>
+    <color name="blue_seekbar">@android:color/holo_blue_dark</color>
+
 </resources>

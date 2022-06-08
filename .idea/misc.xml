@@ -5,7 +5,10 @@
       <map>
         <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/_65076_calculator_function_log_logarithm_math_icon.xml" value="0.3295" />
         <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/aaaaaaa.xml" value="0.2195" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/action_bar.xml" value="0.2635" />
         <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/add_ic.xml" value="0.3635" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/back_ic.xml" value="0.3595" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/button_background_selector.xml" value="0.3635" />
         <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/button_normal.xml" value="0.2485" />
         <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/button_pressed.xml" value="0.25" />
         <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/check_mark_ic.xml" value="0.3635" />
@@ -29,6 +32,7 @@
         <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/ln_ic.xml" value="0.181" />
         <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/log_c.xml" value="0.119" />
         <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/log_ic.xml" value="0.2195" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/menu_item_background.xml" value="0.3625" />
         <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/multiply_ic.xml" value="0.3635" />
         <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/nine_ic.xml" value="0.3635" />
         <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/one_ic.xml" value="0.3635" />
@@ -36,13 +40,36 @@
         <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/pi_ic.xml" value="0.3635" />
         <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/power_ic.xml" value="0.3635" />
         <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/right_parenthesis_ic.xml" value="0.3635" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/round_corners.xml" value="0.2475" />
         <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/square_root_ic.xml" value="0.3635" />
         <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/squared_ic.xml" value="0.3635" />
         <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/drawable/subtract_ic.xml" value="0.3635" />
-        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/activity_main.xml" value="0.27291666666666664" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/ColorPickerPreference.xml" value="0.2916666666666667" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/action_bar.xml" value="0.32019927536231885" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/calculator_expanded.xml" value="0.33" />
         <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/calculator_normal.xml" value="0.33" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/calculator_normal1.xml" value="0.24270833333333333" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/color_picker_preference.xml" value="0.2916666666666667" />
         <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/fragment_calculator.xml" value="0.27708333333333335" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/fragment_color_picker.xml" value="0.33" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/fragment_converter.xml" value="0.24270833333333333" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/settings.xml" value="0.1" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/settings_clear_all_color_button.xml" value="0.32019927536231885" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/settings_clear_color_button.xml" value="0.32019927536231885" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/settings_color_button.xml" value="0.32019927536231885" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/settings_color_image_button.xml" value="0.32019927536231885" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/settings_disabled_color_button.xml" value="0.32019927536231885" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/settings_function_color_button.xml" value="0.32019927536231885" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/settings_highlighting_color_button.xml" value="0.32019927536231885" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/settings_input_color_button.xml" value="0.32019927536231885" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/settings_number_color_button.xml" value="0.32019927536231885" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/settings_operator_color_button.xml" value="0.32019927536231885" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/layout/settings_output_color_button.xml" value="0.32019927536231885" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/menu/menu.xml" value="0.21354166666666666" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/xml/root_preferences.xml" value="0.21458333333333332" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/xml/settings.xml" value="0.22" />
+        <entry key="..\:/Users/Michael/StudioProjects/CalculatorApp/app/src/main/res/xml/settings_reference.xml" value="0.5838739573679332" />
         <entry key="..\:/Users/smart/AndroidStudioProjects/Calculator/app/src/main/res/drawable/button_background_selector.xml" value="0.3115" />
         <entry key="..\:/Users/smart/AndroidStudioProjects/Calculator/app/src/main/res/drawable/button_normal.xml" value="0.3635" />
         <entry key="..\:/Users/smart/AndroidStudioProjects/Calculator/app/src/main/res/drawable/button_pressed.xml" value="0.3635" />

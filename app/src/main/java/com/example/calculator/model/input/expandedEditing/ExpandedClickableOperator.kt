@@ -1,26 +1,23 @@
 package com.example.calculator.model.input.expandedEditing
 
-import android.content.Context
 import android.text.SpannableStringBuilder
 import android.view.View
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
-import com.example.calculator.model.input.defaultEditing.ClickableOperator
 import com.example.calculator.model.operator.OperatorKind
 import com.example.calculator.model.wrapper.Buttons
 import com.example.calculator.parser.OperatorParser
 import com.example.calculator.viewmodel.CalculatorViewModel
 
 class ExpandedClickableOperator(
-    context: Context,
+    activity: FragmentActivity,
     buttons: Buttons,
     viewModel: CalculatorViewModel,
     liveInput: MutableLiveData<SpannableStringBuilder>,
-    index: Int
-) : ExpandedClickable(context, buttons, viewModel, liveInput, index) {
-    override lateinit var oldString: String
-
+    val index: Int
+) : ExpandedClickable(activity, buttons, viewModel, liveInput) {
     override val what
-        get() = ExpandedClickableOperator(context, buttons, viewModel, liveInput, index)
+        get() = ExpandedClickableOperator(activity,buttons, viewModel, liveInput, index)
 
     override fun onClick(view: View) {
         val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
@@ -42,11 +39,11 @@ class ExpandedClickableOperator(
                 setButtonState(button, disabledButtonColor, false)
 
             button.setOnClickListener {
-                oldString = viewModel.formattedInput[index]
+                val oldToken = viewModel.inputAsTokens[index]
 
                 if (viewModel.set(operator, index)) {
-                    replaceSpan(viewModel.formattedInput[index])
-                    applyColorToSpan(highlightedColor, newStart, newEnd)
+                    replaceSpan(what, viewModel.inputAsTokens[index], oldToken)
+                    applyColorToSpan(highlightedColor)
                 }
             }
         }

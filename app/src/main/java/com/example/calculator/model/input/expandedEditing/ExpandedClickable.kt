@@ -1,13 +1,17 @@
 package com.example.calculator.model.input.expandedEditing
 
-import android.app.Activity
-import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.DynamicDrawableSpan
 import android.text.style.ImageSpan
+import android.view.View
 import android.widget.TextView
-import androidx.annotation.ColorInt
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.DrawableCompat.setTint
+import androidx.core.text.getSpans
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import com.example.calculator.R
 import com.example.calculator.model.function.FunctionKind
@@ -21,52 +25,83 @@ import com.example.calculator.parser.FunctionParser
 import com.example.calculator.parser.NumberParser
 import com.example.calculator.parser.OperatorParser
 import com.example.calculator.viewmodel.CalculatorViewModel
+import kotlin.math.roundToInt
 
 abstract class ExpandedClickable(
-    context: Context,
+    activity: FragmentActivity,
     buttons: Buttons,
     viewModel: CalculatorViewModel,
     liveInput: MutableLiveData<SpannableStringBuilder>,
-    index: Int
-) : Clickable(context, buttons, viewModel, liveInput, index) {
-    private val token get() = viewModel.inputAsTokens[index]
+) : Clickable(activity, buttons, viewModel, liveInput) {
+    override fun onClick(view: View) {
+        start = spannable.getSpanStart(this)
+        end = spannable.getSpanEnd(this)
+
+        resetSpannableFocus()
+
+        setButtonState(buttons.changeLayout, disabledButtonColor, false)
+        bindToEditableToken()
+
+        applyColorToSpan(highlightedColor)
+
+        buttons.equal.setImageDrawable(ResourcesCompat.getDrawable(activity.resources, R.drawable.check_mark_ic, activity.theme))
+
+        buttons.equal.setOnClickListener {
+            ExpandedInputAdapter(activity, buttons, viewModel, liveInput).setBindings()
+
+            resetSpannableFocus()
+            buttons.equal.setImageDrawable(ResourcesCompat.getDrawable(activity.resources, R.drawable.equal_ic, activity.theme))
+        }
+    }
 
     override fun resetSpannableFocus() {
         super.resetSpannableFocus()
 
-        val originalIndex = index
+        val imageSpans = spannable.getSpans<ImageSpan>(0, spannable.length)
+        imageSpans.forEach { imageSpan ->
+            val drawable = imageSpan.drawable
 
-        for (i in viewModel.inputAsTokens.indices) {
-            index = i
-            if (token.type == TokenTypes.Function)
-                setDrawableSpan(defaultTextColor)
+            drawable.setTint(defaultTextColor)
+
+            val start = spannable.getSpanStart(imageSpan)
+            val end = spannable.getSpanEnd(imageSpan)
+
+            spannable.removeSpan(imageSpan)
+
+            spannable.setSpan(
+                ImageSpan(
+                    drawable,
+                    DynamicDrawableSpan.ALIGN_CENTER
+                ), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
         }
 
-        index = originalIndex
+        liveInput.value = spannable
     }
 
-    override fun bindToEditableToken() {}
+    override fun replaceSpan(what: Clickable, token: Token, oldToken: Token) {
+        super.replaceSpan(what, token, oldToken)
 
-    override fun applyColorToSpan(color: Int, start: Int, end: Int) {
-        super.applyColorToSpan(color, start, end)
+        if (token.type == TokenTypes.Function && token != oldToken) {
+            val drawable = buttons.functions[FunctionParser.parse<FunctionKind>(token)]!!.drawable.constantState!!.newDrawable().mutate()
 
-        if (token.type == TokenTypes.Function)
-            setDrawableSpan(color)
-    }
+            val size: Int = activity.findViewById<TextView>(R.id.input).textSize.toInt()
+            drawable.setBounds(0, 0,  (size / 1.3).roundToInt(), (size / 1.3).roundToInt())
 
-    protected fun setDrawableSpan(color: Int = defaultTextColor, start: Int = newStart, end: Int = newEnd) {
-        val drawable = when(token.type) {
-            TokenTypes.Function -> buttons.functions[FunctionParser.parse<FunctionKind>(token)]!!.drawable.constantState!!.newDrawable().mutate()
-            TokenTypes.Number -> buttons.numbers[NumberParser.parse<NumberKind>(token)]!!.drawable.constantState?.newDrawable()!!.mutate()
-            TokenTypes.Operator -> buttons.operators[OperatorParser.parse<OperatorKind>(token)]!!.drawable.constantState!!.newDrawable().mutate()
+            if (FunctionParser.parse<FunctionKind>(token) == FunctionKind.LOG)
+                drawable.setBounds(0, 0, (size * 1.4).roundToInt(), size)
+
+            setDrawableSpan(drawable, highlightedColor)
         }
+    }
 
+    protected fun setDrawableSpan(drawable: Drawable, color: Int) {
         drawable.setTint(color)
-        val size: Int = (context as Activity).findViewById<TextView>(R.id.input).textSize.toInt()
-        drawable.setBounds(0, 0,  size - 15, size - 20)
 
-        if (FunctionParser.parse<FunctionKind>(token) == FunctionKind.LOG)
-            drawable.setBounds(0, 0, size + 45, size)
+        val spans = spannable.getSpans<ImageSpan>(start, end)
+
+        if (spans.isNotEmpty())
+            spannable.removeSpan(spans.first())
 
         spannable.setSpan(
             ImageSpan(
@@ -76,5 +111,18 @@ abstract class ExpandedClickable(
         )
 
         liveInput.value = spannable
+    }
+
+    override fun bindToEditableToken() {}
+
+    override fun applyColorToSpan(color: Int) {
+        super.applyColorToSpan(color)
+
+        val spans = spannable.getSpans<ImageSpan>(start, end)
+
+        if (spans.isNotEmpty()) {
+            val drawable = spans.first().drawable
+            setDrawableSpan(drawable, color)
+        }
     }
 }

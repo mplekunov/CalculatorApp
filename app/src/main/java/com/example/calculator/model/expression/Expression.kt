@@ -110,6 +110,7 @@ class Expression {
      */
     private fun processMinusSign(token: Token, index: Int) : Boolean {
         val leftParenthesis = OperatorParser.parse(OperatorKind.LEFT_BRACKET)
+        val rightParenthesis = OperatorParser.parse(OperatorKind.RIGHT_BRACKET)
 
         // Minus sign can be in the beginning of an expression
         if (_expression.isEmpty())
@@ -117,7 +118,7 @@ class Expression {
 
         // Minus sign can be after left parenthesis
         return if (_expression.last().type == TokenTypes.Operator) {
-            if (_expression.last() == leftParenthesis)
+            if (_expression.last() == leftParenthesis || _expression.last() == rightParenthesis)
                 _expression.add(OperatorParser.parse(OperatorKind.SUBTRACTION))
             else {
                 _expression.add(OperatorParser.parse(OperatorKind.LEFT_BRACKET)) &&

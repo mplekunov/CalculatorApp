@@ -3,11 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-    </data>
-
-
     <GridLayout
         android:columnCount="5"
         android:rowCount="6"
@@ -17,7 +12,9 @@
 
         <ImageButton
             android:id="@+id/power"
-            style="@style/Widget.Calculator.CalcButton"
+            style="@style/Widget.Calculator.ImageButton"
+
+            app:tint="@color/calc_operation_button"
 
             android:layout_marginStart="@dimen/button_margin"
             android:padding="@dimen/btn_padding_expanded"
@@ -26,7 +23,9 @@
 
         <ImageButton
             android:id="@+id/log"
-            style="@style/Widget.Calculator.CalcButton"
+            style="@style/Widget.Calculator.ImageButton"
+
+            app:tint="@color/calc_function_button"
 
             android:padding="18dp"
 
@@ -34,7 +33,9 @@
 
         <ImageButton
             android:id="@+id/ln"
-            style="@style/Widget.Calculator.CalcButton"
+            style="@style/Widget.Calculator.ImageButton"
+
+            app:tint="@color/calc_function_button"
 
             android:padding="@dimen/btn_padding_expanded"
 
@@ -42,7 +43,9 @@
 
         <ImageButton
             android:id="@+id/left_parenthesis"
-            style="@style/Widget.Calculator.CalcButton"
+            style="@style/Widget.Calculator.ImageButton"
+
+            app:tint="@color/calc_operation_button"
 
             android:padding="@dimen/btn_padding_expanded"
 
@@ -50,7 +53,9 @@
 
         <ImageButton
             android:id="@+id/right_parenthesis"
-            style="@style/Widget.Calculator.CalcButton"
+            style="@style/Widget.Calculator.ImageButton"
+
+            app:tint="@color/calc_operation_button"
 
             android:padding="@dimen/btn_padding_expanded"
 
@@ -58,7 +63,9 @@
 
         <ImageButton
             android:id="@+id/square_root"
-            style="@style/Widget.Calculator.CalcButton"
+            style="@style/Widget.Calculator.ImageButton"
+
+            app:tint="@color/calc_function_button"
 
             android:layout_marginStart="@dimen/button_margin"
             android:padding="@dimen/btn_padding_expanded"
@@ -67,17 +74,20 @@
 
         <Button
             android:id="@+id/clearAll"
-            style="@style/Widget.Calculator.CalcButton"
+            style="@style/Widget.Calculator.ImageButton"
+
+            android:textColor="@color/calc_clear_all_button"
 
             android:text="@string/all_cleared"
             android:fontFamily="sans-serif-condensed"
-            android:textColor="@color/calc_default_function_button"
             android:textSize="@dimen/button_ac_text_size" />
 
 
         <ImageButton
             android:id="@+id/clear"
-            style="@style/Widget.Calculator.CalcButton"
+            style="@style/Widget.Calculator.ImageButton"
+
+            app:tint="@color/calc_clear_button"
 
             android:padding="@dimen/btn_padding_expanded"
 
@@ -85,7 +95,9 @@
 
         <ImageButton
             android:id="@+id/percent"
-            style="@style/Widget.Calculator.CalcButton"
+            style="@style/Widget.Calculator.ImageButton"
+
+            app:tint="@color/calc_operation_button"
 
             android:padding="@dimen/btn_padding_expanded"
 
@@ -93,7 +105,9 @@
 
         <ImageButton
             android:id="@+id/divide"
-            style="@style/Widget.Calculator.CalcButton"
+            style="@style/Widget.Calculator.ImageButton"
+
+            app:tint="@color/calc_operation_button"
 
             android:padding="@dimen/btn_padding_expanded"
 
@@ -101,7 +115,9 @@
 
         <ImageButton
             android:id="@+id/factorial"
-            style="@style/Widget.Calculator.CalcButton"
+            style="@style/Widget.Calculator.ImageButton"
+
+            app:tint="@color/calc_function_button"
 
             android:layout_marginStart="@dimen/button_margin"
             android:padding="@dimen/btn_padding_expanded"
@@ -110,9 +126,7 @@
 
         <ImageButton
             android:id="@+id/number_7"
-            style="@style/Widget.Calculator.CalcButton"
-
-            app:tint="?android:attr/textColorPrimary"
+            style="@style/Widget.Calculator.ImageButton"
 
             android:padding="@dimen/btn_padding_expanded"
 
@@ -120,9 +134,7 @@
 
         <ImageButton
             android:id="@+id/number_8"
-            style="@style/Widget.Calculator.CalcButton"
-
-            app:tint="?android:attr/textColorPrimary"
+            style="@style/Widget.Calculator.ImageButton"
 
             android:padding="@dimen/btn_padding_expanded"
 
@@ -130,9 +142,7 @@
 
         <ImageButton
             android:id="@+id/number_9"
-            style="@style/Widget.Calculator.CalcButton"
-
-            app:tint="?android:attr/textColorPrimary"
+            style="@style/Widget.Calculator.ImageButton"
 
             android:padding="@dimen/btn_padding_expanded"
 
@@ -140,7 +150,9 @@
 
         <ImageButton
             android:id="@+id/multiply"
-            style="@style/Widget.Calculator.CalcButton"
+            style="@style/Widget.Calculator.ImageButton"
+
+            app:tint="@color/calc_operation_button"
 
             android:padding="@dimen/btn_padding_expanded"
 
@@ -148,7 +160,9 @@
 
         <ImageButton
             android:id="@+id/squared"
-            style="@style/Widget.Calculator.CalcButton"
+            style="@style/Widget.Calculator.ImageButton"
+
+            app:tint="@color/calc_operation_button"
 
             android:layout_marginStart="@dimen/button_margin"
             android:padding="@dimen/btn_padding_expanded"
@@ -157,9 +171,7 @@
 
         <ImageButton
             android:id="@+id/number_4"
-            style="@style/Widget.Calculator.CalcButton"
-
-            app:tint="?android:attr/textColorPrimary"
+            style="@style/Widget.Calculator.ImageButton"
 
             android:padding="@dimen/btn_padding_expanded"
 
@@ -167,9 +179,7 @@
 
         <ImageButton
             android:id="@+id/number_5"
-            style="@style/Widget.Calculator.CalcButton"
-
-            app:tint="?android:attr/textColorPrimary"
+            style="@style/Widget.Calculator.ImageButton"
 
             android:padding="@dimen/btn_padding_expanded"
 
@@ -177,10 +187,7 @@
 
         <ImageButton
             android:id="@+id/number_6"
-            style="@style/Widget.Calculator.CalcButton"
-
-            app:tint="?android:attr/textColorPrimary"
-
+            style="@style/Widget.Calculator.ImageButton"
 
             android:padding="@dimen/btn_padding_expanded"
 
@@ -188,7 +195,9 @@
 
         <ImageButton
             android:id="@+id/subtract"
-            style="@style/Widget.Calculator.CalcButton"
+            style="@style/Widget.Calculator.ImageButton"
+
+            app:tint="@color/calc_operation_button"
 
             android:padding="@dimen/btn_padding_expanded"
 
@@ -196,11 +205,9 @@
 
         <ImageButton
             android:id="@+id/pi"
-            style="@style/Widget.Calculator.CalcButton"
+            style="@style/Widget.Calculator.ImageButton"
 
             android:layout_marginStart="@dimen/button_margin"
-
-            app:tint="?android:attr/textColorPrimary"
 
             android:padding="@dimen/btn_padding_expanded"
 
@@ -208,9 +215,7 @@
 
         <ImageButton
             android:id="@+id/number_1"
-            style="@style/Widget.Calculator.CalcButton"
-
-            app:tint="?android:attr/textColorPrimary"
+            style="@style/Widget.Calculator.ImageButton"
 
             android:padding="@dimen/btn_padding_expanded"
 
@@ -218,9 +223,7 @@
 
         <ImageButton
             android:id="@+id/number_2"
-            style="@style/Widget.Calculator.CalcButton"
-
-            app:tint="?android:attr/textColorPrimary"
+            style="@style/Widget.Calculator.ImageButton"
 
             android:padding="@dimen/btn_padding_expanded"
 
@@ -228,9 +231,7 @@
 
         <ImageButton
             android:id="@+id/number_3"
-            style="@style/Widget.Calculator.CalcButton"
-
-            app:tint="?android:attr/textColorPrimary"
+            style="@style/Widget.Calculator.ImageButton"
 
             android:padding="@dimen/btn_padding_expanded"
 
@@ -238,7 +239,9 @@
 
         <ImageButton
             android:id="@+id/add"
-            style="@style/Widget.Calculator.CalcButton"
+            style="@style/Widget.Calculator.ImageButton"
+
+            app:tint="@color/calc_operation_button"
 
             android:padding="@dimen/btn_padding_expanded"
 
@@ -246,7 +249,9 @@
 
         <ImageButton
             android:id="@+id/change_layout"
-            style="@style/Widget.Calculator.CalcButton"
+            style="@style/Widget.Calculator.ImageButton"
+
+            app:tint="@color/calc_function_button"
 
             android:layout_marginStart="@dimen/button_margin"
             android:padding="@dimen/btn_padding_expanded"
@@ -255,9 +260,7 @@
 
         <ImageButton
             android:id="@+id/epsilon"
-            style="@style/Widget.Calculator.CalcButton"
-
-            app:tint="?android:attr/textColorPrimary"
+            style="@style/Widget.Calculator.ImageButton"
 
             android:padding="18dp"
 
@@ -265,9 +268,7 @@
 
         <ImageButton
             android:id="@+id/number_0"
-            style="@style/Widget.Calculator.CalcButton"
-
-            app:tint="?android:attr/textColorPrimary"
+            style="@style/Widget.Calculator.ImageButton"
 
             android:padding="@dimen/btn_padding_expanded"
 
@@ -275,9 +276,7 @@
 
         <ImageButton
             android:id="@+id/dot"
-            style="@style/Widget.Calculator.CalcButton"
-
-            app:tint="?android:attr/textColorPrimary"
+            style="@style/Widget.Calculator.ImageButton"
 
             android:padding="@dimen/btn_padding_expanded"
 
@@ -285,7 +284,9 @@
 
         <ImageButton
             android:id="@+id/equal"
-            style="@style/Widget.Calculator.CalcButton"
+            style="@style/Widget.Calculator.ImageButton"
+
+            app:tint="@color/calc_function_button"
 
             android:padding="@dimen/btn_padding_equal_expanded"
 

@@ -1,42 +1,26 @@
 package com.example.calculator.model.input.expandedEditing
 
-import android.app.Activity
-import android.content.Context
-import android.text.Spannable
 import android.text.SpannableStringBuilder
-import android.text.style.DynamicDrawableSpan
-import android.text.style.ImageSpan
-import android.view.View
 import android.widget.TextView
-import androidx.annotation.ColorInt
-import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import com.example.calculator.R
 import com.example.calculator.model.function.Function
-import com.example.calculator.model.function.FunctionBody
 import com.example.calculator.model.function.FunctionKind
-import com.example.calculator.model.input.defaultEditing.Clickable
-import com.example.calculator.model.number.NumberKind
-import com.example.calculator.model.operator.OperatorKind
-import com.example.calculator.model.token.TokenTypes
 import com.example.calculator.model.wrapper.Buttons
 import com.example.calculator.parser.FunctionParser
-import com.example.calculator.parser.NumberParser
-import com.example.calculator.parser.OperatorParser
 import com.example.calculator.viewmodel.CalculatorViewModel
+import kotlin.math.roundToInt
 
 class ExpandedClickableFunction(
-    context: Context,
+    activity: FragmentActivity,
     buttons: Buttons,
     viewModel: CalculatorViewModel,
     liveInput: MutableLiveData<SpannableStringBuilder>,
-    index: Int
-) : ExpandedClickable(context, buttons, viewModel, liveInput, index) {
-
-    override lateinit var oldString: String
-
+    val index: Int
+) : ExpandedClickable(activity,  buttons, viewModel, liveInput) {
     override val what
-        get() = ExpandedClickableFunction(context, buttons, viewModel, liveInput, index)
+        get() = ExpandedClickableFunction(activity, buttons, viewModel, liveInput, index)
 
     override fun bindToEditableToken() {
         buttons.operators.forEach { (button, _) -> setButtonState(button, disabledButtonColor, false) }
@@ -63,12 +47,11 @@ class ExpandedClickableFunction(
                     curBody != functionBody }
                     .forEach { (button, _) -> setButtonState(button, disabledButtonColor, false) }
 
-                oldString = viewModel.formattedInput[index]
+                val oldToken = viewModel.inputAsTokens[index]
 
                 if (viewModel.set(function, index)) {
-                    replaceSpan(viewModel.formattedInput[index])
-                    setDrawableSpan()
-                    applyColorToSpan(highlightedColor, newStart, newEnd)
+                    replaceSpan(what, viewModel.inputAsTokens[index], oldToken)
+                    applyColorToSpan(highlightedColor)
                 }
             }
         }

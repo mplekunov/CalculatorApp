@@ -3,12 +3,20 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <!-- Input/Output Textview style -->
+
+    <style name="Widget.Calculator.PopupMenu" parent="Widget.AppCompat.PopupMenu">
+<!--        <item name="android:itemBackground">@drawable/menu_item_background</item>-->
+    </style>
+
+    <style name="ThemeOverlay.Calculator.DayNight" parent="ThemeOverlay.AppCompat.DayNight.ActionBar">
+    </style>
+
     <style name="Widget.Calculator.TextView" parent="Widget.AppCompat.TextView">
         <item name="android:paddingTop">8dp</item>
         <item name="android:paddingBottom">8dp</item>
         <item name="android:paddingStart">24dp</item>
         <item name="android:paddingEnd">24dp</item>
-        <item name="android:colorAccent"></item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
     </style>
 
     <!-- Divider style -->
@@ -20,20 +28,31 @@
         <item name="android:layout_marginBottom">4dp</item>
     </style>
 
+    <style name="Widget.Calculator.Button" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/button_pressed</item>
+        <item name="android:backgroundTint">@color/calc_function_button</item>
+        <item name="android:color">@color/calc_function_button</item>
+    </style>
+
     <!-- Calculator Button style -->
-    <style name="Widget.Calculator.CalcButton" parent="Widget.AppCompat.Button">
-        <item name="android:textColor">?android:textColorPrimary</item>
+    <style name="Widget.Calculator.ImageButton" parent="Widget.AppCompat.ImageButton">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
+
         <item name="android:maxHeight">@dimen/button_size</item>
+
         <item name="android:layout_marginBottom">@dimen/button_margin</item>
         <item name="android:layout_marginEnd">@dimen/button_margin</item>
+
         <item name="android:background">@drawable/button_background_selector</item>
+
         <item name="android:layout_gravity">fill</item>
+
         <item name="android:adjustViewBounds">true</item>
         <item name="android:scaleType">fitCenter</item>
+
         <item name="android:layout_columnWeight">1</item>
-        <item name="android:tint">@color/calc_default_function_button</item>
+
         <item name="backgroundTint">@color/calc_button_pressed</item>
     </style>
 </resources>

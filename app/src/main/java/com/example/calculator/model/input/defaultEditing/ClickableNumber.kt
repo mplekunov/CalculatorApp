@@ -1,21 +1,20 @@
 package com.example.calculator.model.input.defaultEditing
 
-import android.content.Context
 import android.text.SpannableStringBuilder
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
+import com.example.calculator.model.token.Token
 import com.example.calculator.model.wrapper.Buttons
 import com.example.calculator.viewmodel.CalculatorViewModel
 
 open class ClickableNumber(
-    context: Context,
+    activity: FragmentActivity,
     buttons: Buttons,
     viewModel: CalculatorViewModel,
     liveInput: MutableLiveData<SpannableStringBuilder>,
-    index: Int,
-) : Clickable(context, buttons, viewModel, liveInput, index) {
-    override val what get() = ClickableNumber(context, buttons, viewModel, liveInput, index)
-
-    override lateinit var oldString: String
+    val index: Int,
+) : Clickable(activity, buttons, viewModel, liveInput) {
+    override val what get() = ClickableNumber(activity, buttons, viewModel, liveInput, index)
 
     override fun bindToEditableToken() {
         buttons.operators.forEach { (button, _) -> setButtonState(button, disabledButtonColor, false)}
@@ -24,30 +23,30 @@ open class ClickableNumber(
         buttons.numbers.forEach { (button, number) ->
 
             button.setOnClickListener {
-                oldString = viewModel.formattedInput[index]
+                val oldToken = viewModel.inputAsTokens[index]
 
                 if (viewModel.add(number, index)) {
-                    replaceSpan(viewModel.formattedInput[index])
-                    applyColorToSpan(highlightedColor, newStart, newEnd)
+                    replaceSpan(what, viewModel.inputAsTokens[index], oldToken)
+                    applyColorToSpan(highlightedColor)
                 }
             }
         }
 
         buttons.clear.setOnClickListener {
-            oldString = viewModel.formattedInput[index]
+            val oldToken = viewModel.inputAsTokens[index]
 
             if (viewModel.delete(index)) {
-                replaceSpan(viewModel.formattedInput[index])
-                applyColorToSpan(highlightedColor, newStart, newEnd)
+                replaceSpan(what, viewModel.inputAsTokens[index], oldToken)
+                applyColorToSpan(highlightedColor)
             }
         }
 
         buttons.clearAll.setOnClickListener {
-            oldString = viewModel.formattedInput[index]
+            val oldToken = viewModel.inputAsTokens[index]
 
             if (viewModel.deleteAll(index)) {
-                replaceSpan(viewModel.formattedInput[index])
-                applyColorToSpan(highlightedColor, newStart, newEnd)
+                replaceSpan(what, viewModel.inputAsTokens[index], oldToken)
+                applyColorToSpan(highlightedColor)
             }
         }
     }

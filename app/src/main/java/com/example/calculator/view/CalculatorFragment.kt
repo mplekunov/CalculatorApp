@@ -1,13 +1,19 @@
 package com.example.calculator.view
 
+import android.content.res.ColorStateList
 import android.os.Bundle
+import android.text.Spannable
 import android.text.SpannableStringBuilder
 
 import android.text.method.LinkMovementMethod
+import android.text.style.DynamicDrawableSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.ImageSpan
 
 import android.view.*
-import android.widget.Button
 import android.widget.ImageButton
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.ImageViewCompat
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -18,11 +24,14 @@ import com.example.calculator.databinding.CalculatorExpandedBinding
 import com.example.calculator.databinding.CalculatorNormalBinding
 import com.example.calculator.databinding.FragmentCalculatorBinding
 import com.example.calculator.datastructure.BiMap
+import com.example.calculator.formatter.TokenFormatter
 import com.example.calculator.model.function.FunctionKind
 import com.example.calculator.model.input.defaultEditing.InputAdapter
 import com.example.calculator.model.input.expandedEditing.ExpandedInputAdapter
+
 import com.example.calculator.model.number.NumberKind
 import com.example.calculator.model.operator.OperatorKind
+import com.example.calculator.model.settings.SettingsManager
 import com.example.calculator.model.wrapper.Buttons
 
 import com.example.calculator.viewmodel.CalculatorViewModel
@@ -35,22 +44,60 @@ class CalculatorFragment : Fragment() {
 
     private val viewModel: CalculatorViewModel by viewModels()
 
-    private var buttons: Buttons = Buttons()
+    private var buttons = Buttons()
 
     private lateinit var defaultInputAdapter: InputAdapter
     private lateinit var expandedInputAdapter: ExpandedInputAdapter
 
     private var liveInput = MutableLiveData<SpannableStringBuilder>()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentCalculatorBinding.inflate(inflater, container, false)
+        if (binding == null) {
+            binding = FragmentCalculatorBinding.inflate(inflater, container, false)
 
-        defaultCalculatorBinding = CalculatorNormalBinding.inflate(inflater, null, false)
-        expandedCalculatorBinding = CalculatorExpandedBinding.inflate(inflater, null, false)
+            defaultCalculatorBinding = CalculatorNormalBinding.inflate(inflater, null, false)
+            expandedCalculatorBinding = CalculatorExpandedBinding.inflate(inflater, null, false)
+
+            // initializes default InputAdapter
+            initDefaultBindings()
+
+            // Adds Default layout and assigns binding to default DataViewBinding object
+            binding?.calculatorLayout?.addView(defaultCalculatorBinding!!.root)
+
+
+            // Init for spannable string support
+            binding?.input?.movementMethod = LinkMovementMethod.getInstance()
+            binding?.input?.highlightColor =
+                requireContext().getColor(com.google.android.material.R.color.mtrl_btn_transparent_bg_color)
+
+
+            // Change Layout Button
+            defaultCalculatorBinding?.changeLayout?.setOnClickListener {
+                binding?.calculatorLayout?.removeAllViews()
+
+                initExpandedBindings()
+                applyCalculatorSettings()
+
+                binding?.calculatorLayout?.addView(expandedCalculatorBinding!!.root)
+            }
+
+            expandedCalculatorBinding?.changeLayout?.setOnClickListener {
+                binding?.calculatorLayout?.removeAllViews()
+
+                initDefaultBindings()
+                applyCalculatorSettings()
+
+                binding?.calculatorLayout?.addView(defaultCalculatorBinding!!.root)
+            }
+        }
 
         return binding!!.root
     }
@@ -58,44 +105,81 @@ class CalculatorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayShowTitleEnabled(false)
+
         binding?.apply {
             lifecycleOwner = viewLifecycleOwner
             calculatorFragment = this@CalculatorFragment
         }
 
-        // Adds Default layout and assigns binding to default DataViewBinding object
-        binding?.calculatorLayout?.addView(defaultCalculatorBinding!!.root)
-
-        // initializes default InputAdapter
-        initDefaultBindings()
+        colorLiveInput()
 
         // Binds an observer to liveInput...
         // On liveData object modification, updates both input and output textview
         liveInput.observe(viewLifecycleOwner) {
             binding?.input?.text = it
-            binding?.output?.text = viewModel.formattedOutput
+            binding?.output?.text = TokenFormatter.convertTokenToString(viewModel.outputAsToken, true)
         }
 
-        // Init for spannable string support
-        binding?.input?.movementMethod = LinkMovementMethod.getInstance()
-        binding?.input?.highlightColor =
-            requireContext().getColor(com.google.android.material.R.color.mtrl_btn_transparent_bg_color)
+        applyCalculatorSettings()
+    }
 
+    private fun colorLiveInput() {
+        liveInput.value?.setSpan(ForegroundColorSpan(SettingsManager(requireContext()).getColor(R.string.saved_input_font_color_key)), 0, liveInput.value!!.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        val drawables = liveInput.value?.getSpans(0, liveInput.value!!.length, ImageSpan::class.java)
 
-        // Change Layout Button
-        defaultCalculatorBinding?.changeLayout?.setOnClickListener {
-            initExpandedBindings()
+        if (drawables != null) {
+            for (imageSpan in drawables) {
+                val drawable = imageSpan.drawable
+                drawable.setTint(SettingsManager(requireContext()).getColor(R.string.saved_input_font_color_key))
 
-            binding?.calculatorLayout?.removeAllViews()
-            binding?.calculatorLayout?.addView(expandedCalculatorBinding!!.root)
+                val start = liveInput.value!!.getSpanStart(imageSpan)
+                val end = liveInput.value!!.getSpanEnd(imageSpan)
+
+                liveInput.value?.removeSpan(imageSpan)
+
+                liveInput.value?.setSpan(ImageSpan(drawable, DynamicDrawableSpan.ALIGN_CENTER), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+        }
+    }
+
+    private fun applyCalculatorSettings() {
+        val settingsManager = SettingsManager(requireContext())
+
+        binding!!.input.setTextColor(
+            settingsManager.getColor(R.string.saved_input_font_color_key))
+
+        binding!!.output.setTextColor(
+            settingsManager.getColor(R.string.saved_output_font_color_key))
+
+        ImageViewCompat.setImageTintList(buttons.clear, ColorStateList.valueOf(
+            settingsManager.getColor(R.string.saved_clear_button_color_key)
+        ))
+
+        buttons.clearAll.setTextColor(ColorStateList.valueOf(
+            settingsManager.getColor(R.string.saved_clear_all_button_color_key)
+        ))
+
+        buttons.functions.forEach { (button, _) ->
+            ImageViewCompat.setImageTintList(button, ColorStateList.valueOf(
+                settingsManager.getColor(R.string.saved_function_button_color_key)
+            ))
         }
 
-        expandedCalculatorBinding?.changeLayout?.setOnClickListener {
-            initDefaultBindings()
-
-            binding?.calculatorLayout?.removeAllViews()
-            binding?.calculatorLayout?.addView(defaultCalculatorBinding!!.root)
+        buttons.operators.forEach { (button, _) ->
+            ImageViewCompat.setImageTintList(button, ColorStateList.valueOf(
+                settingsManager.getColor(R.string.saved_operator_button_color_key)
+            ))
         }
+
+        buttons.numbers.forEach { (button, _) ->
+            ImageViewCompat.setImageTintList(button, ColorStateList.valueOf(
+                settingsManager.getColor(R.string.saved_number_button_color_key)
+            ))
+        }
+
+//        binding!!.input.textSize = settingsManager.getString(R.string.saved_input_font_size_key).toFloat()
+//        binding!!.output.textSize = settingsManager.getString(R.string.saved_output_font_size_key).toFloat()
     }
 
     private fun initExpandedBindings() {
@@ -152,7 +236,8 @@ class CalculatorFragment : Fragment() {
         buttons.clearAll = expandedCalculatorBinding?.clearAll!!
         buttons.equal = expandedCalculatorBinding?.equal!!
 
-        expandedInputAdapter = ExpandedInputAdapter(requireContext(), buttons, viewModel, liveInput)
+        expandedInputAdapter =
+            ExpandedInputAdapter(requireActivity(), buttons, viewModel, liveInput)
         expandedInputAdapter.setBindings()
     }
 
@@ -200,12 +285,12 @@ class CalculatorFragment : Fragment() {
         buttons.clearAll = defaultCalculatorBinding?.clearAll!!
         buttons.equal = defaultCalculatorBinding?.equal!!
 
-        defaultInputAdapter = InputAdapter(requireContext(), buttons, viewModel, liveInput)
+        defaultInputAdapter = InputAdapter(requireActivity(), buttons, viewModel, liveInput)
         defaultInputAdapter.setBindings()
     }
 
     fun onInputChange() {
-        if (viewModel.formattedInput.isEmpty())
+        if (viewModel.inputAsTokens.isEmpty())
             defaultCalculatorBinding?.clearAll?.text = getText(R.string.all_cleared)
         else
             defaultCalculatorBinding?.clearAll?.text = getText(R.string.clear)
