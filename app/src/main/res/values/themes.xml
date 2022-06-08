@@ -6,7 +6,7 @@
     <style name="Theme.Calculator.DayNight" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/DayPrimary</item>
-        <item name="colorPrimaryVariant">@color/DayPrimaryLight</item>
+        <item name="colorPrimaryVariant">@color/NightPrimaryLight</item>
         <item name="colorOnPrimary">@color/DayTextOnPrimary</item>
 
         <!-- Secondary brand color. -->

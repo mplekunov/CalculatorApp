@@ -63,4 +63,6 @@
     <string name="default_color">%s</string>
     <string name="title">Title</string>
     <string name="summary">Summary</string>
+    <string name="cancel">Cancel</string>
+    <string name="apply">Apply</string>
 </resources>
