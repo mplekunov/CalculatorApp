@@ -84,7 +84,7 @@ abstract class Clickable(
     }
 
     override fun updateDrawState(ds: TextPaint) {
-        ds.isUnderlineText = false
+        ds.isUnderlineText = true
     }
 
     protected abstract val what: Clickable
@@ -144,21 +144,21 @@ abstract class Clickable(
     protected open fun replaceSpan(what: Clickable, token: Token, oldToken: Token) {
         val formattedString = TokenFormatter.convertTokenToString(oldToken, false)
 
-//        var frontOffset = Algorithms.findStartingPosOfPattern(formattedString, oldToken.toString())
-//        var backOffset = formattedString.length - (oldToken.toString().length + frontOffset)
+        var frontOffset = Algorithms.findStartingPosOfPattern(formattedString, oldToken.toString())
+        var backOffset = formattedString.length - (oldToken.toString().length + frontOffset)
 
         val newFormattedString = TokenFormatter.convertTokenToString(token, false)
 
-        val oldStart = start - 1 /*- frontOffset*/
-        val oldEnd = end /*+ backOffset*/
+        val oldStart = start - frontOffset
+        val oldEnd = end + backOffset
 
         spannable.replace(oldStart, oldEnd, newFormattedString)
 
-//        frontOffset = Algorithms.findStartingPosOfPattern(newFormattedString, token.toString())
-//        backOffset = newFormattedString.length - (token.toString().length + frontOffset)
+        frontOffset = Algorithms.findStartingPosOfPattern(newFormattedString, token.toString())
+        backOffset = newFormattedString.length - (token.toString().length + frontOffset)
 
-        start = oldStart + 1 /*+ frontOffset*/
-        end = oldStart + newFormattedString.length /*- backOffset*/
+        start = oldStart + frontOffset
+        end = oldStart + newFormattedString.length - backOffset
 
         spannable.setSpan(what, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 

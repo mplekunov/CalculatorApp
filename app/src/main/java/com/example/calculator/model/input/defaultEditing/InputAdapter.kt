@@ -51,10 +51,6 @@ open class InputAdapter(
         }
     }
 
-    // AddSpan -> Adds New Span at the end of the spannable
-    // UpdateSpan -> Updates Span at the specified index
-    // RemoveSpan -> Removes Span at the end of the spannable
-
     open fun setBindings() {
         buttons.equal.setOnClickListener {
             viewModel.saveResult()
@@ -141,8 +137,11 @@ open class InputAdapter(
             val what = getWhat(token.type, i)
             spanMap[i] = what
 
+            val frontOffset = Algorithms.findStartingPosOfPattern(formattedString, token.toString())
+            val backOffset = formattedString.length - (token.toString().length + frontOffset)
+
             if (what != null)
-                spannable.setSpan(spanMap[i]!!, start + 1, start + formattedString.length)
+                spannable.setSpan(spanMap[i]!!, start + frontOffset, start + formattedString.length - backOffset)
 
             start += formattedString.length
         }
@@ -154,14 +153,17 @@ open class InputAdapter(
 
         val formattedString = TokenFormatter.convertTokenToString(token, false)
 
-        val start = spannable.getSpanStart(what) - 1
-        val end = spannable.getSpanEnd(what)
+        val frontOffset = Algorithms.findStartingPosOfPattern(formattedString, token.toString())
+        val backOffset = formattedString.length - (token.toString().length + frontOffset)
+
+        val start = spannable.getSpanStart(what) - frontOffset
+        val end = spannable.getSpanEnd(what) + backOffset
 
         spannable.replace(start, end, formattedString)
 
         spanMap.replace(index, getWhat(token.type, index)!!)
 
-        spannable.setSpan(spanMap[index]!!, start + 1, start + formattedString.length)
+        spannable.setSpan(spanMap[index]!!, start + frontOffset, start + formattedString.length - backOffset)
 
         spannableInput.value = spannable
     }
@@ -180,9 +182,12 @@ open class InputAdapter(
 
             val what = getWhat(token.type, i)
 
+            val frontOffset = Algorithms.findStartingPosOfPattern(formattedString, token.toString())
+            val backOffset = formattedString.length - (token.toString().length + frontOffset)
+
             if (what != null) {
                 spanMap[i] = what
-                spannable.setSpan(spanMap[i]!!, start + 1, spannable.length)
+                spannable.setSpan(spanMap[i]!!, start + frontOffset, spannable.length - backOffset)
             }
         }
 

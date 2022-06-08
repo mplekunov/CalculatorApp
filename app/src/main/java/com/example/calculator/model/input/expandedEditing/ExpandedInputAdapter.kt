@@ -85,11 +85,6 @@ class ExpandedInputAdapter(
         val what = spanMap[index]
         val token = viewModel.inputAsTokens[index]
 
-//        val formattedString = TokenFormatter.convertTokenToString(token, false)
-//
-////        val frontOffset = Algorithms.findStartingPosOfPattern(formattedString, token.toString())
-////        val backOffset = formattedString.length - (token.length + frontOffset)
-
         val start = spannable.getSpanStart(what)
         val end = spannable.getSpanEnd(what)
 
