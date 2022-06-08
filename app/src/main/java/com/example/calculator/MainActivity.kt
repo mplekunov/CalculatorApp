@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
         val typedValue = TypedValue()
         theme.resolveAttribute(com.google.android.material.R.attr.colorOnPrimary, typedValue, true)
 
-//        settingsManager.setColor(R.string.saved_input_font_color_key, ContextCompat.getColor(this, typedValue.resourceId))
+        settingsManager.setColor(R.string.saved_input_font_color_key, ContextCompat.getColor(this, typedValue.resourceId))
         settingsManager.setColor(R.string.saved_output_font_color_key, ContextCompat.getColor(this, typedValue.resourceId))
 
         settingsManager.setColor(R.string.saved_number_button_color_key, ContextCompat.getColor(this, typedValue.resourceId))
