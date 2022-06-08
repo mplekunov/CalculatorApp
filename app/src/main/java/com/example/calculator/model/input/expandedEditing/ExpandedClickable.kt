@@ -79,7 +79,6 @@ abstract class ExpandedClickable(
         liveInput.value = spannable
     }
 
-
     override fun replaceSpan(what: Clickable, token: Token, oldToken: Token) {
         super.replaceSpan(what, token, oldToken)
 
@@ -87,10 +86,10 @@ abstract class ExpandedClickable(
             val drawable = buttons.functions[FunctionParser.parse<FunctionKind>(token)]!!.drawable.constantState!!.newDrawable().mutate()
 
             val size: Int = activity.findViewById<TextView>(R.id.input).textSize.toInt()
-            drawable.setBounds(0, 0,  (size / 1.2).roundToInt(), (size / 1.2).roundToInt())
+            drawable.setBounds(0, 0,  (size / 1.3).roundToInt(), (size / 1.3).roundToInt())
 
             if (FunctionParser.parse<FunctionKind>(token) == FunctionKind.LOG)
-                drawable.setBounds(0, 0, (size * 1.5).roundToInt(), size)
+                drawable.setBounds(0, 0, (size * 1.4).roundToInt(), size)
 
             setDrawableSpan(drawable, highlightedColor)
         }

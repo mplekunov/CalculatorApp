@@ -149,7 +149,7 @@ abstract class Clickable(
 
         val newFormattedString = TokenFormatter.convertTokenToString(token, false)
 
-        val oldStart = start /*- frontOffset*/
+        val oldStart = start - 1 /*- frontOffset*/
         val oldEnd = end /*+ backOffset*/
 
         spannable.replace(oldStart, oldEnd, newFormattedString)
@@ -157,7 +157,7 @@ abstract class Clickable(
 //        frontOffset = Algorithms.findStartingPosOfPattern(newFormattedString, token.toString())
 //        backOffset = newFormattedString.length - (token.toString().length + frontOffset)
 
-        start = oldStart /*+ frontOffset*/
+        start = oldStart + 1 /*+ frontOffset*/
         end = oldStart + newFormattedString.length /*- backOffset*/
 
         spannable.setSpan(what, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)

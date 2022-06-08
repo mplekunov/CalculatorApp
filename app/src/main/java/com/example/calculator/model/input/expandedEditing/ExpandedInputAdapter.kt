@@ -103,10 +103,10 @@ class ExpandedInputAdapter(
 
         drawable.setTint(activity.getColor(typedValue.resourceId))
         val size: Int = activity.findViewById<TextView>(R.id.input).textSize.toInt()
-        drawable.setBounds(0, 0,  (size / 1.2).roundToInt(), (size / 1.2).roundToInt())
+        drawable.setBounds(0, 0,  (size / 1.3).roundToInt(), (size / 1.3).roundToInt())
 
         if (FunctionParser.parse<FunctionKind>(token) == FunctionKind.LOG)
-            drawable.setBounds(0, 0, (size * 1.5).roundToInt(), size)
+            drawable.setBounds(0, 0, (size * 1.4).roundToInt(), size)
 
         spannable.setSpan(
             ImageSpan(

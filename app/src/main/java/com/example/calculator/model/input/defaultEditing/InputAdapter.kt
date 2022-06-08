@@ -6,9 +6,13 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import com.example.calculator.algorithm.Algorithms
 import com.example.calculator.formatter.TokenFormatter
+import com.example.calculator.model.function.FunctionKind
+import com.example.calculator.model.operator.OperatorKind
 import com.example.calculator.model.token.Token
 import com.example.calculator.model.token.TokenTypes
 import com.example.calculator.model.wrapper.Buttons
+import com.example.calculator.parser.FunctionParser
+import com.example.calculator.parser.OperatorParser
 import com.example.calculator.viewmodel.CalculatorViewModel
 import java.lang.reflect.TypeVariable
 
@@ -22,7 +26,7 @@ open class InputAdapter(
 
     companion object {
         @JvmStatic
-        protected val spanMap = HashMap<Int, Clickable>()
+        protected val spanMap = HashMap<Int, Clickable?>()
     }
 
     val spannable = spannableInput.value ?: SpannableStringBuilder()
@@ -47,15 +51,9 @@ open class InputAdapter(
         }
     }
 
-    protected fun getLastToken(): Token? {
-        return if (viewModel.inputAsTokens.isNotEmpty()) viewModel.inputAsTokens.last()
-        else null
-    }
-
-
-    // If prevIndex == lastIndex => Either Added or Removed From/To Current Token
-    // If prevIndex < lastIndex => Added one or more new Tokens
-    // If prevIndex > lastIndex => Removed one or more old Tokens
+    // AddSpan -> Adds New Span at the end of the spannable
+    // UpdateSpan -> Updates Span at the specified index
+    // RemoveSpan -> Removes Span at the end of the spannable
 
     open fun setBindings() {
         buttons.equal.setOnClickListener {
@@ -68,13 +66,21 @@ open class InputAdapter(
         buttons.clear.setOnClickListener {
             val prevIndex = lastIndex
 
+            val old = mutableListOf<Token>().apply{ addAll(viewModel.inputAsTokens) }
+
             if (viewModel.delete()) {
                 if (viewModel.inputAsTokens.lastIndex < 0)
                     resetSpannableInput()
                 else {
                     when {
                         prevIndex == lastIndex -> updateSpan(prevIndex)
-                        prevIndex > lastIndex -> removeSpan(prevIndex)
+                        prevIndex > lastIndex -> {
+                            var start = 0
+                            for (i in prevIndex downTo lastIndex + 1)
+                                start += TokenFormatter.convertTokenToString(old[i], false).length
+
+                            removeSpan(spannable.length - start, spannable.length)
+                        }
                     }
                 }
             }
@@ -123,6 +129,23 @@ open class InputAdapter(
                 }
             }
         }
+
+        val clickableSpans = spannable.getSpans(0, spannable.length, Clickable::class.java)
+        clickableSpans.forEach { what -> spannable.removeSpan(what) }
+
+        var start = 0
+        for (i in viewModel.inputAsTokens.indices) {
+            val token = viewModel.inputAsTokens[i]
+            val formattedString = TokenFormatter.convertTokenToString(token, false)
+
+            val what = getWhat(token.type, i)
+            spanMap[i] = what
+
+            if (what != null)
+                spannable.setSpan(spanMap[i]!!, start + 1, start + formattedString.length)
+
+            start += formattedString.length
+        }
     }
 
     protected open fun updateSpan(index: Int) {
@@ -131,14 +154,14 @@ open class InputAdapter(
 
         val formattedString = TokenFormatter.convertTokenToString(token, false)
 
-        val start = spannable.getSpanStart(what)
+        val start = spannable.getSpanStart(what) - 1
         val end = spannable.getSpanEnd(what)
 
         spannable.replace(start, end, formattedString)
 
         spanMap.replace(index, getWhat(token.type, index)!!)
 
-        spannable.setSpan(spanMap[index]!!, start, start + formattedString.length)
+        spannable.setSpan(spanMap[index]!!, start + 1, start + formattedString.length)
 
         spannableInput.value = spannable
     }
@@ -155,25 +178,19 @@ open class InputAdapter(
 
             spannable.replace(spannable.length, spannable.length, formattedString)
 
-            spanMap[i] = getWhat(token.type, i)!!
+            val what = getWhat(token.type, i)
 
-            spannable.setSpan(spanMap[i]!!, start, spannable.length)
+            if (what != null) {
+                spanMap[i] = what
+                spannable.setSpan(spanMap[i]!!, start + 1, spannable.length)
+            }
         }
 
         spannableInput.value = spannable
     }
 
-    protected open fun removeSpan(index: Int) {
-        for (i in index downTo viewModel.inputAsTokens.lastIndex + 1) {
-            val what = spanMap[i]
-
-            val start = spannable.getSpanStart(what)
-            val end = spannable.getSpanEnd(what)
-
-            spannable.delete(start, end)
-
-            spanMap.remove(i)
-        }
+    protected open fun removeSpan(start: Int, end: Int) {
+        spannable.delete(start, end)
 
         spannableInput.value = spannable
     }
@@ -188,11 +205,10 @@ open class InputAdapter(
         spannableInput.value = this@setSpan
     }
 
-    private fun SpannableStringBuilder.clearAll() {
+    protected fun SpannableStringBuilder.clearAll() {
         this@clearAll.clearSpans()
         this@clearAll.clear()
 
         spannableInput.value = this@clearAll
     }
 }
-
