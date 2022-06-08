@@ -84,7 +84,7 @@ abstract class Clickable(
     }
 
     override fun updateDrawState(ds: TextPaint) {
-        ds.isUnderlineText = true
+        ds.isUnderlineText = false
     }
 
     protected abstract val what: Clickable
